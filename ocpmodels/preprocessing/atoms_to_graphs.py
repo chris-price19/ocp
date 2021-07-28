@@ -64,6 +64,8 @@ class AtomsToGraphs:
         r_distances=False,
         r_edges=True,
         r_fixed=True,
+        r_sid = True,
+        r_tags = True,
     ):
         self.max_neigh = max_neigh
         self.radius = radius
@@ -72,6 +74,8 @@ class AtomsToGraphs:
         self.r_distances = r_distances
         self.r_fixed = r_fixed
         self.r_edges = r_edges
+        self.r_sid = r_sid
+        self.r_tags = r_tags
 
     def _get_neighbors_pymatgen(self, atoms):
         """Preforms nearest neighbor search and returns edge index, distances,
@@ -152,9 +156,11 @@ class AtomsToGraphs:
 
             data.edge_index = edge_index
             data.cell_offsets = cell_offsets
-        if self.r_energy:
+        if self.r_energy == True:
             energy = atoms.get_potential_energy(apply_constraint=False)
             data.y = energy
+        elif self.r_energy == 'pass_through':
+            data.y = atoms.info['energy']
         if self.r_forces:
             forces = torch.Tensor(atoms.get_forces(apply_constraint=False))
             data.force = forces
@@ -169,6 +175,12 @@ class AtomsToGraphs:
                     if isinstance(constraint, FixAtoms):
                         fixed_idx[constraint.index] = 1
             data.fixed = fixed_idx
+
+        if self.r_sid:
+            data.sid = atoms.info['sid']
+
+        if self.r_tags:
+            data.tags = torch.LongTensor(atoms.info['tags'])
 
         return data
 
