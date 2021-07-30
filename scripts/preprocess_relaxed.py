@@ -112,21 +112,21 @@ if __name__ == "__main__":
         required=True,
         help="Path to ID trajectories",
     )
-    parser.add_argument(
-        "--ood-ads",
-        required=True,
-        help="Path to OOD-Ads trajectories",
-    )
-    parser.add_argument(
-        "--ood-cat",
-        required=True,
-        help="Path to OOD-Cat trajectories",
-    )
-    parser.add_argument(
-        "--ood-both",
-        required=True,
-        help="Path to OOD-Both trajectories",
-    )
+    # parser.add_argument(
+    #     "--ood-ads",
+    #     required=True,
+    #     help="Path to OOD-Ads trajectories",
+    # )
+    # parser.add_argument(
+    #     "--ood-cat",
+    #     required=True,
+    #     help="Path to OOD-Cat trajectories",
+    # )
+    # parser.add_argument(
+    #     "--ood-both",
+    #     required=True,
+    #     help="Path to OOD-Both trajectories",
+    # )
     parser.add_argument(
         "--out-path",
         required=True,
@@ -141,5 +141,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    for split in ["id", "ood_ads", "ood_cat", "ood_both"]:
+    for split in ["id"]: #, "ood_ads", "ood_cat", "ood_both"]:
         main(args, split)
