@@ -44,7 +44,7 @@ a2g_rlx = AtomsToGraphs(
 
 
 ## train lmdb
-dbloc = {"src": datadir + 'is2re/100k/train/data.lmdb'}
+dbloc = {"src": datadir + 'is2re/all/train/data.lmdb'}
 
 traindb = SinglePointLmdbDataset(dbloc)
 
@@ -66,7 +66,7 @@ print(len(glist))
 # print(glist)
 # sys.exit()
 target_col = "y_relaxed"
-mean, std = write_lmbd(glist, target_col, datadir + 'is2re/100k/train', 'binaryCu-relax.lmdb')
+mean, std = write_lmbd(glist, target_col, datadir + 'is2re/all/train', 'binaryCu-relax.lmdb')
 print(mean)
 print(std)
 

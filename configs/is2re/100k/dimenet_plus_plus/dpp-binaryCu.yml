@@ -5,13 +5,13 @@ model:
   name: dimenetplusplus
   hidden_channels: 64
   out_emb_channels: 48
-  num_blocks: 1
+  num_blocks: 2
   cutoff: 6.0 # should this match the a2g radius in the dataset? probably. or is this for regenerating graph on the fly..
   num_radial: 6 # size of the basis set
   num_spherical: 7 # size of the basis set
   num_before_skip: 1
   num_after_skip: 2
-  num_output_layers: 2
+  num_output_layers: 3
   regress_forces: False
   use_pbc: True
 
@@ -21,8 +21,8 @@ model:
 #   the lr_milestones and warmup_steps need to be adjusted accordingly.
 
 optim:
-  batch_size: 6
-  eval_batch_size: 6
+  batch_size: 12
+  eval_batch_size: 12
   num_workers: 1
   lr_initial: 0.0001
   lr_gamma: 0.1
@@ -32,4 +32,4 @@ optim:
     - 600000
   warmup_steps: 100000
   warmup_factor: 0.2
-  max_epochs: 20
+  max_epochs: 100
