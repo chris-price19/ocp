@@ -3,15 +3,15 @@ includes:
 
 model:
   name: dimenetplusplus
-  hidden_channels: 128
-  out_emb_channels: 96
-  num_blocks: 2
+  hidden_channels: 64
+  out_emb_channels: 48
+  num_blocks: 1
   cutoff: 6.0 # should this match the a2g radius in the dataset? probably. or is this for regenerating graph on the fly..
   num_radial: 6 # size of the basis set
   num_spherical: 7 # size of the basis set
   num_before_skip: 1
   num_after_skip: 2
-  num_output_layers: 3
+  num_output_layers: 2
   regress_forces: False
   use_pbc: True
 

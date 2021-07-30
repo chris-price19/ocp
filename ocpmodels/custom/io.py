@@ -26,6 +26,7 @@ def write_lmbd(data_objects, target_col, location, filename):
 
         # Filter data if necessary
         # OCP filters adsorption energies > |10| eV and forces > |50| eV/A
+        data.fid = fid
 
         # compute mean and std.
         target.append(data.y_relaxed)

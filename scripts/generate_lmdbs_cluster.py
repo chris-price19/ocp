@@ -58,15 +58,10 @@ for bi, bb in enumerate(binary_inds):
     
     rlxatoms = relaxed_atoms_from_lmdb(traindb, bb)
     surfatoms = filter_atoms_by_tag(rlxatoms, keep=np.array([1,2]))
-    surfgraph = a2g_rlx.convert(surfatoms)
-    
-#     fig, ax = plt.subplots(1, 2, figsize=(16,8))
-#     plot_atoms(rlxatoms, ax[0], radii=0.8, rotation=("0x, 90y, 0z"))
-#     plot_atoms(surfatoms, ax[1], radii=0.8, rotation=("0x, 90y, 0z"))
-#     break
 
-    glist.append(surfgraph)
-    
+    glist.append(surfatoms)
+
+glist = a2g_rlx.convert_all(glist)    
 print(len(glist))
 # print(glist)
 # sys.exit()
@@ -77,35 +72,35 @@ print(std)
 
 
 
-## validation lmdb
-dbloc = {"src": datadir + 'is2re/all/val_id/data.lmdb'}
+# ## validation lmdb
+# dbloc = {"src": datadir + 'is2re/all/val_id/data.lmdb'}
 
-valdb = SinglePointLmdbDataset(dbloc)
+# valdb = SinglePointLmdbDataset(dbloc)
 
-binary_inds = sids2inds(valdb, list(binary_coppers.keys()))
+# binary_inds = sids2inds(valdb, list(binary_coppers.keys()))
 
-print(valdb[binary_inds[0]])
-print(len(binary_inds))
+# print(valdb[binary_inds[0]])
+# print(len(binary_inds))
 
-# sys.exit()
-glist = []
-for bi, bb in enumerate(binary_inds):
+# # sys.exit()
+# glist = []
+# for bi, bb in enumerate(binary_inds):
     
-    rlxatoms = relaxed_atoms_from_lmdb(valdb, bb)
-    surfatoms = filter_atoms_by_tag(rlxatoms, keep=np.array([1,2]))
-    surfgraph = a2g_rlx.convert(surfatoms)
+#     rlxatoms = relaxed_atoms_from_lmdb(valdb, bb)
+#     surfatoms = filter_atoms_by_tag(rlxatoms, keep=np.array([1,2]))
+#     surfgraph = a2g_rlx.convert(surfatoms)
     
-#     fig, ax = plt.subplots(1, 2, figsize=(16,8))
-#     plot_atoms(rlxatoms, ax[0], radii=0.8, rotation=("0x, 90y, 0z"))
-#     plot_atoms(surfatoms, ax[1], radii=0.8, rotation=("0x, 90y, 0z"))
-#     break
+# #     fig, ax = plt.subplots(1, 2, figsize=(16,8))
+# #     plot_atoms(rlxatoms, ax[0], radii=0.8, rotation=("0x, 90y, 0z"))
+# #     plot_atoms(surfatoms, ax[1], radii=0.8, rotation=("0x, 90y, 0z"))
+# #     break
 
-    glist.append(surfgraph)
+#     glist.append(surfgraph)
     
-print(len(glist))
-print(glist[0])
-# sys.exit()
-target_col = "y_relaxed"
-mean, std = write_lmbd(glist, target_col, datadir + 'is2re/all/val_id', 'binaryCu-relax.lmdb')
-print(mean)
-print(std)
+# print(len(glist))
+# print(glist[0])
+# # sys.exit()
+# target_col = "y_relaxed"
+# mean, std = write_lmbd(glist, target_col, datadir + 'is2re/all/val_id', 'binaryCu-relax.lmdb')
+# print(mean)
+# print(std)
