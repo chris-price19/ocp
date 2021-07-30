@@ -40,11 +40,11 @@ def write_lmbd(data_objects, target_col, location, filename):
         txn.put(f"{fid}".encode("ascii"), pickle.dumps(data, protocol=-1))
         txn.commit()
 
-    txn = db.begin(write=True)
-    txn.put(f"length".encode("ascii"), pickle.dumps(len(data_objects), protocol=-1))
-    txn.commit()
+        # txn = db.begin(write=True)
+        # txn.put(f"length".encode("ascii"), pickle.dumps(len(data_objects), protocol=-1))
+        # txn.commit()
+        db.sync()
 
-    db.sync()
     db.close()
     
     mean = np.mean(target)
