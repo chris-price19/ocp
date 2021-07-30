@@ -7,8 +7,8 @@ model:
   out_emb_channels: 96
   num_blocks: 2
   cutoff: 6.0 # should this match the a2g radius in the dataset? probably. or is this for regenerating graph on the fly..
-  num_radial: 6
-  num_spherical: 7
+  num_radial: 6 # size of the basis set
+  num_spherical: 7 # size of the basis set
   num_before_skip: 1
   num_after_skip: 2
   num_output_layers: 3
@@ -23,7 +23,7 @@ model:
 optim:
   batch_size: 6
   eval_batch_size: 6
-  num_workers: 8
+  num_workers: 1
   lr_initial: 0.0001
   lr_gamma: 0.1
   lr_milestones: # steps at which lr_initial <- lr_initial * lr_gamma

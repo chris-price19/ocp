@@ -158,9 +158,9 @@ class AtomsToGraphs:
             data.cell_offsets = cell_offsets
         if self.r_energy == True:
             energy = atoms.get_potential_energy(apply_constraint=False)
-            data.y = energy
+            data.y_relaxed = energy
         elif self.r_energy == 'pass_through':
-            data.y = atoms.info['energy']
+            data.y_relaxed = atoms.info['energy']
         if self.r_forces:
             forces = torch.Tensor(atoms.get_forces(apply_constraint=False))
             data.force = forces
