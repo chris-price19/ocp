@@ -63,6 +63,29 @@ def relaxed_atoms_from_lmdb(db, ind):
     return atoms
 
 
+def filter_atoms_by_tag(atoms, keep = None):
+    
+    atoms = atoms.copy()
+    # print(atoms)
+    
+    if keep is None:
+        keep = np.unique(atoms.info['tags'])
+    
+    icount = 0
+    # print(np.unique(atoms.info['tags']))
+    # print(np.unique(atoms.info['tags']).shape)
+    # print(type(np.unique(keep)))
+        
+    while not np.array_equal(np.unique(atoms.info['tags']), np.unique(keep)):
+        if atoms.info['tags'][icount] in keep:
+            icount += 1
+        else:
+            atoms.pop(icount)
+            atoms.info['tags'] = np.delete(atoms.info['tags'], icount)
+    
+    return atoms
+
+
 def plot_atom_graph(data_obj):
     
     fig, ax = plt.subplots(1,1,figsize=(8,8))
