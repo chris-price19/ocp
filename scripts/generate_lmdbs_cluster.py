@@ -57,7 +57,7 @@ def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outdir, outf
         p1 = AseAtomsAdaptor.get_structure(rlxatoms)
         p1 = reorient_z(p1)
         compareatoms = AseAtomsAdaptor.get_atoms(p1)
-
+l
         if np.amax(np.abs(compareatoms.cell - rlxatoms.cell)) > 1e-4:
             print('atoms 1')
             print(rlxatoms)
@@ -113,8 +113,8 @@ train_sids, test_sids  = [i.to_dict() for i in train_test_split(s, train_size=tr
 # filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, binary_coppers, a2g_rlx, datadir + 'is2re/all/train/', binaryCu-relax.lmdb')
 
 ## train/test split in-domain
-# filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, train_sids, a2g_rlx, datadir + 'is2re/all/train/', 'binaryCu-relax.lmdb')
-# filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, test_sids, a2g_rlx, datadir + 'is2re/all/test_id/', 'binaryCu-relax.lmdb')
+filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, train_sids, a2g_rlx, datadir + 'is2re/all/train/', 'binaryCu-relax-split.lmdb')
+filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, test_sids, a2g_rlx, datadir + 'is2re/all/test_id/', 'binaryCu-relax-split.lmdb')
 
 
 filter_lmdbs_and_graphs(datadir + 'is2re/all/val_id/data.lmdb', map_dict, binary_coppers, a2g_rlx, datadir + 'is2re/all/val_id/', 'binaryCu-relax.lmdb')
