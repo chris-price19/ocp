@@ -43,6 +43,11 @@ def generate_strain_tensors(number_of_tensors, max_mag = 0.01, man_override = No
             eps[0,1] += ecoords[2]
             eps[1,0] += ecoords[2]
 
+            # eps[1,0] += ecoords[2]
+            # eps[1,0] += ecoords[2]
+            # eps[1,0] += ecoords[2]
+            # eps[1,0] += ecoords[2]
+
             e = StrainTensor(ii+1, eps)
 
             strain_tensor_list.append(e)
@@ -56,8 +61,8 @@ def generate_strain_tensors(number_of_tensors, max_mag = 0.01, man_override = No
             eps = np.eye(3)
             eps[0,0] += ecoords[0]
             eps[1,1] += ecoords[1]
-            eps[0,1] += ecoords[2]
-            eps[1,0] += ecoords[2]
+            eps[0,1] += ecoords[2]/2
+            eps[1,0] += ecoords[2]/2
 
             e = StrainTensor(ii+1, eps)
 
@@ -69,7 +74,11 @@ def strain_atoms(atoms, eps):
 
     ## eps is a 3x3 deformation gradient matrix (symmetric)
     ## default = np.eye(3)
+
     epsilon = eps.eps
+    # epsilon = eps
+
+    # d = pmgst.convert_strain_to_deformation(epsilon, shape='symmetric')
 
     strainatoms = atoms.copy()
     save_constraints = atoms.constraints.copy()
@@ -79,6 +88,8 @@ def strain_atoms(atoms, eps):
     p1 = AseAtomsAdaptor.get_structure(strainatoms)
 
     d = pmgst.Deformation(epsilon)
+    # print('***')
+    # print(d.green_lagrange_strain)
     p2 = d.apply_to_structure(p1)
 
     strainatoms = AseAtomsAdaptor.get_atoms(p2)
@@ -88,3 +99,5 @@ def strain_atoms(atoms, eps):
     strainatoms.info['eid'] = eps.eid
 
     return strainatoms
+
+
