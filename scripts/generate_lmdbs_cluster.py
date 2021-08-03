@@ -7,6 +7,9 @@ from ocpmodels.custom import *
 
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
+
+
 
 import sys
 import os
@@ -23,13 +26,14 @@ from ase.visualize.plot import plot_atoms
 from pymatgen.analysis.adsorption import reorient_z
 from pymatgen.io.ase import AseAtomsAdaptor
 
+import random
+
 import lmdb
 from tqdm import tqdm
 import pickle
 
 
-
-def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outfile):
+def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outdir, outfile):
 
     ## train lmdb
     dbloc = {"src": datadir }
@@ -68,7 +72,7 @@ def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outfile):
     glist = graph_builder.convert_all(glist)    
 
     target_col = "y_relaxed"
-    mean, std = write_lmbd(glist, target_col, os.path.dirname(datadir), outfile )
+    mean, std = write_lmbd(glist, target_col, outdir, outfile)
     print(mean)
     print(std)
 
@@ -96,17 +100,24 @@ a2g_rlx = AtomsToGraphs(
 train_frac = 0.9
 test_frac = 0.1
 
-cutoff = np.ceil(len(binary_coppers) * test_frac)
+s = pd.Series(binary_coppers)
+train_sids, test_sids  = [i.to_dict() for i in train_test_split(s, train_size=train_frac)]
+# cutoff = np.ceil(len(binary_coppers) * test_frac)
 
-np.random.shuffle(binary_coppers)
+# np.random.shuffle(binary_coppers)
 
-test_sids = binary_coppers[0:cutoff]
-train_sids = binary_coppers[cutoff:]
+# test_sids = binary_coppers[0:cutoff]
+# train_sids = binary_coppers[cutoff:]
 
-# filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, binary_coppers, a2g_rlx, 'binaryCu-relax.lmdb')
+## all train
+# filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, binary_coppers, a2g_rlx, datadir + 'is2re/all/train/', binaryCu-relax.lmdb')
+
+## train/test split in-domain
+# filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, train_sids, a2g_rlx, datadir + 'is2re/all/train/', 'binaryCu-relax.lmdb')
+# filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, test_sids, a2g_rlx, datadir + 'is2re/all/test_id/', 'binaryCu-relax.lmdb')
 
 
-filter_lmdbs_and_graphs(datadir + 'is2re/all/val_id/data.lmdb', map_dict, binary_coppers, a2g_rlx, 'binaryCu-relax.lmdb')
+filter_lmdbs_and_graphs(datadir + 'is2re/all/val_id/data.lmdb', map_dict, binary_coppers, a2g_rlx, datadir + 'is2re/all/val_id/', 'binaryCu-relax.lmdb')
 
 
 ## validation lmdb
