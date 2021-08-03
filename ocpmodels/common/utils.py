@@ -271,6 +271,7 @@ def update_config(original, update):
 
 
 def build_config(args, args_override):
+    print(args_override)
     config = yaml.safe_load(open(args.config_yml, "r"))
 
     # Load config from included files.

@@ -53,5 +53,5 @@ done
 
 #### call your code below
 # e.g. python path_to/run_tune.py --mode train --config-yml path_to/configs/s2ef/200k/forcenet/fn_forceonly.yml --run_dir path_to_run_dir
-python ~/mem/chrispr/catalysis/ocp/scripts/hpo/run_tune.py --mode train --config-yml ~/mem/chrispr/catalysis/ocp/configs/is2re/all/dimenet_plus_plus/dpp-binaryCu.yml --run_dir ~/mem/chrispr/catalysis/experiments
+python ~/mem/chrispr/catalysis/ocp/scripts/hpo/run_tune.py --mode=train --config-yml=~/mem/chrispr/catalysis/ocp/configs/is2re/all/dimenet_plus_plus/dpp-binaryCu.yml --run_dir=~/mem/chrispr/catalysis/experiments
 exit
