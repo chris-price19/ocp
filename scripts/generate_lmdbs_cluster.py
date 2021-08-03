@@ -57,7 +57,7 @@ def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outdir, outf
         p1 = AseAtomsAdaptor.get_structure(rlxatoms)
         p1 = reorient_z(p1)
         compareatoms = AseAtomsAdaptor.get_atoms(p1)
-l
+
         if np.amax(np.abs(compareatoms.cell - rlxatoms.cell)) > 1e-4:
             print('atoms 1')
             print(rlxatoms)
