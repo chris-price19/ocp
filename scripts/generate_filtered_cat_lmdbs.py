@@ -25,11 +25,14 @@ import pickle
 # datadir = '/home/ccprice/catalysis-data/ocp/data/'
 datadir = '/backup/chris/catalysis-staging/slab_trajectories/'
 cat_map = np.load(datadir + 'mapping_adslab_slab.pkl', allow_pickle=True)
+map_dict = np.load(datadir + 'oc20_data_mapping.pkl', allow_pickle=True)
 
 regexp = re.compile(r'Cu')
 binary_coppers = regex_symbol_filter(map_dict, regexp, 2)
 
 binary_cids = get_cat_sids(cat_map, list(binary_coppers.keys()))
+
+binary_cids = binary_cids[0:10]
 
 filename = 'binaryCu-cat-relax.lmdb'
 
@@ -72,7 +75,7 @@ for ci, cc in enumerate(binary_cids):
         print(atoms)
         print('atoms 2')
         print(compareatoms)
-        return
+        break
 
     data = a2g_rlx.convert(atoms)
        
