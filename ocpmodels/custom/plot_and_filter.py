@@ -22,10 +22,10 @@ def get_cat_sids(cat_map, sids):
     # if isinstance(sids[0], str):
     #     sids = [int(i.split('random')[-1]) for i in sids]
 
-    print(len(cat_map))
-    print(len(sids))
+    # print(len(cat_map))
+    # print(len(sids))
     
-    cids_int = [int(value.split('random')[-1]) for (key, value) in list(cat_map.items()) if key in set(sids)]
+    cids_int = [cat_map[key] for key in list(binary_coppers.keys()) if key in set(cat_map.keys())]
 
     # cids = [ii for ii in list(cat_map.items()) if ii[0] in sids]
     

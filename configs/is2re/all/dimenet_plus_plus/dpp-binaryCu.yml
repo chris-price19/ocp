@@ -1,5 +1,6 @@
 includes:
-- configs/is2re/100k/binaryCu.yml
+# - configs/is2re/100k/binaryCu.yml
+- configs/is2re/100k/binaryCu-hpo.yml
 
 model:
   name: dimenetplusplus

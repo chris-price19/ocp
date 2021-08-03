@@ -23,9 +23,9 @@ dataset:
     target_mean: -1.1955971954016584
     target_std: 2.279836063743405
 
-logger: tensorboard
-# logger: None
-# is_hpo: True
+# logger: tensorboard
+logger: None
+is_hpo: True
 
 task:
   dataset: single_point_lmdb
