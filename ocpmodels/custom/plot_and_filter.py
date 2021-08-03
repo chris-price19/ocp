@@ -21,6 +21,9 @@ def get_cat_sids(cat_map, sids):
     
     # if isinstance(sids[0], str):
     #     sids = [int(i.split('random')[-1]) for i in sids]
+
+    print(len(cat_map))
+    print(len(sids))
     
     cids_int = [int(value.split('random')[-1]) for (key, value) in list(cat_map.items()) if key in set(sids)]
 

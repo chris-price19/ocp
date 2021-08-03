@@ -33,6 +33,7 @@ binary_coppers = regex_symbol_filter(map_dict, regexp, 2)
 binary_cids = get_cat_sids(cat_map, list(binary_coppers.keys()))
 
 binary_cids = binary_cids[0:10]
+print(binary_cids)
 
 filename = 'binaryCu-cat-relax.lmdb'
 
@@ -57,7 +58,7 @@ a2g_rlx = AtomsToGraphs(
 
 for ci, cc in enumerate(binary_cids):
 
-    filename = 'slab_trajectories/random' + str(cc) + '.extxyz.xz'
+    file = 'slab_trajectories/random' + str(cc) + '.extxyz.xz'
     atoms = read_lzma_to_atoms(datadir + file)
     tags = [i.tag for i in atoms]
     atoms.info['tags'] = tags
