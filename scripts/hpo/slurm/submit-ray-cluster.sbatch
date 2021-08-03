@@ -1,20 +1,26 @@
 #!/bin/bash
 
-#SBATCH -C gpu
-#SBATCH --time=00:10:00
-
-### This script works for any number of nodes, Ray will find and manage all resources
+#SBATCH --job-name=h1c2
+#SBATCH --time=0-12:00:00
 #SBATCH --nodes=1
-
-### Give all resources to a single Ray task, ray can manage the resources internally
+##SBATCH --tasks-per-node=32
+#SBATCH --mem-per-cpu=3900
+#SBATCH -e err.%j
+#SBATCH -C "[ib1|ib2|ib3|ib4]"
+#SBATCH --partition g_vsheno
+#SBATCH --constraint=gpu
+#SBATCH --gres=gpu:gk210gl:8
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-task=8
-#SBATCH --cpus-per-task=80
+#SBATCH --cpus-per-task=32
+
+### This script works for any number of nodes, Ray will find and manage all resources
+### Give all resources to a single Ray task, ray can manage the resources internally
 
 
 # Load modules or your own conda environment here
 # e.g. conda activate ocp-models
-
+conda activate ocp-models
 ################# DON NOT CHANGE THINGS HERE UNLESS YOU KNOW WHAT YOU ARE DOING ###############
 # This script is a modification to the implementation suggest by gregSchwartz18 here:
 # https://github.com/ray-project/ray/issues/826#issuecomment-522116599
@@ -47,4 +53,5 @@ done
 
 #### call your code below
 # e.g. python path_to/run_tune.py --mode train --config-yml path_to/configs/s2ef/200k/forcenet/fn_forceonly.yml --run_dir path_to_run_dir
+python scripts/hpo/run_tune.py --mode train --config-yml configs/is2re/all/dimenet_plus_plus/dpp-binaryCu.yml --run_dir ../experiments
 exit

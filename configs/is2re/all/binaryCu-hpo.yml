@@ -18,10 +18,10 @@ dataset:
     normalize_labels: True
     target_mean: -1.1955971954016584
     target_std: 2.279836063743405
-  - src: data/is2re/all/test_id/binaryCu-relax-split.lmdb
-    normalize_labels: True
-    target_mean: -1.1955971954016584
-    target_std: 2.279836063743405
+  # - src: data/is2re/all/test_id/binaryCu-relax-split.lmdb
+  #   normalize_labels: True
+  #   target_mean: -1.1955971954016584
+  #   target_std: 2.279836063743405
 
 # logger: tensorboard
 logger: None

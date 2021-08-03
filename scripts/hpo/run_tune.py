@@ -47,12 +47,20 @@ def main():
     args, override_args = parser.parse_known_args()
     config = build_config(args, override_args)
     # add parameters to tune using grid or random search
+    # config["model"].update(
+    #     hidden_channels=tune.choice([256, 384, 512, 640, 704]),
+    #     decoder_hidden_channels=tune.choice([256, 384, 512, 640, 704]),
+    #     depth_mlp_edge=tune.choice([1, 2, 3, 4, 5]),
+    #     depth_mlp_node=tune.choice([1, 2, 3, 4, 5]),
+    #     num_interactions=tune.choice([3, 4, 5, 6]),
+    # )
     config["model"].update(
-        hidden_channels=tune.choice([256, 384, 512, 640, 704]),
-        decoder_hidden_channels=tune.choice([256, 384, 512, 640, 704]),
-        depth_mlp_edge=tune.choice([1, 2, 3, 4, 5]),
-        depth_mlp_node=tune.choice([1, 2, 3, 4, 5]),
-        num_interactions=tune.choice([3, 4, 5, 6]),
+        hidden_channels=tune.choice([32, 64, 128]),
+        out_emb_channels=tune.choice([24, 48, 96]),
+        num_blocks=tune.choice([1, 2, 3]),
+        num_radial=tune.choice([4, 6, 8]),
+        num_spherical=tune.choice([3, 6, 7]),
+        num_output_layers=tune.choice([1,2,3,4]),
     )
     # define scheduler
     scheduler = ASHAScheduler(
@@ -83,14 +91,14 @@ def main():
             "epochs": "epochs",
             "training_iteration": "training_iteration",
             "val_loss": "val_loss",
-            "val_forces_mae": "val_forces_mae",
+            "energy_mae": "energy_mae",
         },
     )
 
     # define run parameters
     analysis = tune.run(
         ocp_trainable,
-        resources_per_trial={"cpu": 8, "gpu": 1},
+        resources_per_trial={"cpu": 4, "gpu": 1},
         config=config,
         fail_fast=False,
         local_dir=config.get("run_dir", "./"),
@@ -102,7 +110,7 @@ def main():
     print(
         "Best config is:",
         analysis.get_best_config(
-            metric="val_forces_mae", mode="min", scope="last"
+            metric="energy_mae", mode="min", scope="last"
         ),
     )
 
