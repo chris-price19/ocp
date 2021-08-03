@@ -1,12 +1,30 @@
 #!/usr/bin/python
 
 import numpy as np
+import ase
 
 import lmdb
 from tqdm import tqdm
 import pickle
+import lzma
 
 import os
+
+def read_lzma(inpfile, outfile):
+    with open(inpfile, "rb") as f:
+        contents = lzma.decompress(f.read())
+        with open(outfile, "wb") as op:
+            op.write(contents)
+
+def read_lzma_to_atoms(inpfile, ofile='temp.extxyz'):
+    ipdir = '/'.join(inpfile.split('/')[:-1])
+    ofile = ipdir + '/' + ofile
+    with open(inpfile, "rb") as f:
+        contents = lzma.decompress(f.read())
+        with open(ofile, "wb") as op:
+            op.write(contents)           
+    atoms = ase.io.read(ofile, "-1")
+    return atoms
 
 def write_lmbd(data_objects, target_col, location, filename):
     
@@ -26,7 +44,8 @@ def write_lmbd(data_objects, target_col, location, filename):
 
         # Filter data if necessary
         # OCP filters adsorption energies > |10| eV and forces > |50| eV/A
-        data.fid = fid
+        
+        data.fid = fid # becomes ind
 
         # compute mean and std.
         target.append(data.y_relaxed)

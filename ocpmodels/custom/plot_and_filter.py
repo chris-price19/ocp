@@ -16,6 +16,19 @@ import matplotlib.pyplot as plt
 from ase.visualize.plot import plot_atoms
 from ase.constraints import FixAtoms
 
+
+def get_cat_sids(cat_map, sids):
+    
+    # if isinstance(sids[0], str):
+    #     sids = [int(i.split('random')[-1]) for i in sids]
+    
+    cids_int = [int(value.split('random')[-1]) for (key, value) in list(cat_map.items()) if key in set(sids)]
+
+    # cids = [ii for ii in list(cat_map.items()) if ii[0] in sids]
+    
+    return np.unique(cids_int)
+
+
 def regex_symbol_filter(map_dict, regexp, nelements = None):
     
     mapdict_subset = {key: value for (key,value) in map_dict.items() if regexp.search(value['bulk_symbols'])}

@@ -10,6 +10,9 @@ __all__ = [
     "strain_atoms",
     "filter_atoms_by_tag",
     "write_lmbd",
+    "get_cat_sids",
+    "read_lzma",
+    "read_lzma_to_atoms"
     # "init_atoms_from_lmdb",
 
 ]
