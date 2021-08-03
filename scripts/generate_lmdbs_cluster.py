@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 from ase.visualize.plot import plot_atoms
 
 from pymatgen.analysis.adsorption import reorient_z
+from pymatgen.io.ase import AseAtomsAdaptor
 
 import lmdb
 from tqdm import tqdm
@@ -90,6 +91,17 @@ a2g_rlx = AtomsToGraphs(
     r_fixed=True,
 )
 
+
+## train test split, optional
+train_frac = 0.9
+test_frac = 0.1
+
+cutoff = np.ceil(len(binary_coppers) * test_frac)
+
+np.random.shuffle(binary_coppers)
+
+test_sids = binary_coppers[0:cutoff]
+train_sids = binary_coppers[cutoff:]
 
 # filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, binary_coppers, a2g_rlx, 'binaryCu-relax.lmdb')
 
