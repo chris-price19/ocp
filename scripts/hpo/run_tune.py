@@ -81,13 +81,13 @@ def main():
     )
     # ray init
     # for debug
-    ray.init(local_mode=True, num_cpus=32, num_gpus=8)
+    # ray.init(local_mode=True, num_cpus=32, num_gpus=8)
     # for slurm cluster
-    # ray.init(
-    #     address="auto",
-    #     _node_ip_address=os.environ["ip_head"].split(":")[0],
-    #     _redis_password=os.environ["redis_password"],
-    # )
+    ray.init(
+        address="auto",
+        _node_ip_address=os.environ["ip_head"].split(":")[0],
+        _redis_password=os.environ["redis_password"],
+    )
     # define command line reporter
     reporter = CLIReporter(
         print_intermediate_tables=True,
