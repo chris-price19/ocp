@@ -32,6 +32,7 @@ nodes_array=( $nodes )
 
 node_1=${nodes_array[0]}
 ip=$(srun --nodes=1 --ntasks=1 -w $node_1 hostname --ip-address) # making redis-address
+echo $( ip )
 port=6379
 ip_head=$ip:$port
 export ip_head
