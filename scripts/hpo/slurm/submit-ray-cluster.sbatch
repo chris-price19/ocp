@@ -21,6 +21,7 @@
 # Load modules or your own conda environment here
 # e.g. conda activate ocp-models
 source activate ocp-models
+ray stop
 ################# DON NOT CHANGE THINGS HERE UNLESS YOU KNOW WHAT YOU ARE DOING ###############
 # This script is a modification to the implementation suggest by gregSchwartz18 here:
 # https://github.com/ray-project/ray/issues/826#issuecomment-522116599
@@ -32,7 +33,6 @@ nodes_array=( $nodes )
 
 node_1=${nodes_array[0]}
 ip=$(srun --nodes=1 --ntasks=1 -w $node_1 hostname --ip-address) # making redis-address
-echo $( ip )
 port=6379
 ip_head=$ip:$port
 export ip_head
