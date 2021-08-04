@@ -51,6 +51,7 @@ def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outdir, outf
 
         rcell, Q = rlxatoms.cell.standard_form()
         rlxatoms.cell = rlxatoms.cell @ Q.T
+        rlxatoms.cell[np.abs(rlxatoms.cell) < 1e-8] = 0.
         rlxatoms.positions = rlxatoms.positions @ Q.T
 
         p1 = AseAtomsAdaptor.get_structure(rlxatoms)

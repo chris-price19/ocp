@@ -66,6 +66,7 @@ for ci, cc in enumerate(binary_cids):
 
     rcell, Q = atoms.cell.standard_form()
     atoms.cell = atoms.cell @ Q.T
+    atoms.cell[np.abs(atoms.cell) < 1e-8] = 0.
     atoms.positions = atoms.positions @ Q.T
 
     p1 = AseAtomsAdaptor.get_structure(atoms)

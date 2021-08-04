@@ -40,8 +40,8 @@ def generate_strain_tensors(number_of_tensors, max_mag = 0.01, man_override = No
             eps = np.eye(3)
             eps[0,0] += ecoords[0]
             eps[1,1] += ecoords[1]
-            eps[0,1] += ecoords[2]
-            eps[1,0] += ecoords[2]
+            eps[0,1] += ecoords[2]/2.
+            eps[1,0] += ecoords[2]/2.
 
             # eps[1,0] += ecoords[2]
             # eps[1,0] += ecoords[2]
@@ -61,8 +61,8 @@ def generate_strain_tensors(number_of_tensors, max_mag = 0.01, man_override = No
             eps = np.eye(3)
             eps[0,0] += ecoords[0]
             eps[1,1] += ecoords[1]
-            eps[0,1] += ecoords[2]/2
-            eps[1,0] += ecoords[2]/2
+            eps[0,1] += ecoords[2]/2.
+            eps[1,0] += ecoords[2]/2.
 
             e = StrainTensor(ii+1, eps)
 
