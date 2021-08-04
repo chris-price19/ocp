@@ -45,7 +45,10 @@ def main():
     # parse config
     parser = flags.get_parser()
     args, override_args = parser.parse_known_args()
+    print('enter main')
+    print(override_args)
     config = build_config(args, override_args)
+    print(type(config))
     # add parameters to tune using grid or random search
     # config["model"].update(
     #     hidden_channels=tune.choice([256, 384, 512, 640, 704]),
@@ -98,10 +101,11 @@ def main():
             "epochs": "epochs",
             "training_iteration": "training_iteration",
             "val_loss": "val_loss",
-            "energy_mae": "energy_mae",
+            "val_energy_mae": "val_energy_mae",
         },
     )
 
+    print(config.get("run_dir", "./"))
     # define run parameters
     analysis = tune.run(
         ocp_trainable,
@@ -117,7 +121,7 @@ def main():
     print(
         "Best config is:",
         analysis.get_best_config(
-            metric="energy_mae", mode="min", scope="last"
+            metric="val_energy_mae", mode="min", scope="last"
         ),
     )
 
