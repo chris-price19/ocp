@@ -54,6 +54,7 @@ def main():
     #     depth_mlp_node=tune.choice([1, 2, 3, 4, 5]),
     #     num_interactions=tune.choice([3, 4, 5, 6]),
     # )
+    ## dpp - what about optimizer params? can anything in config.yml go here?
     config["model"].update(
         hidden_channels=tune.choice([32, 64, 128]),
         out_emb_channels=tune.choice([24, 48, 96]),
