@@ -263,9 +263,12 @@ def update_config(original, update):
     Parameters must be specified in original to be overwritten
     """
     for basekey, baseval in original.items():
+        print('1')
         if isinstance(baseval, dict):
+            print('2')
             for key, val in baseval.items():
                 if key in update:
+                    
                     original[basekey][key] = demjson.decode(update[key])
     return original
 
@@ -292,7 +295,9 @@ def build_config(args, args_override):
     # Check for overriden parameters.
     if args_override != []:
         overrides = create_config_dict(args_override)
-        config = update_config(config, overrides)
+        # config = update_config(config, overrides)
+        ## changing this to get run_dir to work
+        config.update(overrides)
 
     # Some other flags.
     config["mode"] = args.mode

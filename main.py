@@ -33,6 +33,8 @@ class Runner(submitit.helpers.Checkpointable):
         self.config = copy.deepcopy(config)
 
         if args.distributed:
+            print('dist?')
+            print(args.distributed)
             distutils.setup(config)
 
         try:

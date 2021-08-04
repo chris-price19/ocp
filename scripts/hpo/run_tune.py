@@ -68,10 +68,10 @@ def main():
     )
 
     ## I think something like
-    # config["optim"].update(
-    #     lr_initial=tune.choice([1e-3, 5e-4, 1e-4]),
-    #     lr_milestones=tune.choice([24, 48, 96]),
-    # )
+    config["optim"].update(
+        lr_initial=tune.choice([1e-3, 5e-4, 1e-4]),
+        lr_milestones=tune.choice([[1000, 2000, 3000], [10000, 20000, 30000]]),
+    )
     # define scheduler
     scheduler = ASHAScheduler(
         time_attr="steps",

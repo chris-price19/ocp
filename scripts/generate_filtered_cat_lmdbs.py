@@ -32,7 +32,7 @@ binary_coppers = regex_symbol_filter(map_dict, regexp, 2)
 
 binary_cids = get_cat_sids(cat_map, list(binary_coppers.keys()))
 
-binary_cids = binary_cids[0:10]
+# binary_cids = binary_cids[0:10]
 print(binary_cids)
 
 filename = 'binaryCu-cat-relax.lmdb'
