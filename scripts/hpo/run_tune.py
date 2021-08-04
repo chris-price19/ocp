@@ -63,6 +63,12 @@ def main():
         num_spherical=tune.choice([3, 6, 7]),
         num_output_layers=tune.choice([1,2,3,4]),
     )
+
+    ## I think something like
+    # config["optim"].update(
+    #     lr_initial=tune.choice([1e-3, 5e-4, 1e-4]),
+    #     lr_milestones=tune.choice([24, 48, 96]),
+    # )
     # define scheduler
     scheduler = ASHAScheduler(
         time_attr="steps",
@@ -99,11 +105,11 @@ def main():
     # define run parameters
     analysis = tune.run(
         ocp_trainable,
-        resources_per_trial={"cpu": 4, "gpu": 1},
+        resources_per_trial={"cpu": 8, "gpu": 2},
         config=config,
         fail_fast=False,
         local_dir=config.get("run_dir", "./"),
-        num_samples=500,
+        num_samples=100,
         progress_reporter=reporter,
         scheduler=scheduler,
     )
