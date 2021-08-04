@@ -58,10 +58,11 @@ a2g_rlx = AtomsToGraphs(
 
 for ci, cc in enumerate(binary_cids):
 
-    file = 'slab_trajectories/' + str(cc) + '.extxyz.xz'
+    file = 'slab_trajectories/' + cc + '.extxyz.xz'
     atoms = read_lzma_to_atoms(datadir + file)
     tags = [i.tag for i in atoms]
     atoms.info['tags'] = tags
+    atoms.info['sid'] = int(cc.split('random')[-1])
 
     rcell, Q = atoms.cell.standard_form()
     atoms.cell = atoms.cell @ Q.T
