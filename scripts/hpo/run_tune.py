@@ -13,7 +13,7 @@ from ocpmodels.common.utils import build_config, setup_imports
 
 # this function is general and should work for any ocp trainer
 def ocp_trainable(config, checkpoint_dir=None):
-    wait_for_gpu()
+    # wait_for_gpu()
     setup_imports()
     # trainer defaults are changed to run HPO
     trainer = registry.get_trainer_class(config.get("trainer", "simple"))(
