@@ -109,7 +109,7 @@ def main():
     # define run parameters
     analysis = tune.run(
         ocp_trainable,
-        resources_per_trial={"cpu": 8, "gpu": 2},
+        resources_per_trial={"gpu": 1},
         config=config,
         fail_fast=False,
         local_dir=config.get("run_dir", "./"),
