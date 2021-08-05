@@ -24,7 +24,8 @@ import pickle
 def get_cat_sids(cat_map, sids):
 
     print('local') 
-    cids_int = [cat_map[key] for key in sids if key in set(cat_map.keys())]
+    s = set(cat_map.keys())
+    cids_int = [cat_map[key] for key in sids if key in s]
     # cids_int = [cat_map[key] for key in sids if key in set(cat_map.keys())]
 
     return np.unique(cids_int)
@@ -60,3 +61,4 @@ for ci, cc in enumerate(binary_cids):
         continue
 
 print(missing)
+print(len(missing))

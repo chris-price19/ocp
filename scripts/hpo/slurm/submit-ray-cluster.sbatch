@@ -3,25 +3,22 @@
 #SBATCH --job-name=h1c2
 #SBATCH --time=0-12:00:00
 #SBATCH --nodes=1
-##SBATCH --tasks-per-node=32
-##SBATCH --mem-per-cpu=3900
 #SBATCH -e err.%j
-#SBATCH -C "[ib1|ib2|ib3|ib4]"
+##SBATCH -C "[ib1|ib2|ib3|ib4]"
 #SBATCH --partition g_vsheno
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-task=8
 #SBATCH --cpus-per-task=32
-##SBATCH --constraint=gpu
-##SBATCH --gres=gpu:gk210gl:8
 
 ### This script works for any number of nodes, Ray will find and manage all resources
 ### Give all resources to a single Ray task, ray can manage the resources internally
-
 
 # Load modules or your own conda environment here
 # e.g. conda activate ocp-models
 module load intel/17.0.3
 module load gpu/cuda/10.2
+
+ulimit -s unlimited
 
 source activate ocp-models
 ray stop

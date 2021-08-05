@@ -294,6 +294,7 @@ def build_config(args, args_override):
 
     # Check for overriden parameters.
     if args_override != []:
+        print('overriding')
         overrides = create_config_dict(args_override)
         # config = update_config(config, overrides)
         ## changing this to get run_dir to work

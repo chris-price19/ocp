@@ -32,9 +32,9 @@ class Runner(submitit.helpers.Checkpointable):
     def __call__(self, config):
         self.config = copy.deepcopy(config)
 
+        print('dist?')
+        print(args.distributed)
         if args.distributed:
-            print('dist?')
-            print(args.distributed)
             distutils.setup(config)
 
         try:
