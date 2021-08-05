@@ -56,10 +56,17 @@ a2g_rlx = AtomsToGraphs(
     r_fixed=True,
 )
 
+missing = []
+
 for ci, cc in enumerate(binary_cids):
 
     file = 'slab_trajectories/' + cc + '.extxyz.xz'
-    atoms = read_lzma_to_atoms(datadir + file)
+    try:
+        file = 'slab_trajectories/' + cc + '.extxyz.xz'
+        atoms = read_lzma_to_atoms(datadir + file)
+    except:
+        missing.append(cc)
+        continue
     tags = [i.tag for i in atoms]
     atoms.info['tags'] = tags
     atoms.info['sid'] = int(cc.split('random')[-1])
@@ -96,3 +103,5 @@ for ci, cc in enumerate(binary_cids):
     db.sync()
 
 db.close()
+
+print(missing)

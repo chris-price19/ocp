@@ -19,7 +19,6 @@ from ase.constraints import FixAtoms
 
 def get_cat_sids(cat_map, sids):
 
-    print('local') 
     s = set(cat_map.keys())
     cids_int = [cat_map[key] for key in sids if key in s]
     # cids_int = [cat_map[key] for key in sids if key in set(cat_map.keys())]
