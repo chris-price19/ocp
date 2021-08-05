@@ -320,6 +320,8 @@ def build_config(args, args_override):
     config["world_size"] = args.num_nodes * args.num_gpus
     config["distributed_backend"] = args.distributed_backend
 
+    print(config["run_dir"])
+
     return config
 
 
