@@ -20,6 +20,9 @@
 
 # Load modules or your own conda environment here
 # e.g. conda activate ocp-models
+module load intel/17.0.3
+module load gpu/cuda/10.2
+
 source activate ocp-models
 ray stop
 ################# DON NOT CHANGE THINGS HERE UNLESS YOU KNOW WHAT YOU ARE DOING ###############
@@ -27,6 +30,8 @@ ray stop
 # https://github.com/ray-project/ray/issues/826#issuecomment-522116599
 redis_password=$(uuidgen)
 export redis_password
+
+nvidia-smi --query-gpu=timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 60 > nvidialog.txt
 
 nodes=$(scontrol show hostnames $SLURM_JOB_NODELIST) # Getting the node names
 nodes_array=( $nodes )

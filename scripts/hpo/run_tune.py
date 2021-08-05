@@ -4,6 +4,7 @@ import ray
 from ray import tune
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
+from ray.tune.utils import wait_for_gpu
 
 from ocpmodels.common.flags import flags
 from ocpmodels.common.registry import registry
@@ -12,6 +13,7 @@ from ocpmodels.common.utils import build_config, setup_imports
 
 # this function is general and should work for any ocp trainer
 def ocp_trainable(config, checkpoint_dir=None):
+    wait_for_gpu()
     setup_imports()
     # trainer defaults are changed to run HPO
     trainer = registry.get_trainer_class(config.get("trainer", "simple"))(
@@ -111,11 +113,12 @@ def main():
         ocp_trainable,
         resources_per_trial={"gpu": 1},
         config=config,
-        fail_fast=False,
+        fail_fast=True,
         local_dir=config.get("run_dir", "./"),
         num_samples=100,
         progress_reporter=reporter,
         scheduler=scheduler,
+
     )
 
     print(
