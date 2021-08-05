@@ -31,7 +31,8 @@ ray stop
 redis_password=$(uuidgen)
 export redis_password
 
-nvidia-smi --query-gpu=timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 60 > nvidialog.txt
+nvidia-smi --query-gpu=timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 60 -f nvidialog.txt &
+bckpid=$!
 
 nodes=$(scontrol show hostnames $SLURM_JOB_NODELIST) # Getting the node names
 nodes_array=( $nodes )
@@ -60,4 +61,7 @@ done
 #### call your code below
 # e.g. python path_to/run_tune.py --mode train --config-yml path_to/configs/s2ef/200k/forcenet/fn_forceonly.yml --run_dir path_to_run_dir
 python -u /home/chrispr/mem/chrispr/catalysis/ocp/scripts/hpo/run_tune.py --mode=train --config-yml=/home/chrispr/mem/chrispr/catalysis/ocp/configs/is2re/all/dimenet_plus_plus/dpp-binaryCu.yml --run_dir=/home/chrispr/mem/chrispr/catalysis/experiments
+
+kill "$bckpid"
+
 exit

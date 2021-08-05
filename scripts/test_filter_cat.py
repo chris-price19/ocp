@@ -24,7 +24,7 @@ import pickle
 def get_cat_sids(cat_map, sids):
 
     print('local') 
-    cids_int = [cat_map[key] for key in sids[-100:] if key in set(cat_map.keys())]
+    cids_int = [cat_map[key] for key in sids if key in set(cat_map.keys())]
     # cids_int = [cat_map[key] for key in sids if key in set(cat_map.keys())]
 
     return np.unique(cids_int)
@@ -43,12 +43,20 @@ if rewrite or not os.path.isfile('intermediate_cids.txt'):
         for item in binary_cids:
             f.write("%s\n" % item)
 else:
-    with open('intermediate_cids.txt', 'w') as f:
+    with open('intermediate_cids.txt', 'r') as f:
         binary_cids = f.readlines()
 
 print(binary_cids)
+print(len(binary_cids))
 
+missing = []
 for ci, cc in enumerate(binary_cids):
 
-    file = 'slab_trajectories/' + cc + '.extxyz.xz'
-    atoms = read_lzma_to_atoms(datadir + file)
+    try:
+        file = 'slab_trajectories/' + cc + '.extxyz.xz'
+        atoms = read_lzma_to_atoms(datadir + file)
+    except:
+        missing.append(cc)
+        continue
+
+print(missing)
