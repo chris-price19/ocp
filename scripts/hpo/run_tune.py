@@ -47,10 +47,7 @@ def main():
     # parse config
     parser = flags.get_parser()
     args, override_args = parser.parse_known_args()
-    print('enter main')
-    print(override_args)
     config = build_config(args, override_args)
-    print(type(config))
     # add parameters to tune using grid or random search
     # config["model"].update(
     #     hidden_channels=tune.choice([256, 384, 512, 640, 704]),
@@ -64,9 +61,9 @@ def main():
         hidden_channels=tune.choice([32, 64, 128]),
         out_emb_channels=tune.choice([24, 48, 96]),
         num_blocks=tune.choice([1, 2, 3]),
-        num_radial=tune.choice([4, 6, 8]),
-        num_spherical=tune.choice([3, 6, 7]),
-        num_output_layers=tune.choice([1,2,3,4]),
+        num_radial=tune.choice([4, 5, 6]),
+        num_spherical=tune.choice([4, 5, 6]),
+        num_output_layers=tune.choice([1,2,3]),
     )
 
     ## I think something like
@@ -87,6 +84,7 @@ def main():
     # ray init
     # for debug
     # ray.init(local_mode=True, num_cpus=32, num_gpus=8)
+    
     # for slurm cluster
     ray.init(
         address="auto",
@@ -115,7 +113,7 @@ def main():
         config=config,
         fail_fast=True,
         local_dir=config.get("run_dir", "./"),
-        num_samples=16,
+        num_samples=64,
         progress_reporter=reporter,
         scheduler=scheduler,
 

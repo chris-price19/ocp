@@ -9,6 +9,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-task=8
 #SBATCH --cpus-per-task=32
+#SBATCH --mem=MaxMemPerNode
 
 ### This script works for any number of nodes, Ray will find and manage all resources
 ### Give all resources to a single Ray task, ray can manage the resources internally
@@ -57,7 +58,7 @@ done
 
 #### call your code below
 # e.g. python path_to/run_tune.py --mode train --config-yml path_to/configs/s2ef/200k/forcenet/fn_forceonly.yml --run_dir path_to_run_dir
-python -u /home/chrispr/mem/chrispr/catalysis/ocp/scripts/hpo/run_tune.py --mode=train --config-yml=/home/chrispr/mem/chrispr/catalysis/ocp/configs/is2re/all/dimenet_plus_plus/dpp-binaryCu.yml --run_dir=/home/chrispr/mem/chrispr/catalysis/experiments
+python -u /home/chrispr/mem/chrispr/catalysis/ocp/scripts/hpo/run_tune.py --mode=train --config-yml=/home/chrispr/mem/chrispr/catalysis/ocp/configs/is2re/all/dimenet_plus_plus/dpp-binaryCu.yml --run_dir=/home/chrispr/mem/chrispr/catalysis/experiments/
 
 kill "$bckpid"
 

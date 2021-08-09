@@ -276,7 +276,7 @@ def update_config(original, update):
 def build_config(args, args_override):
     print(args_override)
     config = yaml.safe_load(open(args.config_yml, "r"))
-    print(type(config))
+    # print(type(config))
 
     # Load config from included files.
     includes = config.get("includes", [])
@@ -291,14 +291,6 @@ def build_config(args, args_override):
 
     if includes != []:
         config.pop("includes")
-
-    # Check for overriden parameters.
-    if args_override != []:
-        print('overriding')
-        overrides = create_config_dict(args_override)
-        # config = update_config(config, overrides)
-        ## changing this to get run_dir to work
-        config.update(overrides)
 
     # Some other flags.
     config["mode"] = args.mode
@@ -320,7 +312,15 @@ def build_config(args, args_override):
     config["world_size"] = args.num_nodes * args.num_gpus
     config["distributed_backend"] = args.distributed_backend
 
-    print(config["run_dir"])
+        # Check for overriden parameters.
+    if args_override != []:
+        print('overriding')
+        overrides = create_config_dict(args_override)
+        # config = update_config(config, overrides)
+        ## changing this to get run_dir to work
+        config.update(overrides)
+
+    print(config)
 
     return config
 
