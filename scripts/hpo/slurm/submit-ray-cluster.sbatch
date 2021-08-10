@@ -16,7 +16,8 @@
 
 # Load modules or your own conda environment here
 # e.g. conda activate ocp-models
-module load intel/17.0.3
+# module load intel/17.0.3
+module load gcc-9.2.0/9.2.0
 module load gpu/cuda/10.2
 
 ulimit -s unlimited
