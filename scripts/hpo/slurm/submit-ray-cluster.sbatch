@@ -9,7 +9,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-task=8
 #SBATCH --cpus-per-task=32
-#SBATCH --mem-per-cpu=DefMemPerCPU 
+##SBATCH --mem-per-cpu=DefMemPerCPU 
 
 ### This script works for any number of nodes, Ray will find and manage all resources
 ### Give all resources to a single Ray task, ray can manage the resources internally
