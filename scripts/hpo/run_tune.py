@@ -84,12 +84,13 @@ def main():
     # ray init
     # for debug
     # ray.init(local_mode=True, num_cpus=32, num_gpus=8)
-    
+
     # for slurm cluster
     ray.init(
         address="auto",
         _node_ip_address=os.environ["ip_head"].split(":")[0],
         _redis_password=os.environ["redis_password"],
+        _temp_dir="/home/chrispr/raylogs"
     )
     # define command line reporter
     reporter = CLIReporter(
