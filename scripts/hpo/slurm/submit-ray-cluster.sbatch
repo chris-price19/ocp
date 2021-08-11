@@ -25,6 +25,7 @@ module load gcc-9.2.0/9.2.0
 module load gpu/cuda/10.2
 
 ulimit -s unlimited
+ulimit -n 4096
 
 source activate ocp-models
 
