@@ -10,6 +10,8 @@ from ocpmodels.common.flags import flags
 from ocpmodels.common.registry import registry
 from ocpmodels.common.utils import build_config, setup_imports
 
+os.environ['http_proxy'] = ''
+os.environ['https_proxy'] = ''
 
 # this function is general and should work for any ocp trainer
 def ocp_trainable(config, checkpoint_dir=None):
@@ -38,7 +40,7 @@ def ocp_trainable(config, checkpoint_dir=None):
         checkpoint = os.path.join(checkpoint_dir, "checkpoint")
         trainer.load_pretrained(checkpoint)
     # start training
-
+    print('traintype')
     print(type(trainer))
 
     trainer.train()
