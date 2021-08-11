@@ -13,7 +13,7 @@ from ocpmodels.common.utils import build_config, setup_imports
 
 # this function is general and should work for any ocp trainer
 def ocp_trainable(config, checkpoint_dir=None):
-    wait_for_gpu()
+    # wait_for_gpu()
     setup_imports()
     # trainer defaults are changed to run HPO
     trainer = registry.get_trainer_class(config.get("trainer", "simple"))(
@@ -38,6 +38,9 @@ def ocp_trainable(config, checkpoint_dir=None):
         checkpoint = os.path.join(checkpoint_dir, "checkpoint")
         trainer.load_pretrained(checkpoint)
     # start training
+
+    print(type(trainer))
+
     trainer.train()
 
 
@@ -83,14 +86,16 @@ def main():
     )
     # ray init
     # for debug
-    # ray.init(local_mode=True, num_cpus=32, num_gpus=8)
+    # ray.init(local_mode=True,num_cpus=32, num_gpus=8,  _temp_dir="/home/chrispr/raylogs")
+    # for cluster interactive session
+    # ray.init(address="auto", _temp_dir="/home/chrispr/raylogs", _redis_password='4fe577fb-1673-4760-9907-f46ef54a013a')
 
     # for slurm cluster
     ray.init(
         address="auto",
         _node_ip_address=os.environ["ip_head"].split(":")[0],
         _redis_password=os.environ["redis_password"],
-        _temp_dir="/home/chrispr/raylogs"
+        _temp_dir="/home/chrispr/raylogs",
     )
     # define command line reporter
     reporter = CLIReporter(

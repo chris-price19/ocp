@@ -1,22 +1,5 @@
 #!/bin/bash
 
-#SBATCH --job-name=h1c2
-#SBATCH --time=0-12:00:00
-#SBATCH --nodes=1
-#SBATCH -e err.%j
-##SBATCH -C "[ib1|ib2|ib3|ib4]"
-#SBATCH --partition g_vsheno
-#SBATCH --ntasks-per-node=1
-#SBATCH --gpus-per-task=8
-#SBATCH --cpus-per-task=32
-##SBATCH --mem-per-cpu=DefMemPerCPU 
-
-### This script works for any number of nodes, Ray will find and manage all resources
-### Give all resources to a single Ray task, ray can manage the resources internally
-
-# Load modules or your own conda environment here
-# e.g. conda activate ocp-models
-# module load intel/17.0.3
 module purge
 
 ray stop
@@ -34,8 +17,8 @@ source activate ocp-models
 redis_password=$(uuidgen)
 export redis_password
 
-nvidia-smi --query-gpu=timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 60 -f nvidialog.txt &
-bckpid=$!
+# nvidia-smi --query-gpu=timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 60 -f nvidialog.txt &
+# bckpid=$!
 
 nodes=$(scontrol show hostnames $SLURM_JOB_NODELIST) # Getting the node names
 nodes_array=( $nodes )
@@ -52,22 +35,19 @@ srun --nodes=1 --ntasks=1 -w $node_1 start-head.sh $ip $redis_password &
 sleep 45
 
 worker_num=$(($SLURM_JOB_NUM_NODES - 1)) #number of nodes other than the head node
-
-if [ $worker_num -gt 0 ]; then
-  for ((  i=1; i<=$worker_num; i++ ))
-    do
-      node_i=${nodes_array[$i]}
-      echo "STARTING WORKER $i at $node_i"
-      srun --nodes=1 --ntasks=1 -w $node_i start-worker.sh $ip_head $redis_password &
-      sleep 5
-    done
-fi
+for ((  i=1; i<=$worker_num; i++ ))
+do
+  node_i=${nodes_array[$i]}
+  echo "STARTING WORKER $i at $node_i"
+  srun --nodes=1 --ntasks=1 -w $node_i start-worker.sh $ip_head $redis_password &
+  sleep 5
+done
 ##############################################################################################
 
 #### call your code below
 # e.g. python path_to/run_tune.py --mode train --config-yml path_to/configs/s2ef/200k/forcenet/fn_forceonly.yml --run_dir path_to_run_dir
 python -u /home/chrispr/mem/chrispr/catalysis/ocp/scripts/hpo/run_tune.py --mode=train --config-yml=/home/chrispr/mem/chrispr/catalysis/ocp/configs/is2re/all/dimenet_plus_plus/dpp-binaryCu.yml --run_dir=/home/chrispr/mem/chrispr/catalysis/experiments/
 
-kill "$bckpid"
+# kill "$bckpid"
 
 exit
