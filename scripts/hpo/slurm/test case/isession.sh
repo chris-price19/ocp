@@ -28,6 +28,7 @@ ulimit -n 4096
 source activate ocp-models
 
 ray stop
+
 ################# DON NOT CHANGE THINGS HERE UNLESS YOU KNOW WHAT YOU ARE DOING ###############
 # This script is a modification to the implementation suggest by gregSchwartz18 here:
 # https://github.com/ray-project/ray/issues/826#issuecomment-522116599
@@ -76,4 +77,4 @@ python -u bug_tune.py
 # kill "$bckpid"
 # kill "$bckpid1"
 
-exit
+# exit

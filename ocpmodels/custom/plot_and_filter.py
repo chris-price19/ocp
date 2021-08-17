@@ -68,7 +68,9 @@ def relaxed_atoms_from_lmdb(db, ind):
                       info={'energy':db[ind].y_relaxed, 'sid':db[ind].sid, 'tags': db[ind].tags.numpy()})
 
     mask = [True if i == 0 else False for i in atoms.info['tags']]
+    # print(mask)
     atoms.constraints += [FixAtoms(mask=mask)]
+    # print(atoms.constraints)
     
     return atoms
 

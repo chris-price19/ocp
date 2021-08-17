@@ -29,6 +29,7 @@ def generate_strain_tensors(number_of_tensors, max_mag = 0.01, man_override = No
     rng = default_rng()
 
     strain_tensor_list.append(StrainTensor(0))
+    # first is always the ground state
 
     if man_override is None:
 
@@ -93,7 +94,7 @@ def strain_atoms(atoms, eps):
     p2 = d.apply_to_structure(p1)
 
     strainatoms = AseAtomsAdaptor.get_atoms(p2)
-
+    
     strainatoms.constraints = save_constraints
     strainatoms.info = save_info
     strainatoms.info['eid'] = eps.eid

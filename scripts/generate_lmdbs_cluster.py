@@ -48,6 +48,9 @@ def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outdir, outf
     for bi, bb in enumerate(binary_inds):
         
         rlxatoms = relaxed_atoms_from_lmdb(traindb, bb)
+        print(rlxatoms.constraints)
+        sys.exit()
+        saveconstraints = rlxatoms.constraints.copy()
 
         rcell, Q = rlxatoms.cell.standard_form()
         rlxatoms.cell = rlxatoms.cell @ Q.T
