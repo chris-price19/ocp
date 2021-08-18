@@ -106,7 +106,7 @@ a2g_rlx = AtomsToGraphs(
 
 ## full structures (vasp)
 
-filter_lmdbs_and_graphs(datadir + 'is2re/10k/train/data.lmdb', map_dict, train_sids, a2g_rlx, datadir + 'is2re/10k/train/', 'full-binaryCu-relax-split.lmdb', filteratoms=False)
+filter_lmdbs_and_graphs(datadir + 'is2re/10k/train/data.lmdb', map_dict, binary_coppers, a2g_rlx, datadir + 'is2re/10k/train/', 'full-binaryCu-relax-split.lmdb', filteratoms=False)
 
 sys.exit()
 
