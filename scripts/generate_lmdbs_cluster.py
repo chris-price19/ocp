@@ -32,7 +32,7 @@ from tqdm import tqdm
 import pickle
 
 
-def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outdir, outfile):
+def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outdir, outfile, filteratoms=True):
 
     ## train lmdb
     dbloc = {"src": datadir }
@@ -56,8 +56,8 @@ def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outdir, outf
         rlxatoms.cell[np.abs(rlxatoms.cell) < 1e-8] = 0.
         rlxatoms.positions = rlxatoms.positions @ Q.T
 
-        print(rlxatoms.constraints)
-        sys.exit()
+        # print(rlxatoms.constraints)
+        # sys.exit()
 
         p1 = AseAtomsAdaptor.get_structure(rlxatoms)
         p1 = reorient_z(p1)
@@ -70,9 +70,11 @@ def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outdir, outf
             print(compareatoms)
             return
 
-        surfatoms = filter_atoms_by_tag(rlxatoms, keep=np.array([1,2]))
-
-        glist.append(surfatoms)
+        if filteratoms:
+            surfatoms = filter_atoms_by_tag(rlxatoms, keep=np.array([1,2]))
+            glist.append(surfatoms)
+        else:
+            glist.append(rlxatoms)
 
     glist = graph_builder.convert_all(glist)    
 
@@ -98,9 +100,18 @@ a2g_rlx = AtomsToGraphs(
     r_forces=False,
     r_distances=True,
     r_fixed=True,
+    r_tags=True
 )
 
 
+## full structures (vasp)
+
+filter_lmdbs_and_graphs(datadir + 'is2re/10k/train/data.lmdb', map_dict, train_sids, a2g_rlx, datadir + 'is2re/10k/train/', 'full-binaryCu-relax-split.lmdb', filteratoms=False)
+
+sys.exit()
+
+
+## ML databases (atom filtering turned on)
 ## train test split, optional
 train_frac = 0.9
 test_frac = 0.1
@@ -112,7 +123,7 @@ train_sids, test_sids  = [i.to_dict() for i in train_test_split(s, train_size=tr
 # filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, binary_coppers, a2g_rlx, datadir + 'is2re/all/train/', binaryCu-relax.lmdb')
 
 ## train/test split in-domain
-filter_lmdbs_and_graphs(datadir + 'is2re/10k/train/data.lmdb', map_dict, train_sids, a2g_rlx, datadir + 'is2re/all/train/', 'binaryCu-relax-split.lmdb')
+filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, train_sids, a2g_rlx, datadir + 'is2re/all/train/', 'binaryCu-relax-split.lmdb')
 
 filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, test_sids, a2g_rlx, datadir + 'is2re/all/test_id/', 'binaryCu-relax-split.lmdb')
 

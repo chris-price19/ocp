@@ -22,6 +22,8 @@ from tqdm import tqdm
 import pickle
 
 
+### for plain slabs
+
 # datadir = '/home/ccprice/catalysis-data/ocp/data/'
 datadir = '/backup/chris/catalysis-staging/slab_trajectories/'
 cat_map = np.load(datadir + 'mapping_adslab_slab.pkl', allow_pickle=True)
