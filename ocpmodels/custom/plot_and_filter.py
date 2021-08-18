@@ -32,7 +32,7 @@ def regex_symbol_filter(map_dict, regexp, nelements = None):
     
     if nelements is not None:
         element_regex = '[A-Z][^A-Z]*'
-        mapdict_subset = {key: value for (key, value) in mapdict_subset.items() if regexp.search(value['bulk_symbols']) and len(re.findall(element_regex, value['bulk_symbols'])) <= nelements}
+        mapdict_subset = {key: value for (key, value) in map_dict.items() if regexp.search(value['bulk_symbols']) and len(re.findall(element_regex, value['bulk_symbols'])) <= nelements}
     else:
         mapdict_subset = {key: value for (key,value) in map_dict.items() if regexp.search(value['bulk_symbols'])}
     
