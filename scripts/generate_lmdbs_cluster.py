@@ -48,14 +48,16 @@ def filter_lmdbs_and_graphs(datadir, map_dict, sids, graph_builder, outdir, outf
     for bi, bb in enumerate(binary_inds):
         
         rlxatoms = relaxed_atoms_from_lmdb(traindb, bb)
-        print(rlxatoms.constraints)
-        sys.exit()
+        
         saveconstraints = rlxatoms.constraints.copy()
 
         rcell, Q = rlxatoms.cell.standard_form()
         rlxatoms.cell = rlxatoms.cell @ Q.T
         rlxatoms.cell[np.abs(rlxatoms.cell) < 1e-8] = 0.
         rlxatoms.positions = rlxatoms.positions @ Q.T
+
+        print(rlxatoms.constraints)
+        sys.exit()
 
         p1 = AseAtomsAdaptor.get_structure(rlxatoms)
         p1 = reorient_z(p1)
@@ -110,7 +112,8 @@ train_sids, test_sids  = [i.to_dict() for i in train_test_split(s, train_size=tr
 # filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, binary_coppers, a2g_rlx, datadir + 'is2re/all/train/', binaryCu-relax.lmdb')
 
 ## train/test split in-domain
-filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, train_sids, a2g_rlx, datadir + 'is2re/all/train/', 'binaryCu-relax-split.lmdb')
+filter_lmdbs_and_graphs(datadir + 'is2re/10k/train/data.lmdb', map_dict, train_sids, a2g_rlx, datadir + 'is2re/all/train/', 'binaryCu-relax-split.lmdb')
+
 filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, test_sids, a2g_rlx, datadir + 'is2re/all/test_id/', 'binaryCu-relax-split.lmdb')
 
 
