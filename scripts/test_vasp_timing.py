@@ -64,8 +64,8 @@ VASP_FLAGS = {'ibrion': 2,
               # 'xc': 'PBE'
               }
 
-datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/is2re/all/train/binaryCu-relax-split.lmdb'
-datadir = '/home/ccprice/catalysis-data/ocp/data/is2re/100k/train/binaryCu-relax.lmdb'
+datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/is2re/10k/train/full-binaryCu-relax-split.lmdb'
+# datadir = '/home/ccprice/catalysis-data/ocp/data/is2re/100k/train/binaryCu-relax.lmdb'
 dbloc = {"src": datadir }
 traindb = SinglePointLmdbDataset(dbloc)
 
@@ -80,7 +80,7 @@ p1 = reorient_z(p1)
 rotatoms = AseAtomsAdaptor.get_atoms(p1)
 rotatoms.constraints = saveconstraints
 print(rotatoms.constraints)
-sys.exit()
+# sys.exit()
 
 number_of_tensors = 5
 
