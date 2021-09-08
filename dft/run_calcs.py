@@ -184,7 +184,7 @@ def main():
         selection = selection[np.random.randint(limit)]
         data = selection.data.copy()
 
-        atoms = selection.get_atoms()
+        atoms = selection.toatoms()
 
         if data['status'] == '':
             
