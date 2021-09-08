@@ -49,7 +49,7 @@ def generate_strain_tensors(number_of_tensors, max_mag = 0.01, man_override = No
             # eps[1,0] += ecoords[2]
             # eps[1,0] += ecoords[2]
 
-            e = StrainTensor(ii+1, eps)
+            e = StrainTensor(int(ii+1), eps)
 
             strain_tensor_list.append(e)
 
@@ -97,7 +97,7 @@ def strain_atoms(atoms, eps):
     
     strainatoms.constraints = save_constraints
     strainatoms.info = save_info
-    strainatoms.info['eid'] = eps.eid
+    strainatoms.info['eid'] = int(eps.eid)
 
     return strainatoms
 

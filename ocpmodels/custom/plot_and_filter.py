@@ -50,7 +50,11 @@ def sids2inds(db, sids):
     
     return inds
 
-def init_atoms_from_lmdb(db, ind):   
+def init_atoms_from_lmdb(db, ind):
+
+    """
+    returns an atoms object with initial, non-relaxed positions from an lmdb file.
+    """
     
     atoms = ase.Atoms(cell=db[ind].cell.numpy().squeeze(), 
                       positions=db[ind].pos.numpy(), 
@@ -62,7 +66,11 @@ def init_atoms_from_lmdb(db, ind):
 
     return atoms
 
-def relaxed_atoms_from_lmdb(db, ind):   
+def relaxed_atoms_from_lmdb(db, ind):
+
+    """
+    returns an atoms object with relaxed positions from an lmdb file.
+    """   
     
     atoms = ase.Atoms(cell=db[ind].cell.numpy().squeeze(), 
                       positions=db[ind].pos_relaxed.numpy(), 
@@ -78,6 +86,10 @@ def relaxed_atoms_from_lmdb(db, ind):
 
 
 def filter_atoms_by_tag(atoms, keep = None):
+
+    """
+    returns an atoms object with tags matching iterable keep
+    """
     
     atoms = atoms.copy()
     # print(atoms)
@@ -102,6 +114,11 @@ def filter_atoms_by_tag(atoms, keep = None):
 
 def plot_atom_graph(data_obj):
     
+    """
+    visualize atomic graph (useful for verifying type / number of elements, size of graph)
+    """
+
+
     fig, ax = plt.subplots(1,1,figsize=(8,8))
     
     node_labels = [str(int(i)) for i in data_obj.atomic_numbers.numpy()]
