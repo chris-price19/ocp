@@ -27,8 +27,12 @@ db = ase.db.connect('total-calc-plan.db')
 number_of_tensors = 5
 max_magnitude = 0.03
 
-base_datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/'
-base_datadir = '/home/ccprice/catalysis-data/ocp/data/'
+cwd = os.getcwd()
+
+if 'scratch' in cwd:
+    base_datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/'
+else:
+    base_datadir = '/home/ccprice/catalysis-data/ocp/data/'
 map_dict = np.load(base_datadir + 'oc20_data_mapping.pkl', allow_pickle=True)
 cat_map = np.load(base_datadir + 'mapping_adslab_slab.pkl', allow_pickle=True)
 regexp = re.compile(r'Cu')
