@@ -177,17 +177,18 @@ def main():
         with ase.db.connect(database) as db:
             # this has been tested on command line, should work
             # use only numbers and strings, skip the NaNs... too much fuckery
-            selection = list(db.select(filter=lambda x: (x.data.status=='' or x.data.status=='half') and x.id not in skip_ids, limit=limit))
+            selection = db.select(filter=lambda x: (x.data.status=='' or x.data.status=='half') and x.id not in skip_ids)
         
-        if not len(selection):
+        # if not len(selection):
+        # print(selection)
+        # print('length of selection', len(selection))
+        try:
+            selection = next(selection) # selection[np.random.randint(limit)]
+        except:
             global_completion = True
             break
 
-        print(selection)
-        print('length of selection', len(selection))
-        selection = selection[np.random.randint(limit)]
         data = selection.data.copy()
-
         atoms = selection.toatoms()
 
         if data['status'] == '':
