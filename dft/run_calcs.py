@@ -166,7 +166,6 @@ def run_cat_calc(basedir, atoms, data):
 
 def main():
 
-    limit = 20
     basedir = '/scratch/vshenoy1/chrispr/catalysis/dft/'
     database = basedir + 'total-calc-plan.db'
     global_completion = False
@@ -234,7 +233,7 @@ def main():
 
             if not success:
                 skip_ids.append(selection.id)
-                print('skip_ids 2', skip_ids)
+                print('skip_ids 3', skip_ids)
                 continue
 
             end = datetime.now()

@@ -85,7 +85,7 @@ for di, dd in enumerate(datadirs):
                     'start_time': '',
                     'calc_time': 999,
                     'ads_sid': rlxatoms.info['sid'],
-                    'slab_sid': cat_map['random'+str(rlxatoms.info['sid'])],
+                    'slab_sid': int(cat_map['random'+str(rlxatoms.info['sid'])].split('random')[-1]),
                     'mol_sid': map_dict['random'+str(rlxatoms.info['sid'])]['ads_id'],
                     'tags': rlxatoms.info['tags'],
                     'strain': aa.eps,
