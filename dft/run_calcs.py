@@ -25,7 +25,7 @@ from ase.calculators.vasp import Vasp
 
 
 VASP_FLAGS = {'ibrion': 2,
-          'nsw': 1,
+          'nsw': 200,
           'nelm': 5,  # turn this off!
           'isif': 0,
           'isym': 0,
@@ -36,16 +36,16 @@ VASP_FLAGS = {'ibrion': 2,
           # 'laechg': False,
           'lwave': False,
           'lcharg': False,
-          'ncore': 4,
-          'kpar': 4,
+          'ncore': 8,
+          'kpar': 2,
           'gga': 'RP',
           'pp': 'PBE',
           'prec': 'Normal',
           'ediff': 1e-4,
           'ivdw': 12,
-          # 'amin': 0.01,
-          # 'lcorr': True,
-          'nsim': 8,
+          'amin': 0.01,
+          'lcorr': True,
+          'nsim': 16,
           'ismear': 1,
           # 'nblock': 1,
           # 'gga_compat': False
@@ -182,6 +182,7 @@ def main():
         if not len(selection):
             global_completion = True
             break
+        print('length of selection', len(selection))
         selection = selection[np.random.randint(limit)]
         data = selection.data.copy()
 
@@ -196,6 +197,7 @@ def main():
 
             if not success:
                 skip_ids.append(selection.id)
+                print('skip_ids 1', skip_ids)
                 continue
 
             halfend = datetime.now()
@@ -211,6 +213,7 @@ def main():
 
             if not success:
                 skip_ids.append(selection.id)
+                print('skip_ids 2', skip_ids)
                 continue
 
             end = datetime.now()
@@ -229,6 +232,7 @@ def main():
 
             if not success:
                 skip_ids.append(selection.id)
+                print('skip_ids 2', skip_ids)
                 continue
 
             end = datetime.now()
