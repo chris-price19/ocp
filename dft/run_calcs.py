@@ -25,7 +25,8 @@ from ase.calculators.vasp import Vasp
 
 
 VASP_FLAGS = {'ibrion': 2,
-          'nsw': 200,
+          'nsw': 1,
+          'nelm': 5,  # turn this off!
           'isif': 0,
           'isym': 0,
           'lreal': 'Auto',
