@@ -182,6 +182,8 @@ def main():
         if not len(selection):
             global_completion = True
             break
+
+        print(selection)
         print('length of selection', len(selection))
         selection = selection[np.random.randint(limit)]
         data = selection.data.copy()
@@ -208,7 +210,6 @@ def main():
                 db.update(selection.id, atoms=rlxatoms, data=data)
                 skip_ids = []            
 
-            print(data['tags'])
             success, data = run_slab_calc(basedir, atoms, data)
 
             if not success:
