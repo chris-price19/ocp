@@ -91,7 +91,7 @@ def run_slab_calc(basedir, atoms, data):
     atoms = atoms.copy()    
     keep = [0,1]  # 0 = subsurface atoms, 1 = surface atoms, 2 = adsorbate atoms
     icount = 0
-    tags = data.tags.copy()
+    tags = data['tags'].copy()
     while not np.array_equal(np.unique(tags), np.unique(keep)):
         if tags[icount] in keep:
             icount += 1
@@ -205,6 +205,7 @@ def main():
                 db.update(selection.id, atoms=rlxatoms, data=data)
                 skip_ids = []            
 
+            print(data['tags'])
             success, data = run_slab_calc(basedir, atoms, data)
 
             if not success:
