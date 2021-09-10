@@ -88,6 +88,7 @@ def run_slab_calc(basedir, atoms, data):
         if round(time.time()) - last_time < 60*5: # if the most recent file has been updated within the last 5 minutes.
             return False, data
 
+    os.system('echo $SLURM_JOBID >> jobfile.out')
     ## delete adsorbate atoms
     atoms = atoms.copy()    
     keep = [0,1]  # 0 = subsurface atoms, 1 = surface atoms, 2 = adsorbate atoms
@@ -140,6 +141,7 @@ def run_cat_calc(basedir, atoms, data):
         if round(time.time()) - last_time < 60*5: # if the most recent file has been updated within the last 5 minutes.
             return False, atoms, data
 
+    os.system('echo $SLURM_JOBID >> jobfile.out')
     ## check for CONTCAR / continuation
     if os.path.exists('CONTCAR'):
         if os.path.getsize('CONTCAR') > 0:

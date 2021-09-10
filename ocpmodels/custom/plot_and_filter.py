@@ -26,7 +26,7 @@ def get_cat_sids(cat_map, sids):
     return np.unique(cids_int)
 
 
-def regex_symbol_filter(map_dict, regexp, nelements = None):
+def regex_symbol_filter(map_dict, regexp, nelements = None, molecules = None):
     
     # mapdict_subset = {key: value for (key,value) in map_dict.items() if regexp.search(value['bulk_symbols'])}
     
@@ -36,6 +36,10 @@ def regex_symbol_filter(map_dict, regexp, nelements = None):
     else:
         mapdict_subset = {key: value for (key,value) in map_dict.items() if regexp.search(value['bulk_symbols'])}
     
+    if molecules is not None:
+        molecules = set(molecules)
+        mapdict_subset = {key: value for (key,value) in mapdict_subset.items() if value['ads_id'] in molecules}
+
     return mapdict_subset
 
 def sids2inds(db, sids):

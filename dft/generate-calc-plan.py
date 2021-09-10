@@ -21,26 +21,39 @@ from ase.io import read, write
 from ase.calculators.vasp import Vasp
 
 
-# number of strains per structure
-db = ase.db.connect('total-calc-plan.db')
 
-number_of_tensors = 5
+# number of strains per structure
+
+number_of_tensors = 6
 max_magnitude = 0.03
+ads_id_keep_to_start = [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,62,63,65,69,70,71,72,73,74,75,76,77,78,81]
+
+db = ase.db.connect('total-calc-plan.db')
 
 cwd = os.getcwd()
 
 if 'scratch' in cwd:
     base_datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/'
+    datadirs = [
+            base_datadir + 'is2re/all/train/data.lmdb',
+            base_datadir + 'is2re/all/val_id/data.lmdb',
+            base_datadir + 'is2re/all/val_ood_ads/data.lmdb',
+            base_datadir + 'is2re/all/val_ood_both/data.lmdb',
+            base_datadir + 'is2re/all/val_ood_cat/data.lmdb',
+            base_datadir + 'is2re/all/test_id/data.lmdb',
+            base_datadir + 'is2re/all/test_ood_ads/data.lmdb',
+            base_datadir + 'is2re/all/test_ood_cat/data.lmdb',
+            base_datadir + 'is2re/all/test_ood_both/data.lmdb',
+            ]
 else:
     base_datadir = '/home/ccprice/catalysis-data/ocp/data/'
+    datadirs = [base_datadir + 'is2re/10k/train/data.lmdb',]
+
 map_dict = np.load(base_datadir + 'oc20_data_mapping.pkl', allow_pickle=True)
 cat_map = np.load(base_datadir + 'mapping_adslab_slab.pkl', allow_pickle=True)
 regexp = re.compile(r'Cu')
-binary_coppers = regex_symbol_filter(map_dict, regexp, 2)
+binary_coppers = regex_symbol_filter(map_dict, regexp, nelements=2, molecules=ads_id_keep_to_start)
 ### write sids, strains to an ase db
-
-datadirs = [base_datadir + 'is2re/10k/train/data.lmdb',]
-            # base_datadir + 'is2re/all/val_id/data.lmdb']
 
 for di, dd in enumerate(datadirs):
 
@@ -87,6 +100,7 @@ for di, dd in enumerate(datadirs):
                     'ads_sid': rlxatoms.info['sid'],
                     'slab_sid': int(cat_map['random'+str(rlxatoms.info['sid'])].split('random')[-1]),
                     'mol_sid': map_dict['random'+str(rlxatoms.info['sid'])]['ads_id'],
+                    'original_split': split,
                     'tags': rlxatoms.info['tags'],
                     'strain': aa.eps,
                     'strain_id': aa.eid,                    
