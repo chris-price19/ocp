@@ -23,6 +23,21 @@ from pymatgen.io.ase import AseAtomsAdaptor
 from pymatgen.analysis.adsorption import reorient_z
 from ase.calculators.vasp import Vasp
 
+from string import Template
+
+class DeltaTemplate(Template):
+    delimiter = "%"
+
+def strfdelta(tdelta, fmt):
+    d = {"D": tdelta.days}
+    hours, rem = divmod(tdelta.seconds, 3600)
+    hours += tdelta.days*24
+    minutes, seconds = divmod(rem, 60)
+    d["H"] = '{:02d}'.format(hours)
+    d["M"] = '{:02d}'.format(minutes)
+    d["S"] = '{:02d}'.format(seconds)
+    t = DeltaTemplate(fmt)
+    return t.substitute(**d)
 
 VASP_FLAGS = {'ibrion': 2,
           'nsw': 200,
@@ -205,7 +220,7 @@ def main():
                 continue
 
             halfend = datetime.now()
-            data['calc_time'] = str((halfend - begin) // 1000000 * 1000000)
+            data['calc_time'] = strfdelta((halfend - begin) // 1000000 * 1000000, "%H:%M:%S")
 
             with ase.db.connect(database) as db:
                 data['status'] = 'half'
@@ -220,7 +235,7 @@ def main():
                 continue
 
             end = datetime.now()
-            data['calc_time'] = str((end - begin) // 1000000 * 1000000)
+            data['calc_time'] = strfdelta((end - begin) // 1000000 * 1000000, "%H:%M:%S")
 
             with ase.db.connect(database) as db:
                 data['status'] = 'full'
@@ -239,7 +254,7 @@ def main():
                 continue
 
             end = datetime.now()
-            data['calc_time'] = str(datetime.strptime(data['calc_time'], "%H:%M:%S") + (end - begin) // 1000000 * 1000000)
+            data['calc_time'] = strfdelta(datetime.strptime(data['calc_time'], "%H:%M:%S") + (end - begin) // 1000000 * 1000000, "%H:%M:%S")
 
             with ase.db.connect(database) as db:
                 data['status'] = 'full'
