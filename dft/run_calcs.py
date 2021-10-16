@@ -40,7 +40,7 @@ def strfdelta(tdelta, fmt):
     return t.substitute(**d)
 
 VASP_FLAGS = {'ibrion': 2,
-          'nsw': 200,
+          'nsw': 300,
           # 'nelm': 5,  # turn this off!
           'isif': 0,
           'isym': 0,
@@ -254,7 +254,7 @@ def main():
                 continue
 
             end = datetime.now()
-            data['calc_time'] = strfdelta(datetime.strptime(data['calc_time'], "%H:%M:%S") + (end - begin) // 1000000 * 1000000, "%H:%M:%S")
+            data['calc_time'] = datetime.strftime(datetime.strptime(data['calc_time'], "%H:%M:%S") + (end - begin) // 1000000 * 1000000, "%H:%M:%S")
 
             with ase.db.connect(database) as db:
                 data['status'] = 'full'
