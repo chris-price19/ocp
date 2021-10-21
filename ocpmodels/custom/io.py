@@ -70,3 +70,12 @@ def write_lmbd(data_objects, target_col, location, filename):
     std = np.std(target)
 
     return mean, std
+
+def get_adsorbate_energy(database, index):
+    
+    with ase.db.connect(database) as db:
+        
+        row = list(db.select(index+1))[0]
+        data = row.data
+        
+    return data['energy']

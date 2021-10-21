@@ -12,7 +12,9 @@ __all__ = [
     "write_lmbd",
     "get_cat_sids",
     "read_lzma",
-    "read_lzma_to_atoms"
+    "read_lzma_to_atoms",
+    "get_adsorbate_energy",
+
     # "init_atoms_from_lmdb",
 
 ]
