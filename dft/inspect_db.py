@@ -34,5 +34,3 @@ with ase.db.connect(database) as db:
 results = list(selection)
 print(results)
 print(len(results))
-
-

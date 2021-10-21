@@ -21,7 +21,6 @@ from ase.io import read, write
 from ase.calculators.vasp import Vasp
 
 
-
 # number of strains per structure
 
 number_of_tensors = 6

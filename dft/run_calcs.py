@@ -254,7 +254,7 @@ def main():
                 continue
 
             end = datetime.now()
-            data['calc_time'] = datetime.strftime(datetime.strptime(data['calc_time'], "%H:%M:%S") + (end - begin) // 1000000 * 1000000, "%H:%M:%S")
+            # data['calc_time'] = datetime.strftime(datetime.strptime(data['calc_time'], "%H:%M:%S") + (end - begin) // 1000000 * 1000000, "%H:%M:%S")
 
             with ase.db.connect(database) as db:
                 data['status'] = 'full'
