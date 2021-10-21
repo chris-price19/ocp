@@ -89,6 +89,7 @@ for mi, mm in enumerate(ads_id_keep_to_start):
     
     atoms.cell = np.array([[box_size,0,0],[0,box_size,0],[0,0,box_size]])
     atoms.positions += box_size/2
+    atoms.set_pbc([True, True, True])
 
     os.makedirs(str(mm), exist_ok=True)
     os.chdir(str(mm))
