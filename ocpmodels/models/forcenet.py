@@ -380,7 +380,7 @@ class ForceNet(BaseModel):
 
             # if basis_type is spherical harmonics, then reduce to powersine
             if "sph" in self.basis_type:
-                print(
+                logging.info(
                     "Under onlydist ablation, spherical basis is reduced to powersine basis."
                 )
                 self.basis_type = "powersine"
@@ -436,7 +436,7 @@ class ForceNet(BaseModel):
 
         if self.otf_graph:
             edge_index, cell_offsets, neighbors = radius_graph_pbc(
-                data, self.cutoff, 50, data.pos.device
+                data, self.cutoff, 50
             )
             data.edge_index = edge_index
             data.cell_offsets = cell_offsets
