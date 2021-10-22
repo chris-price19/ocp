@@ -6,6 +6,7 @@ LICENSE file in the root directory of this source tree.
 """
 
 import bisect
+import logging
 import math
 import pickle
 import random
@@ -39,7 +40,9 @@ class TrajectoryLmdbDataset(Dataset):
 
         srcdir = Path(self.config["src"])
         db_paths = sorted(srcdir.glob("*.lmdb"))
-        assert len(db_paths) > 0, f"No LMDBs found in {srcdir}"
+        assert len(db_paths) > 0, f"No LMDBs found in '{srcdir}'"
+
+        self.metadata_path = srcdir / "metadata.npz"
 
         self._keys, self.envs = [], []
         for db_path in db_paths:
@@ -108,7 +111,8 @@ def data_list_collater(data_list, otf_graph=False):
                 n_neighbors.append(n_index.shape[0])
             batch.neighbors = torch.tensor(n_neighbors)
         except NotImplementedError:
-            print(
+            logging.warning(
                 "LMDB does not contain edge index information, set otf_graph=True"
             )
+
     return batch
