@@ -78,7 +78,7 @@ for di, dd in enumerate(datadirs):
     if 'pos_relaxed' in traindb[0].keys:
         pass
     else:
-        break
+        continue
 
     glist_full, glist_reduced = filter_lmdbs_and_graphs(traindb, binary_inds, a2g_rlx, filteratoms=False)
 
