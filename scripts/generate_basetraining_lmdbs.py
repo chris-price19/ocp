@@ -75,7 +75,7 @@ for di, dd in enumerate(datadirs):
     binary_inds = sids2inds(traindb, list(binary_coppers.keys()))
     print(len(binary_inds) * (1+number_of_tensors))
 
-    if 'pos_relaxed' in traindb[ff].keys:
+    if 'pos_relaxed' in traindb[0].keys:
         pass
     else:
         break
