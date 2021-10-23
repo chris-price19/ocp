@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 from ase.visualize.plot import plot_atoms
 from ase.constraints import FixAtoms
 
+from pymatgen.analysis.adsorption import reorient_z
+from pymatgen.io.ase import AseAtomsAdaptor
+
 
 def get_cat_sids(cat_map, sids):
 
