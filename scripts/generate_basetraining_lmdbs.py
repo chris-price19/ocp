@@ -89,7 +89,7 @@ outdir = base_datadir + 'full_structures'
 outfile = 'binaryCu-relax-moleculesubset.lmdb'
 target_col = "y_relaxed"
 mean, std = write_lmbd(full_list, target_col, outdir, outfile)
-with open(outdir + '/target.stats') as file:
+with open(outdir + '/target.stats', 'w') as file:
     file.write('mean    std\n %f %f' % (mean, std))
 print(mean, std)
 fulldb = SinglePointLmdbDataset({"src": outdir + '/' + outfile})
@@ -98,7 +98,7 @@ outdir = base_datadir + 'reduced_structures'
 outfile = 'binaryCu-relax-moleculesubset.lmdb'
 target_col = "y_relaxed"
 mean, std = write_lmbd(reduced_list, target_col, outdir, outfile)
-with open(outdir + '/target.stats') as file:
+with open(outdir + '/target.stats', 'w') as file:
     file.write('mean    std\n %.8f \t %.8f' % (mean, std))
 print(mean, std)
 reduceddb = SinglePointLmdbDataset({"src": outdir + '/' + outfile})
