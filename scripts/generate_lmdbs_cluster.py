@@ -94,8 +94,8 @@ regexp = re.compile(r'Cu')
 binary_coppers = regex_symbol_filter(map_dict, regexp, 2)
 
 a2g_rlx = AtomsToGraphs(
-    max_neigh=50,
-    radius=6,
+    max_neigh=60,
+    radius=7,
     r_energy='pass_through',
     r_forces=False,
     r_distances=True,
