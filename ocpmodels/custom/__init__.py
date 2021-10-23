@@ -14,6 +14,7 @@ __all__ = [
     "read_lzma",
     "read_lzma_to_atoms",
     "get_adsorbate_energy",
+    "filter_lmdbs_and_graphs",
 
     # "init_atoms_from_lmdb",
 

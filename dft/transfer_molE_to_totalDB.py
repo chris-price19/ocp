@@ -40,10 +40,10 @@ for mi, mm in enumerate(ads_id_keep_to_start):
         for fi, ff in enumerate(list(selection)):
 
             data = ff.data
-            print(data)
+            # print(data)
             data['mol_E'] = energy
-            print(data)
+            # print(data)
             db.update(ff.id, data=data)
             
-            sys.exit()
+            # sys.exit()
                 

@@ -147,3 +147,48 @@ def plot_atom_graph(data_obj):
     # can use edgecolors attribute to color border of nodes by tag
     
     return ax
+
+
+def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=True):
+
+    ## train lmdb
+
+    # binary_inds = sids2inds(traindb, list(sids.keys()))
+
+    glist_full = []
+    glist_reduced = []
+
+    for bi, bb in enumerate(binary_inds):
+        
+        rlxatoms = relaxed_atoms_from_lmdb(traindb, bb)
+        
+        saveconstraints = rlxatoms.constraints.copy()
+
+        rcell, Q = rlxatoms.cell.standard_form()
+        rlxatoms.cell = rlxatoms.cell @ Q.T
+        rlxatoms.cell[np.abs(rlxatoms.cell) < 1e-8] = 0.
+        rlxatoms.positions = rlxatoms.positions @ Q.T
+
+        p1 = AseAtomsAdaptor.get_structure(rlxatoms)
+        p1 = reorient_z(p1)
+        compareatoms = AseAtomsAdaptor.get_atoms(p1)
+
+        if np.amax(np.abs(compareatoms.cell - rlxatoms.cell)) > 1e-4:
+            print('atoms 1')
+            print(rlxatoms)
+            print('atoms 2')
+            print(compareatoms)
+            return
+
+        # if filteratoms:
+        surfatoms = filter_atoms_by_tag(rlxatoms, keep=np.array([1,2]))
+        glist_reduced.append(surfatoms)
+        # else:
+        glist_full.append(rlxatoms)
+
+    glist_full = graph_builder.convert_all(glist_full)
+    glist_reduced = graph_builder.convert_all(glist_reduced)
+
+    return glist_full, glist_reduced
+
+
