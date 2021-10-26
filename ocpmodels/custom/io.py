@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import numpy as np
+import pandas as pd
 import ase
 
 import lmdb
@@ -9,6 +10,10 @@ import pickle
 import lzma
 
 import os
+
+from ocpmodels.datasets import SinglePointLmdbDataset
+from ocpmodels.custom.plot_and_filter import sids2inds
+from sklearn.model_selection import train_test_split
 
 def read_lzma(inpfile, outfile):
     with open(inpfile, "rb") as f:
@@ -73,9 +78,94 @@ def write_lmbd(data_objects, target_col, location, filename):
 
 def get_adsorbate_energy(database, index):
     
+    """
+    get energy from molecule database of plain molecules in a box. designed for adsorbates.db
+
+    database: ase db file path (str)
+    index: adsorbate index (int)
+    """
+
     with ase.db.connect(database) as db:
         
         row = list(db.select(index+1))[0]
         data = row.data
         
     return data['energy']
+
+
+def reshuffle_lmdb_splits(base_lmdb, splits, outdir = os.getcwd(), ood=False):
+
+    def build_subset(basedb, ind):
+
+        objs = []
+        for ti, tt in enumerate(ind):
+
+            objs.append(basedb[tt])
+
+        return objs
+
+    if np.sum(splits) != 1.:
+        raise Exception('splits dont add to 1')
+
+    basedb = SinglePointLmdbDataset({"src": base_lmdb})
+    trainpct, valpct, testpct = splits
+
+    if ood:
+
+        domain_cols = ['ads_id', 'bulk_mpid']
+
+        base_datadir = '/home/ccprice/catalysis-data/ocp/data/'
+        map_frame = pd.DataFrame.from_dict(np.load(base_datadir + 'oc20_data_mapping.pkl', allow_pickle=True), orient='index')
+        cat_frame = pd.DataFrame.from_dict(np.load(base_datadir + 'mapping_adslab_slab.pkl', allow_pickle=True), orient='index', columns=['slab'])
+
+        # set up dataframe with sid, ads_id, slab_id, bulk_mpid
+        merged =  pd.merge(map_frame, cat_frame, left_index=True, right_index=True, how='inner')
+        sids =  ['random'+str(aa.sid) for aa in basedb]
+        merged = merged.loc[merged.index.isin(sids)]
+
+        # get unique groups and shuffle them
+        unique = merged.groupby(domain_cols).size().reset_index().rename(columns={0:'count'}).sample(frac=1).reset_index(drop=True)
+
+        traingroups = unique[0:int(np.floor(trainpct*len(unique)))]
+        valgroups = unique[int(np.floor(trainpct*len(unique))):int(np.floor((trainpct+valpct)*len(unique)))]
+        testgroups = unique[int(np.floor((trainpct+valpct)*len(unique))):]
+
+        trainsids = pd.merge(merged.reset_index(), traingroups, on=domain_cols, how='inner')
+        valsids = pd.merge(merged.reset_index(), valgroups, on=domain_cols, how='inner')
+        testsids = pd.merge(merged.reset_index(), testgroups, on=domain_cols, how='inner')
+
+        ind_train = sids2inds(basedb, trainsids['index'].tolist())
+        ind_valid = sids2inds(basedb, valsids['index'].tolist())
+        ind_test = sids2inds(basedb, testsids['index'].tolist())
+
+        adder = '_ood'
+
+    else:
+
+        inds = np.arange(len(basedb))
+
+        ind_train, ind_rem = train_test_split(inds, train_size=trainpct)
+        ind_valid, ind_test = train_test_split(ind_rem, test_size=valpct / (valpct+testpct))
+        adder = ''
+
+    print(len(basedb))
+    print(len(ind_train))
+    print(len(ind_valid))
+    print(len(ind_test))
+    # print(ind_train[0:50])
+
+    trainobjs = build_subset(basedb, ind_train)
+    m, s = write_lmbd(trainobjs, "y_relaxed", outdir, base_lmdb.split('/')[-1].split('.')[0] + '_train' + adder + '.lmdb')
+    print(m, s)
+
+    validobjs = build_subset(basedb, ind_valid)
+    m, s = write_lmbd(validobjs, "y_relaxed", outdir, base_lmdb.split('/')[-1].split('.')[0] + '_valid' + adder + '.lmdb')
+    print(m, s)
+
+    testobjs = build_subset(basedb, ind_test)
+    m, s = write_lmbd(testobjs, "y_relaxed", outdir, base_lmdb.split('/')[-1].split('.')[0] + '_test' + adder + '.lmdb')
+    print(m, s)
+
+
+
+    return
