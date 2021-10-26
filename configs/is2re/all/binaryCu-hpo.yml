@@ -29,7 +29,7 @@ is_hpo: True
 
 task:
   dataset: single_point_lmdb
-  description: "Relaxed state energy prediction from initial structure."
+  description: "Relaxed state energy prediction from relaxed structure."
   type: regression
   metric: mae
   labels:

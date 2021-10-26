@@ -127,6 +127,5 @@ filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, train_s
 
 filter_lmdbs_and_graphs(datadir + 'is2re/all/train/data.lmdb', map_dict, test_sids, a2g_rlx, datadir + 'is2re/all/test_id/', 'binaryCu-relax-split.lmdb')
 
-
 filter_lmdbs_and_graphs(datadir + 'is2re/all/val_id/data.lmdb', map_dict, binary_coppers, a2g_rlx, datadir + 'is2re/all/val_id/', 'binaryCu-relax.lmdb')
 

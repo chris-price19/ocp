@@ -39,10 +39,10 @@ if 'scratch' in cwd:
             base_datadir + 'is2re/all/val_ood_ads/data.lmdb',
             base_datadir + 'is2re/all/val_ood_both/data.lmdb',
             base_datadir + 'is2re/all/val_ood_cat/data.lmdb',
-            base_datadir + 'is2re/all/test_id/data.lmdb',
-            base_datadir + 'is2re/all/test_ood_ads/data.lmdb',
-            base_datadir + 'is2re/all/test_ood_cat/data.lmdb',
-            base_datadir + 'is2re/all/test_ood_both/data.lmdb',
+            # base_datadir + 'is2re/all/test_id/data.lmdb',
+            # base_datadir + 'is2re/all/test_ood_ads/data.lmdb',
+            # base_datadir + 'is2re/all/test_ood_cat/data.lmdb',
+            # base_datadir + 'is2re/all/test_ood_both/data.lmdb',
             ]
 else:
     base_datadir = '/home/ccprice/catalysis-data/ocp/data/'
