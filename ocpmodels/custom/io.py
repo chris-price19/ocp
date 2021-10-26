@@ -113,8 +113,11 @@ def reshuffle_lmdb_splits(base_lmdb, splits, outdir = os.getcwd(), ood=False):
     if ood:
 
         domain_cols = ['ads_id', 'bulk_mpid']
-
-        base_datadir = '/home/ccprice/catalysis-data/ocp/data/'
+        if 'scratch' in cwd:
+            base_datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/'
+        else:
+            base_datadir = '/home/ccprice/catalysis-data/ocp/data/'
+            
         map_frame = pd.DataFrame.from_dict(np.load(base_datadir + 'oc20_data_mapping.pkl', allow_pickle=True), orient='index')
         cat_frame = pd.DataFrame.from_dict(np.load(base_datadir + 'mapping_adslab_slab.pkl', allow_pickle=True), orient='index', columns=['slab'])
 
