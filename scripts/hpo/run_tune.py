@@ -121,7 +121,7 @@ def main():
         config=config,
         fail_fast=True,
         local_dir=config.get("run_dir", "./"),
-        num_samples=256,
+        num_samples=512,
         progress_reporter=reporter,
         scheduler=scheduler,
 

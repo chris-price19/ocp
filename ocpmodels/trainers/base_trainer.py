@@ -83,7 +83,6 @@ class BaseTrainer(ABC):
         if run_dir is None:
             run_dir = os.getcwd()
 
-<<<<<<< HEAD
         if timestamp_id is None:
             timestamp = torch.tensor(datetime.datetime.now().timestamp()).to(
                 self.device
