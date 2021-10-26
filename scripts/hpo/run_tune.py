@@ -63,12 +63,12 @@ def main():
     # )
     ## dpp - what about optimizer params? can anything in config.yml go here?
     config["model"].update(
-        hidden_channels=tune.choice([32, 64, 128]),
-        out_emb_channels=tune.choice([24, 48, 96]),
-        num_blocks=tune.choice([1, 2, 3]),
-        num_radial=tune.choice([4, 5, 6]),
-        num_spherical=tune.choice([4, 5, 6]),
-        num_output_layers=tune.choice([1,2,3]),
+        hidden_channels=tune.choice([64, 96, 128, 172]),
+        out_emb_channels=tune.choice([48, 64, 96, 128]),
+        num_blocks=tune.choice([2, 3, 4]),
+        num_radial=tune.choice([5, 6, 7]),
+        num_spherical=tune.choice([5, 6, 7]),
+        num_output_layers=tune.choice([2,3]),
     )
 
     ## I think something like
@@ -121,7 +121,7 @@ def main():
         config=config,
         fail_fast=True,
         local_dir=config.get("run_dir", "./"),
-        num_samples=64,
+        num_samples=256,
         progress_reporter=reporter,
         scheduler=scheduler,
 

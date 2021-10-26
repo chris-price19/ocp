@@ -1,15 +1,13 @@
 #!/bin/bash
 
 #SBATCH --job-name=h1c2
-#SBATCH --time=0-12:00:00
+#SBATCH --time=06-02:00:00
 #SBATCH --nodes=1
 #SBATCH -e err.%j
-##SBATCH -C "[ib1|ib2|ib3|ib4]"
 #SBATCH --partition g_vsheno
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-task=8
 #SBATCH --cpus-per-task=32
-##SBATCH --mem-per-cpu=DefMemPerCPU 
 
 ### This script works for any number of nodes, Ray will find and manage all resources
 ### Give all resources to a single Ray task, ray can manage the resources internally
@@ -35,8 +33,8 @@ ray stop
 redis_password=$(uuidgen)
 export redis_password
 
-nvidia-smi --query-gpu=timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 15 -f nvidialog.txt &
-bckpid=$!
+# nvidia-smi --query-gpu=timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 15 -f nvidialog.txt &
+# bckpid=$!
 
 nodes=$(scontrol show hostnames $SLURM_JOB_NODELIST) # Getting the node names
 nodes_array=( $nodes )
@@ -68,12 +66,13 @@ fi
 #### call your code below
 # e.g. python path_to/run_tune.py --mode train --config-yml path_to/configs/s2ef/200k/forcenet/fn_forceonly.yml --run_dir path_to_run_dir
 
-bash ~/script-repo/memoryprofile.sh "$processname" &
-bckpid1=$!
+# bash ~/script-repo/memoryprofile.sh "$processname" &
+# bckpid1=$!
 
 python -u /home/chrispr/mem/chrispr/catalysis/ocp/scripts/hpo/run_tune.py --mode=train --config-yml=/home/chrispr/mem/chrispr/catalysis/ocp/configs/is2re/all/dimenet_plus_plus/dpp-binaryCu.yml --run_dir=/home/chrispr/mem/chrispr/catalysis/experiments/
 
-kill "$bckpid"
-kill "$bckpid1"
+# kill "$bckpid"
+# kill "$bckpid1"
+ray stop
 
 exit
