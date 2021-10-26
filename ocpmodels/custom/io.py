@@ -126,14 +126,17 @@ def reshuffle_lmdb_splits(base_lmdb, splits, outdir = os.getcwd(), ood=False):
         # get unique groups and shuffle them
         unique = merged.groupby(domain_cols).size().reset_index().rename(columns={0:'count'}).sample(frac=1).reset_index(drop=True)
 
+        # perform the split using the unique groups
         traingroups = unique[0:int(np.floor(trainpct*len(unique)))]
         valgroups = unique[int(np.floor(trainpct*len(unique))):int(np.floor((trainpct+valpct)*len(unique)))]
         testgroups = unique[int(np.floor((trainpct+valpct)*len(unique))):]
 
+        # remerge with original DF to get all sids corresponding to subgroups
         trainsids = pd.merge(merged.reset_index(), traingroups, on=domain_cols, how='inner')
         valsids = pd.merge(merged.reset_index(), valgroups, on=domain_cols, how='inner')
         testsids = pd.merge(merged.reset_index(), testgroups, on=domain_cols, how='inner')
 
+        # convert to indices in base database
         ind_train = sids2inds(basedb, trainsids['index'].tolist())
         ind_valid = sids2inds(basedb, valsids['index'].tolist())
         ind_test = sids2inds(basedb, testsids['index'].tolist())
@@ -165,7 +168,5 @@ def reshuffle_lmdb_splits(base_lmdb, splits, outdir = os.getcwd(), ood=False):
     testobjs = build_subset(basedb, ind_test)
     m, s = write_lmbd(testobjs, "y_relaxed", outdir, base_lmdb.split('/')[-1].split('.')[0] + '_test' + adder + '.lmdb')
     print(m, s)
-
-
 
     return
