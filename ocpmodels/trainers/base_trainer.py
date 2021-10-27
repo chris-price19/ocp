@@ -180,6 +180,9 @@ class BaseTrainer(ABC):
         self.is_vis = is_vis
         self.is_hpo = is_hpo
 
+        print('*****')
+        print(self.is_hpo)
+
         if self.is_hpo:
             # conditional import is necessary for checkpointing
             from ray import tune
