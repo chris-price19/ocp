@@ -184,6 +184,7 @@ class BaseTrainer(ABC):
         print(self.is_hpo)
 
         if self.is_hpo:
+            print('conditional import')
             # conditional import is necessary for checkpointing
             from ray import tune
 
