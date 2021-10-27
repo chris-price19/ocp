@@ -23,7 +23,8 @@ module load gpu/cuda/10.2
 ulimit -s unlimited
 ulimit -n 4096
 
-source activate ocp-models
+# source activate ocp-models
+source activate ocp-gpu
 
 ray stop
 
