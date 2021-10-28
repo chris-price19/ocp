@@ -34,6 +34,7 @@ from torch_scatter import segment_coo, segment_csr
 def save_checkpoint(
     state, checkpoint_dir="checkpoints/", checkpoint_file="checkpoint.pt"
 ):
+    os.makedirs(checkpoint_dir,exist_ok=True)
     filename = os.path.join(checkpoint_dir, checkpoint_file)
     torch.save(state, filename)
 

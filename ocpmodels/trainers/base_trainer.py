@@ -44,6 +44,9 @@ from ocpmodels.modules.loss import DDPLoss, L2MAELoss
 from ocpmodels.modules.normalizer import Normalizer
 from ocpmodels.modules.scheduler import LRScheduler
 
+from ray import tune
+from ocpmodels.common.hpo_utils import tune_reporter
+
 
 @registry.register_trainer("base")
 class BaseTrainer(ABC):
@@ -180,11 +183,15 @@ class BaseTrainer(ABC):
         self.is_vis = is_vis
         self.is_hpo = is_hpo
 
-        if self.is_hpo:
-            # conditional import is necessary for checkpointing
-            from ray import tune
+        print('*****')
+        print(self.is_hpo)
 
-            from ocpmodels.common.hpo_utils import tune_reporter
+        if self.is_hpo:
+            print('conditional import')
+            # conditional import is necessary for checkpointing
+            ## is it??
+            ## from ray import tune
+            ## from ocpmodels.common.hpo_utils import tune_reporter
 
             # sets the hpo checkpoint frequency
             # default is no checkpointing
