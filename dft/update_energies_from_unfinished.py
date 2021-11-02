@@ -42,7 +42,7 @@ ads_id_keep_to_start = [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,62,63,65,69,70,71,72
 
 # logfile = 'slurm-1040138.out'
 logfile = 'snapshot-dirlist.out'
-total_database = './total-calc-plan.db'
+total_database = 'total-calc-plan.db'
 
 with open(logfile, 'r') as f:
 
@@ -59,12 +59,12 @@ for li, ll in enumerate(lines):
     os.chdir(ads_sid + '.' + strain_id + '/' + calcstring)
     updated_energy = outcarparse('OUTCAR')
 
-    print(ads_sid)
-    print(strain_id)
-    print(calcstring)
+    # print(ads_sid)
+    # print(strain_id)
+    # print(calcstring)
     ## pausing here - need to get the energy from outcar here and then change dirs back at the end
 
-    with ase.db.connect(total_database) as db:
+    with ase.db.connect(cwd + '/' + total_database) as db:
 
         selection = db.select(filter=lambda x: (x.data.ads_sid == int(ads_sid) and x.data.strain_id == int(strain_id)))
         entry = next(selection)
