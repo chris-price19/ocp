@@ -50,6 +50,7 @@ with open(logfile, 'r') as f:
 
 for li, ll in enumerate(lines):
 
+    print(li)
     sid = ll.rstrip().split('/')[-2]
     strain_id = sid.split('.')[-1]
     ads_sid = sid.split('.')[0]
@@ -57,12 +58,17 @@ for li, ll in enumerate(lines):
 
     os.chdir(ads_sid + '.' + strain_id + '/' + calcstring)
     updated_energy = outcarparse('OUTCAR')
+
+    print(ads_sid)
+    print(strain_id)
+    print(calcstring)
     ## pausing here - need to get the energy from outcar here and then change dirs back at the end
 
     with ase.db.connect(total_database) as db:
 
         selection = db.select(filter=lambda x: (x.data.ads_sid == int(ads_sid) and x.data.strain_id == int(strain_id)))
         entry = next(selection)
+        print(entry)
         data = entry.data
         
         data[calcstring+'_E'] = updated_energy
