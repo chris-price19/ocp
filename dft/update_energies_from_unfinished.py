@@ -20,13 +20,28 @@ import matplotlib
 import matplotlib.pyplot as plt
 from ase.visualize.plot import plot_atoms
 
-os.getcwd()
+def outcarparse(filepath):
+    
+    if os.path.isfile(filepath):
+        with open(filepath,'r') as f:
+            lines = f.read().splitlines()
+            for line in lines:
+                # Free energy
+                if line.lower().startswith('  free  energy   toten'):
+                    energy_free = float(line.split()[-2])
+                # Extrapolated zero point energy
+                if line.startswith('  energy  without entropy'):
+                    energy_zero = float(line.split()[-1])
+                    
+    return energy_zero
+
+
+#use symbolic link to run this from the catalysis/dft directory
+cwd = os.getcwd()
 ads_id_keep_to_start = [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,62,63,65,69,70,71,72,73,74,75,76,77,78,81]
 
-
 logfile = 'slurm-1040138.out'
-total_database = '../../dft/total-calc-plan.db'
-
+total_database = './total-calc-plan.db'
 
 with open(logfile, 'r') as f:
 
@@ -40,7 +55,8 @@ for li, ll in enumerate(lines):
     calcstring = ll.rstrip().split('/')[-1]
 
     os.chdir(ads_sid + '.' + strain_id + '/' + calcstring)
-    
+    updated_energy = outcarparse('OUTCAR')
+    ## pausing here - need to get the energy from outcar here and then change dirs back at the end
 
     with ase.db.connect(total_database) as db:
 
@@ -48,7 +64,8 @@ for li, ll in enumerate(lines):
         entry = next(selection)
         data = entry.data
         
-        data[calcstring+'_E'] = 
+        data[calcstring+'_E'] = updated_energy
         
         db.update(entry.id, data=data)
-                
+    
+    os.chdir(cwd)
