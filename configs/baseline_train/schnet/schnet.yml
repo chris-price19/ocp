@@ -1,5 +1,6 @@
 includes:
-- configs/is2re/10k/base.yml
+#   - configs/is2re/10k/base.yml
+   - /mnt/io2/scratch_vshenoy1/chrispr/catalysis/ocp/configs/baseline_train/binaryCu-hpo.yml
 
 model:
   name: schnet
@@ -7,7 +8,7 @@ model:
   num_filters: 128
   num_interactions: 3
   num_gaussians: 100
-  cutoff: 6.0
+  cutoff: 7.0
   use_pbc: True
   regress_forces: False
 
@@ -28,4 +29,4 @@ optim:
     - 3125
   warmup_steps: 468
   warmup_factor: 0.2
-  max_epochs: 30
+  max_epochs: 100

@@ -79,7 +79,7 @@ def main():
         batch_size=tune.choice([16, 32, 64, 128]),
         warmup_steps=tune.choice([50, 250, 500]),
     )
-    
+
     # define scheduler
     scheduler = ASHAScheduler(
         time_attr="steps",
@@ -128,7 +128,7 @@ def main():
         config=config,
         fail_fast=True,
         local_dir=config.get("run_dir", "./"),
-        num_samples=512,
+        num_samples=1024,
         progress_reporter=reporter,
         scheduler=scheduler,
 
