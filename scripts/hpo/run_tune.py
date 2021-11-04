@@ -117,6 +117,7 @@ def main():
     # define run parameters
     analysis = tune.run(
         ocp_trainable,
+        name=config["model"]["name"],
         resources_per_trial={"cpu": 4, "gpu": 1},
         config=config,
         fail_fast=True,

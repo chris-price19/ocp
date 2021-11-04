@@ -23,6 +23,7 @@ from pathlib import Path
 
 import demjson
 import numpy as np
+import pandas as pd
 import torch
 import yaml
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -405,6 +406,11 @@ def build_config(args, args_override):
     #     ## changing this to get run_dir to work
     #     config.update(overrides)
 
+    for di, dd in enumerate(config["dataset"]):
+        datastats = pd.read_csv(os.path.dirname(dd["src"]) + '/target.stats', sep='\t')
+        dd["target_mean"] = datastats['mean'].values[0]
+        dd["target_std"] = datastats['std'].values[0]
+        
     print(config)
 
     return config
