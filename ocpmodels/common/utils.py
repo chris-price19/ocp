@@ -406,11 +406,16 @@ def build_config(args, args_override):
     #     ## changing this to get run_dir to work
     #     config.update(overrides)
 
-    for di, dd in enumerate(config["dataset"]):
-        datastats = pd.read_csv(os.path.dirname(dd["src"]) + '/target.stats', sep='\t')
-        dd["target_mean"] = datastats['mean'].values[0]
-        dd["target_std"] = datastats['std'].values[0]
-        
+    # for di, dd in enumerate(config["dataset"]):
+    #     datastats = pd.read_csv(os.path.dirname(dd["src"]) + '/target.stats', sep='\t')
+    #     dd["target_mean"] = datastats['mean'].values[0]
+    #     dd["target_std"] = datastats['std'].values[0]
+
+    # read mean, std from target.stats, apply to training dataset (dataset[0])
+    datastats = pd.read_csv(os.path.dirname(dd["src"]) + '/target.stats', sep='\t')
+    config["dataset"][0]["target_mean"] = datastats['mean'].values[0]
+    config["dataset"][0]["target_std"] = datastats['std'].values[0]
+
     print(config)
 
     return config

@@ -10,9 +10,6 @@ from ocpmodels.common.flags import flags
 from ocpmodels.common.registry import registry
 from ocpmodels.common.utils import build_config, setup_imports
 
-os.environ['http_proxy'] = ''
-os.environ['https_proxy'] = ''
-
 # this function is general and should work for any ocp trainer
 def ocp_trainable(config, checkpoint_dir=None):
     # wait_for_gpu()
@@ -63,19 +60,20 @@ def main():
     # )
     ## dpp - what about optimizer params? can anything in config.yml go here?
     config["model"].update(
-        hidden_channels=tune.choice([64, 96, 128, 172]),
-        out_emb_channels=tune.choice([48, 64, 96, 128]),
-        num_blocks=tune.choice([2, 3, 4]),
-        num_radial=tune.choice([5, 6, 7]),
-        num_spherical=tune.choice([5, 6, 7]),
-        num_output_layers=tune.choice([2,3]),
+        hidden_channels=tune.choice([96, 128, 172, 256]),
+        num_filters=tune.choice([64, 96, 128, 172]),
+        num_interactions=tune.choice([2, 3, 4]),
+        num_gaussians=tune.choice([75, 110, 150]),
     )
 
     ## I think something like - update yes this works
     config["optim"].update(
-        lr_initial=tune.choice([1e-3, 5e-4, 1e-4]),
-        # lr_milestones=tune.choice([[1000, 2000, 3000], [10000, 20000, 30000]]),
+        lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
+        lr_milestones=tune.choice([[350, 700, 1400], [700, 1400, 2500]]),
+        batch_size=tune.choice([16, 32, 64, 128]),
+        warmup_steps=tune.choice([50, 250, 500]),
     )
+
     # define scheduler
     scheduler = ASHAScheduler(
         time_attr="steps",

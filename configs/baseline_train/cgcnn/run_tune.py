@@ -10,8 +10,8 @@ from ocpmodels.common.flags import flags
 from ocpmodels.common.registry import registry
 from ocpmodels.common.utils import build_config, setup_imports
 
-os.environ['http_proxy'] = ''
-os.environ['https_proxy'] = ''
+# os.environ['http_proxy'] = ''
+# os.environ['https_proxy'] = ''
 
 # this function is general and should work for any ocp trainer
 def ocp_trainable(config, checkpoint_dir=None):
@@ -53,6 +53,7 @@ def main():
     parser = flags.get_parser()
     args, override_args = parser.parse_known_args()
     config = build_config(args, override_args)
+
     # add parameters to tune using grid or random search
     # config["model"].update(
     #     hidden_channels=tune.choice([256, 384, 512, 640, 704]),
@@ -63,19 +64,22 @@ def main():
     # )
     ## dpp - what about optimizer params? can anything in config.yml go here?
     config["model"].update(
-        hidden_channels=tune.choice([64, 96, 128, 172]),
-        out_emb_channels=tune.choice([48, 64, 96, 128]),
-        num_blocks=tune.choice([2, 3, 4]),
-        num_radial=tune.choice([5, 6, 7]),
-        num_spherical=tune.choice([5, 6, 7]),
-        num_output_layers=tune.choice([2,3]),
+        atom_embedding_size=tune.choice([32, 64, 96, 128, 172, 256]),
+        fc_feat_size=tune.choice([64, 96, 128, 172, 256]),
+        num_fc_layers=tune.choice([2, 3, 4, 5]),
+        num_graph_conv_layers=tune.choice([3,4,5,6]),
+        num_gaussians=tune.choice([50, 80, 110, 140]),
+        num_output_layers=tune.choice([2, 3]),
     )
 
     ## I think something like - update yes this works
     config["optim"].update(
-        lr_initial=tune.choice([1e-3, 5e-4, 1e-4]),
-        # lr_milestones=tune.choice([[1000, 2000, 3000], [10000, 20000, 30000]]),
+        lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
+        lr_milestones=tune.choice([[350, 700, 1400], [700, 1400, 2500]]),
+        batch_size=tune.choice([16, 32, 64, 128]),
+        warmup_steps=tune.choice([50, 250, 500]),
     )
+    
     # define scheduler
     scheduler = ASHAScheduler(
         time_attr="steps",
@@ -86,6 +90,8 @@ def main():
         reduction_factor=4,
         brackets=1,
     )
+
+
     # ray init
     # for debug
     # ray.init(local_mode=True,num_cpus=32, num_gpus=8,  _temp_dir="/home/chrispr/raylogs")

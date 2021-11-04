@@ -72,9 +72,11 @@ def main():
     )
 
     ## I think something like - update yes this works
-    config["optim"].update(
-        lr_initial=tune.choice([1e-3, 5e-4, 1e-4]),
-        # lr_milestones=tune.choice([[1000, 2000, 3000], [10000, 20000, 30000]]),
+     config["optim"].update(
+        lr_initial=tune.choice([1e-3, 5e-3, 1e-4]),
+        lr_milestones=tune.choice([[1000, 5000, 8000], [2000, 6000, 10000]]),
+        batch_size=tune.choice([8, 16, 32, 64]),
+        warmup_steps=tune.choice([50, 250, 500]),
     )
     # define scheduler
     scheduler = ASHAScheduler(

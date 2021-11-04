@@ -21,10 +21,6 @@ from ase.io import read, write
 from ase.calculators.vasp import Vasp
 
 
-# number of strains per structure
-
-number_of_tensors = 6
-max_magnitude = 0.03
 ads_id_keep_to_start = [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,62,63,65,69,70,71,72,73,74,75,76,77,78,81]
 
 db = ase.db.connect('total-calc-plan.db')
