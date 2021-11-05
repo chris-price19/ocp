@@ -9,6 +9,7 @@ from ray.tune.utils import wait_for_gpu
 from ocpmodels.common.flags import flags
 from ocpmodels.common.registry import registry
 from ocpmodels.common.utils import build_config, setup_imports
+from datetime import datetime
 
 # this function is general and should work for any ocp trainer
 def ocp_trainable(config, checkpoint_dir=None):
@@ -115,7 +116,7 @@ def main():
     # define run parameters
     analysis = tune.run(
         ocp_trainable,
-        name=config["model"]["name"],
+        name=config["model"]["name"] + '-' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S"),
         resources_per_trial={"cpu": 4, "gpu": 1},
         config=config,
         fail_fast=True,
