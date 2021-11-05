@@ -69,7 +69,6 @@ def main():
         num_fc_layers=tune.choice([2, 3, 4, 5]),
         num_graph_conv_layers=tune.choice([3,4,5,6]),
         num_gaussians=tune.choice([50, 80, 110, 140]),
-        num_output_layers=tune.choice([2, 3]),
     )
 
     ## I think something like - update yes this works
