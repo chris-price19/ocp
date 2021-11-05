@@ -75,7 +75,7 @@ def main():
     ## I think something like - update yes this works
     config["optim"].update(
         lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
-        lr_milestones=tune.choice([[350, 700, 1400], [700, 1400, 2500]]),
+        # lr_milestones=tune.choice([[350, 700, 1400], [700, 1400, 2500]]),
         batch_size=tune.choice([16, 32, 64, 128]),
         warmup_steps=tune.choice([50, 250, 500]),
     )
