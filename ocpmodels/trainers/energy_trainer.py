@@ -316,11 +316,20 @@ class EnergyTrainer(BaseTrainer):
                         checkpoint_file="checkpoint.pt", training_state=True
                     )
 
+                    if self.test_loader is not None:
+                        test_metrics = self.validate(
+                            split="test",
+                            disable_tqdm=disable_eval_tqdm,
+                        )
+                    else:
+                        test_metrics = None
+
                     if self.val_loader is not None:
                         val_metrics = self.validate(
                             split="val",
                             disable_tqdm=disable_eval_tqdm,
                         )
+                        # if the val_mae is the best so far, update and predict
                         if (
                             val_metrics[
                                 self.evaluator.task_primary_metric[self.name]
@@ -341,6 +350,7 @@ class EnergyTrainer(BaseTrainer):
                                     results_file="predictions",
                                     disable_tqdm=False,
                                 )
+                                
 
                         if self.is_hpo:
                             self.hpo_update(
@@ -348,6 +358,7 @@ class EnergyTrainer(BaseTrainer):
                                 self.step,
                                 self.metrics,
                                 val_metrics,
+                                test_metrics,
                             )
 
                 if self.scheduler.scheduler_type == "ReduceLROnPlateau":
