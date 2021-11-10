@@ -344,7 +344,7 @@ class EnergyTrainer(BaseTrainer):
                                 checkpoint_file="best_checkpoint.pt",
                                 training_state=False,
                             )
-                            if self.test_loader is not None:
+                            if self.test_loader is not None and not self.is_hpo:
                                 self.predict(
                                     self.test_loader,
                                     results_file="predictions",

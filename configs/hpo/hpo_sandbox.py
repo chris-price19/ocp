@@ -7,8 +7,44 @@ import ray
 from ray import tune
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
-from ray.tune.utils import wait_for_gpu
+# from ray.tune.utils import wait_for_gpu
 
+from ocpmodels.common.flags import flags
+from ocpmodels.common.registry import registry
+from ocpmodels.common.utils import build_config, setup_imports
+from datetime import datetime
+
+
+def ocp_trainable(config, checkpoint_dir=None):
+    # wait_for_gpu()
+    setup_imports()
+    # trainer defaults are changed to run HPO
+    trainer = registry.get_trainer_class(config.get("trainer", "energy"))(
+        task=config["task"],
+        model=config["model"],
+        dataset=config["dataset"],
+        optimizer=config["optim"],
+        identifier=config["identifier"],
+        run_dir=config.get("run_dir", "./"),
+        is_debug=config.get("is_debug", False),
+        is_vis=config.get("is_vis", False),
+        is_hpo=config.get("is_hpo", True),  # hpo
+        print_every=config.get("print_every", 10),
+        seed=config.get("seed", 0),
+        logger=config.get("logger", None),  # hpo
+        local_rank=config["local_rank"],
+        amp=config.get("amp", False),
+        cpu=config.get("cpu", False),
+    )
+    # add checkpoint here
+    if checkpoint_dir:
+        checkpoint = os.path.join(checkpoint_dir, "checkpoint")
+        trainer.load_pretrained(checkpoint)
+    # start training
+    print('traintype', flush=True)
+    print(type(trainer), flush=True)
+
+    trainer.train()
 
 # this function is general and should work for any ocp trainer
 def test_trainable(config):
@@ -21,7 +57,9 @@ def test_trainable(config):
 
 def main():
 
-    config = {"model": "abc", "run_dir": "./logs"}
+    # config = {"model": "abc", "run_dir": "./logs"}
+    parser = flags.get_parser()
+    args, override_args = parser.parse_known_args()
     config = build_config(args, override_args)
     
     config["model"].update(
@@ -35,7 +73,7 @@ def main():
     ## I think something like - update yes this works
     config["optim"].update(
         lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
-        # lr_milestones=tune.choice([[350, 700, 1400], [700, 1400, 2500]]),
+        lr_milestones=tune.choice([[350, 700, 1400], [700, 1400, 2500]]),
         batch_size=tune.choice([16, 32, 64, 128]),
         warmup_steps=tune.choice([50, 250, 500]),
     )
@@ -63,7 +101,7 @@ def main():
 
     # define run parameters
     analysis = tune.run(
-        test_trainable,
+        ocp_trainable,
         resources_per_trial={"cpu": 1},
         config=config,
         fail_fast=True,

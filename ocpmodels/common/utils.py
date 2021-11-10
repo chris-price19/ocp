@@ -412,9 +412,10 @@ def build_config(args, args_override):
     #     dd["target_std"] = datastats['std'].values[0]
 
     # read mean, std from target.stats, apply to training dataset (dataset[0])
-    datastats = pd.read_csv(os.path.dirname(config["dataset"][0]["src"]) + '/target.stats', sep='\t')
-    config["dataset"][0]["target_mean"] = datastats['mean'].values[0]
-    config["dataset"][0]["target_std"] = datastats['std'].values[0]
+    if os.path.isfile(os.path.dirname(config["dataset"][0]["src"]) + '/target.stats'):
+        datastats = pd.read_csv(os.path.dirname(config["dataset"][0]["src"]) + '/target.stats', sep='\t')
+        config["dataset"][0]["target_mean"] = datastats['mean'].values[0]
+        config["dataset"][0]["target_std"] = datastats['std'].values[0]
 
     print(config)
 
