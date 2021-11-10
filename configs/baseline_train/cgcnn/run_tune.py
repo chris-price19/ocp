@@ -40,10 +40,7 @@ def ocp_trainable(config, checkpoint_dir=None):
     if checkpoint_dir:
         checkpoint = os.path.join(checkpoint_dir, "checkpoint")
         trainer.load_pretrained(checkpoint)
-    # start training
-    print('traintype', flush=True)
-    print(type(trainer), flush=True)
-
+    
     trainer.train()
 
 
@@ -75,7 +72,7 @@ def main():
     ## I think something like - update yes this works
     config["optim"].update(
         lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
-        # lr_milestones=tune.choice([[350, 700, 1400], [700, 1400, 2500]]),
+        lr_milestones=tune.choice([[2500, 5000, 10000], [5000, 10000, 20000]]),
         batch_size=tune.choice([16, 32, 64, 128]),
         warmup_steps=tune.choice([50, 250, 500]),
     )
@@ -116,7 +113,7 @@ def main():
             "training_iteration": "training_iteration",
             "val_loss": "val_loss",
             "val_energy_mae": "val_energy_mae",
-            "ood_energy_mae": "test_energy_mae",
+            "test_energy_mae": "test_energy_mae",
         },
     )
 

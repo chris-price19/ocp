@@ -40,10 +40,7 @@ def ocp_trainable(config, checkpoint_dir=None):
     if checkpoint_dir:
         checkpoint = os.path.join(checkpoint_dir, "checkpoint")
         trainer.load_pretrained(checkpoint)
-    # start training
-    print('traintype', flush=True)
-    print(type(trainer), flush=True)
-
+  
     trainer.train()
 
 

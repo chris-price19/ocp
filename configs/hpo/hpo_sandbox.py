@@ -40,10 +40,7 @@ def ocp_trainable(config, checkpoint_dir=None):
     if checkpoint_dir:
         checkpoint = os.path.join(checkpoint_dir, "checkpoint")
         trainer.load_pretrained(checkpoint)
-    # start training
-    print('traintype', flush=True)
-    print(type(trainer), flush=True)
-
+    
     trainer.train()
 
 # this function is general and should work for any ocp trainer
@@ -97,7 +94,7 @@ def main():
     #     _temp_dir="/home/chrispr/raylogs",
     # )
 
-    ray.init(local_mode=True, num_cpus=8)
+    ray.init()
 
     # define run parameters
     analysis = tune.run(
@@ -106,7 +103,7 @@ def main():
         config=config,
         fail_fast=True,
         local_dir=config.get("run_dir", "./"),
-        num_samples=64,
+        num_samples=8,
     )
 
 
