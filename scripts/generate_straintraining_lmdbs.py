@@ -69,7 +69,6 @@ df = pd.DataFrame(rows, columns=["ads_sid", "slab_sid", "mol_sid", "strain_id", 
 df['ads_energy'] = df['ads_E'] - df['slab_E'] - df['mol_E']
 df = pd.merge(df, df.loc[df['strain_id'] == 0, ['ads_sid','ads_energy']], on='ads_sid')
 df = pd.merge(df, df.loc[df['strain_id'] == 0, ['ads_sid','slab_E']], on='ads_sid')
-df = pd.merge(df, moldf, on='mol_sid', how='left')
 df['strain_delta'] = df['ads_energy_x'] - df['ads_energy_y']
 df.rename(columns={'ads_energy_x':'ads_energy', 'ads_energy_y':'ground_state_energy', 'slab_E_x':'slab_E', 'slab_E_y':'slab_ground_state_energy'}, inplace=True)
 
