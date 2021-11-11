@@ -522,7 +522,8 @@ class BaseTrainer(ABC):
                 k: train_metrics[k]["metric"] for k in self.metrics
             },
             val_metrics={k: val_metrics[k]["metric"] for k in val_metrics},
-            test_metrics=test_metrics,
+            # test_metrics=test_metrics,
+            test_metrics = {k: test_metrics[k]["metric"] for k in test_metrics},
         )
 
     @abstractmethod

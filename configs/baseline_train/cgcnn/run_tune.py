@@ -69,9 +69,9 @@ def main():
         num_gaussians=tune.choice([50, 80, 110, 140]),
     )
 
-    lr_milestones = np.array([[3500, 7000, 14000],
-                              [7000, 14000, 21000],
-                              [10000, 20000, 34000]])
+    lr_milestones = np.array([[7000, 14000, 21000],
+                              [10000, 20000, 34000],
+                              [15000, 25000]])
 
     ## I think something like - update yes this works
     config["optim"].update(
@@ -121,11 +121,12 @@ def main():
         },
     )
 
+    datastring = config["dataset"][0]["src"].split('/')[-2].split('_')[0]
     print(config.get("run_dir", "./"))
     # define run parameters
     analysis = tune.run(
         ocp_trainable,
-        name=config["model"]["name"] + '-' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S"),
+        name=config["model"]["name"] + '-' + datastring + '-' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S"),
         resources_per_trial={"cpu": 4, "gpu": 1},
         config=config,
         fail_fast=True,

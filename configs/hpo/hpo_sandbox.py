@@ -103,9 +103,12 @@ def main():
 
     ray.init()
 
+
+    datastring = config["dataset"][0]["src"].split('/')[-2].split('_')[0]
     # define run parameters
     analysis = tune.run(
         ocp_trainable,
+        name=config["model"]["name"] + '-' + datastring + '-' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S"),
         resources_per_trial={"cpu": 1},
         config=config,
         fail_fast=True,

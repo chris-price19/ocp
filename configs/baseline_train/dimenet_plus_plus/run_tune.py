@@ -61,24 +61,24 @@ def main():
     # )
     ## dpp - what about optimizer params? can anything in config.yml go here?
     config["model"].update(
-        hidden_channels=tune.choice([64, 96, 128, 172]),
-        out_emb_channels=tune.choice([48, 64, 96, 128]),
-        num_blocks=tune.choice([2, 3, 4]),
-        num_radial=tune.choice([5, 6, 7]),
-        num_spherical=tune.choice([5, 6, 7]),
-        num_output_layers=tune.choice([2,3]),
+        hidden_channels=tune.choice([32, 64, 96, 128, ]),
+        out_emb_channels=tune.choice([24, 48, 64, 96, ]),
+        num_blocks=tune.choice([2, 3,]),
+        num_radial=tune.choice([4, 5, 6, ]),
+        num_spherical=tune.choice([4, 5, 6,]),
+        num_output_layers=tune.choice([2, 3, 4]),
     )
 
-    lr_milestones = np.array([[3500, 7000, 14000],
-                              [7000, 14000, 21000],
-                              [10000, 20000, 34000]])
+    lr_milestones = np.array([[7000, 14000, 21000],
+                              [10000, 20000, 34000],
+                              [15000, 25000]])
 
     ## I think something like - update yes this works
     config["optim"].update(
-        lr_initial=tune.choice([1e-3, 5e-3, 1e-4]),
+        lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
         lr_milestones=tune.sample_from(lambda spec: lr_milestones[np.random.randint(len(lr_milestones))]),
-        batch_size=tune.choice([8, 16, 32, 64]),
-        warmup_steps=tune.choice([50, 250, 500]),
+        batch_size=tune.choice([16, 32, 64]),
+        warmup_steps=tune.choice([50, 200]),
     )
     # define scheduler
     scheduler = ASHAScheduler(
@@ -117,11 +117,14 @@ def main():
         },
     )
 
+
+    datastring = config["dataset"][0]["src"].split('/')[-2].split('_')[0]
+    
     print(config.get("run_dir", "./"))
     # define run parameters
     analysis = tune.run(
         ocp_trainable,
-        name=config["model"]["name"] + '-' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S"),
+        name=config["model"]["name"] + '-' + datastring + '-' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S"),
         resources_per_trial={"cpu": 4, "gpu": 1},
         config=config,
         fail_fast=True,
