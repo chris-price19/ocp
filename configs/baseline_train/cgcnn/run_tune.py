@@ -68,9 +68,9 @@ def main():
         num_gaussians=tune.choice([50, 80, 110, 140]),
     )
 
-    lr_milestones = np.array([[7000, 14000, 21000],
-                              [10000, 20000, 34000],
-                              [15000, 25000]])
+    lr_milestones = [[7000, 14000, 21000],
+                      [10000, 20000, 34000],
+                      [15000, 25000]]
 
     ## I think something like - update yes this works
     config["optim"].update(
