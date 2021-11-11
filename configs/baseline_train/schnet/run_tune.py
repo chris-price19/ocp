@@ -71,7 +71,7 @@ def main():
     lr_milestones = np.array([[3500, 7000, 14000],
                               [7000, 14000, 21000],
                               [10000, 20000, 34000]])
-    
+
     ## I think something like - update yes this works
     config["optim"].update(
         lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
@@ -126,7 +126,7 @@ def main():
         config=config,
         fail_fast=True,
         local_dir=config.get("run_dir", "./"),
-        num_samples=512,
+        num_samples=256,
         progress_reporter=reporter,
         scheduler=scheduler,
 
