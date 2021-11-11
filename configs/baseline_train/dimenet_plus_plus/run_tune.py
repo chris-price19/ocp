@@ -69,10 +69,14 @@ def main():
         num_output_layers=tune.choice([2,3]),
     )
 
+    lr_milestones = np.array([[3500, 7000, 14000],
+                              [7000, 14000, 21000],
+                              [10000, 20000, 34000]])
+
     ## I think something like - update yes this works
     config["optim"].update(
         lr_initial=tune.choice([1e-3, 5e-3, 1e-4]),
-        # lr_milestones=tune.choice([[1000, 5000, 8000], [2000, 6000, 10000]]),
+        lr_milestones=tune.sample_from(lambda spec: lr_milestones[np.random.randint(len(lr_milestones))]),
         batch_size=tune.choice([8, 16, 32, 64]),
         warmup_steps=tune.choice([50, 250, 500]),
     )
@@ -122,7 +126,7 @@ def main():
         config=config,
         fail_fast=True,
         local_dir=config.get("run_dir", "./"),
-        num_samples=512,
+        num_samples=256,
         progress_reporter=reporter,
         scheduler=scheduler,
 

@@ -69,10 +69,14 @@ def main():
         num_gaussians=tune.choice([50, 80, 110, 140]),
     )
 
+    lr_milestones = np.array([[3500, 7000, 14000],
+                              [7000, 14000, 21000],
+                              [10000, 20000, 34000]])
+
     ## I think something like - update yes this works
     config["optim"].update(
         lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
-        lr_milestones=tune.choice([[2500, 5000, 10000], [5000, 10000, 20000]]),
+        lr_milestones=tune.sample_from(lambda spec: lr_milestones[np.random.randint(len(lr_milestones))]),
         batch_size=tune.choice([16, 32, 64, 128]),
         warmup_steps=tune.choice([50, 250, 500]),
     )
