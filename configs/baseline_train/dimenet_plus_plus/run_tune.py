@@ -11,8 +11,7 @@ from ocpmodels.common.registry import registry
 from ocpmodels.common.utils import build_config, setup_imports
 from datetime import datetime
 
-os.environ['http_proxy'] = ''
-os.environ['https_proxy'] = ''
+import numpy as np
 
 # this function is general and should work for any ocp trainer
 def ocp_trainable(config, checkpoint_dir=None):
@@ -119,7 +118,7 @@ def main():
 
 
     datastring = config["dataset"][0]["src"].split('/')[-2].split('_')[0]
-    
+
     print(config.get("run_dir", "./"))
     # define run parameters
     analysis = tune.run(

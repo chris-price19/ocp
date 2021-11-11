@@ -11,6 +11,8 @@ from ocpmodels.common.registry import registry
 from ocpmodels.common.utils import build_config, setup_imports
 from datetime import datetime
 
+import numpy as np
+
 # this function is general and should work for any ocp trainer
 def ocp_trainable(config, checkpoint_dir=None):
     # wait_for_gpu()
