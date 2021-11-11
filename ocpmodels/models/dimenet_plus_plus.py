@@ -451,6 +451,9 @@ class DimeNetPlusPlusWrap(DimeNetPlusPlus):
             x = interaction_block(x, rbf, sbf, idx_kj, idx_ji)
             P += output_block(x, rbf, i, num_nodes=pos.size(0))
 
+        ## node level predictions to be made here on P
+        # print(P.shape)
+        
         energy = P.sum(dim=0) if batch is None else scatter(P, batch, dim=0)
 
         return energy
