@@ -38,6 +38,7 @@ a2g_strain_rlx = StrainAtomsToGraphs(
 
 base_datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/'
 dft_datadir = '/scratch/vshenoy1/chrispr/catalysis/dft/'
+
 database = dft_datadir + 'total-calc-plan.db'
 with ase.db.connect(database) as db:
     selection = db.select(filter=lambda x: (x.data.status=='full' and x.data.ads_E != 999 and x.data.slab_E != 999 and x.data.mol_E != 999))
@@ -67,8 +68,8 @@ for fi, ff in enumerate(selection):
     
 df = pd.DataFrame(rows, columns=["ads_sid", "slab_sid", "mol_sid", "strain_id", "total_natoms", "ads_E", "slab_E", "mol_E", "strain_norm", "shear_ratio", "strain_anisotropy"])
 df['ads_energy'] = df['ads_E'] - df['slab_E'] - df['mol_E']
-df = pd.merge(df, df.loc[df['strain_id'] == 0, ['ads_sid','ads_energy']], on='ads_sid')
-df = pd.merge(df, df.loc[df['strain_id'] == 0, ['ads_sid','slab_E']], on='ads_sid')
+df = pd.merge(df, df.loc[df['strain_id'] == 0, ['ads_sid','ads_energy']], on='ads_sid', how='left')
+df = pd.merge(df, df.loc[df['strain_id'] == 0, ['ads_sid','slab_E']], on='ads_sid', how='left')
 df['strain_delta'] = df['ads_energy_x'] - df['ads_energy_y']
 df.rename(columns={'ads_energy_x':'ads_energy', 'ads_energy_y':'ground_state_energy', 'slab_E_x':'slab_E', 'slab_E_y':'slab_ground_state_energy'}, inplace=True)
 
