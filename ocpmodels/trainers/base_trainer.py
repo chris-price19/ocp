@@ -320,7 +320,8 @@ class BaseTrainer(ABC):
                 self.model, device_ids=[self.device]
             )
 
-        print(self.model.state_dict())
+        # print('check out state dict')
+        # print(self.model.state_dict())
 
     def load_checkpoint(self, checkpoint_path, strict_load=True):
         if not os.path.isfile(checkpoint_path):
@@ -372,6 +373,7 @@ class BaseTrainer(ABC):
         self.loss_fn = {}
         self.loss_fn["energy"] = self.config["optim"].get("loss_energy", "mae")
         self.loss_fn["force"] = self.config["optim"].get("loss_force", "mae")
+        self.loss_fn["classify"] = self.config["optim"].get("loss_classify", "crossentropy")
         for loss, loss_name in self.loss_fn.items():
             if loss_name in ["l1", "mae"]:
                 self.loss_fn[loss] = nn.L1Loss()
@@ -379,6 +381,8 @@ class BaseTrainer(ABC):
                 self.loss_fn[loss] = nn.MSELoss()
             elif loss_name == "l2mae":
                 self.loss_fn[loss] = L2MAELoss()
+            elif loss_name == "crossentropy":
+                self.loss_fn[loss] = nn.CrossEntropyLoss(weight=self.config["dataset"].get("class_weights", None))
             else:
                 raise NotImplementedError(
                     f"Unknown loss function name: {loss_name}"

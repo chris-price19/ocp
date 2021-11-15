@@ -423,6 +423,7 @@ def build_config(args, args_override):
     # read mean, std from target.stats, apply to training dataset (dataset[0])
     if os.path.isfile(os.path.dirname(config["dataset"][0]["src"]) + '/data.stats'):
         datastats = pd.read_csv(os.path.dirname(config["dataset"][0]["src"]) + '/data.stats', index_col=0)
+        # print(datastats)
         config["dataset"][0]["target_mean"] = datastats.loc['target']['mean'] # .values[0]
         config["dataset"][0]["target_std"] = datastats.loc['target']['std']
 
@@ -430,6 +431,8 @@ def build_config(args, args_override):
         config["dataset"][0]["data_std"] = datastats.filter(regex='strain', axis=0)['std'].values
 
         config["model"]["max_atoms"] = int(datastats.loc["max_atoms"]["mean"])
+        config["dataset"][0]["global_min_target"] = int(datastats.loc["global_min_target"]["mean"])
+        config["dataset"][0]["class_weights"] = torch.FloatTensor(datastats.filter(regex='class', axis=0)['mean'].values)
 
     print(config)
 

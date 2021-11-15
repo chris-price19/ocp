@@ -204,6 +204,7 @@ class OutputPPBlock(torch.nn.Module):
 
 
 class StrainBlock(torch.nn.Module):
+    
     def __init__(
         self,
         out_channels,
@@ -238,7 +239,9 @@ class StrainBlock(torch.nn.Module):
     def forward(self, x, natoms, strains):
         
         splits = torch.tensor_split(x, torch.cumsum(natoms, 0)[:-1])
-        x = pad_sequence(splits, batch_first=True).squeeze()
+        x = pad_sequence(splits, batch_first=True) # .view(-1)
+        # print(x)
+        # print(x.shape)
         p = torch.nn.ConstantPad1d((0, self.max_atoms - x.shape[-1]), 0.)
         # print(p(x))
         # print(p(x).shape)
@@ -432,8 +435,6 @@ class DimeNetPlusPlusWrap(DimeNetPlusPlus):
         # print(max_atoms)
 
         # print('numatoms')
-        # print(num_atoms)
-        # sys.exit()
 
         super(DimeNetPlusPlusWrap, self).__init__(
             hidden_channels=hidden_channels,
@@ -544,6 +545,11 @@ class DimeNetPlusPlusWrap(DimeNetPlusPlus):
 
         energy = P.sum(dim=0) if batch is None else scatter(P, batch, dim=0)
 
+        if self.num_targets > 1:
+            return energy, P
+        else:
+            return energy
+
         return energy
 
     def forward(self, data):
@@ -602,11 +608,10 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
         self.cutoff = cutoff
         self.otf_graph = otf_graph
         self.max_atoms = max_atoms
-
         
         super(StrainDimeNetPlusPlusWrap, self).__init__(
             hidden_channels=hidden_channels,
-            out_channels=num_targets,
+            out_channels = num_targets,
             num_blocks=num_blocks,
             int_emb_size=int_emb_size,
             basis_emb_size=basis_emb_size,
@@ -705,18 +710,22 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
         # print('v2')
         # print(x.shape)
         # print(P.shape)
-        P = self.strain_block(P, data.natoms, data.strain)
+        # sys.exit()
+        SP = self.strain_block(P.sum(dim=-1), data.natoms, data.strain)
         ## node level predictions to be made here on P
         # print(P)
         # print(P.shape)
         # print(scatter(P, batch, dim=0))
         # sys.exit()
+        energy = SP.sum(dim=-1)
 
-        energy = P.sum(dim=-1)
+        if self.num_targets > 1:
+            return energy, P
+        else:
+            return energy        
 
         # energy = P.sum(dim=0) if batch is None else scatter(P, batch, dim=0)
-
-        return energy
+        
 
     def forward(self, data):
         if self.regress_forces:

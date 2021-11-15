@@ -49,6 +49,8 @@ glist_reduced = []
 strains = []
 full_natoms = []
 reduced_natoms = []
+full_atom_targets = []
+reduced_atom_targets = []
 
 for fi, ff in enumerate(selection):
     
@@ -60,16 +62,21 @@ for fi, ff in enumerate(selection):
     rlxatoms.info['sid'] = ff.data.ads_sid
     rlxatoms.info['energy'] = ff.data['ads_E'] - ff.data['slab_E'] - ff.data['mol_E']
     rlxatoms.info['strain_id'] = ff.data['strain_id']
-    rlxatoms.info['strain'] = (ff.data['strain'] - np.eye(3))[0:2,0:2].flatten()  ## xx, xy, yx, yy
-    strains.append((ff.data['strain'] - np.eye(3))[0:2,0:2])
+    rlxatoms.info['strain'] = np.expand_dims((ff.data['strain'] - np.eye(3))[0:2,0:2].flatten(),0)*100  ## xx, xy, yx, yy
+    strains.append((ff.data['strain'] - np.eye(3))[0:2,0:2]*100)
     full_natoms.append(len(rlxatoms.get_chemical_symbols()))
-
+#     print(np.shape(np.expand_dims((ff.data['strain'] - np.eye(3))[0:2,0:2].flatten(),0)))
+#     sys.exit()
+#     print(rlxatoms.info)
     glist_full.append(rlxatoms)
-
     reduced_atoms = filter_atoms_by_tag(rlxatoms, keep=np.array([1,2]))
     glist_reduced.append(reduced_atoms)
     reduced_natoms.append(len(reduced_atoms.get_chemical_symbols()))
-
+    
+#     print(type(rlxatoms.info['tags']))
+    full_atom_targets = full_atom_targets + (rlxatoms.info['tags'].tolist())
+    reduced_atom_targets = reduced_atom_targets + (reduced_atoms.info['tags'].tolist())
+    
     shear_ratio = (np.sum(np.abs(ff.data.strain)) - np.trace(np.abs(ff.data.strain)) + 3) / np.trace(np.abs(ff.data.strain))
     # magnitude of off diagaonal elements / magnitude of diagonal elements. < 1 means more uniaxial, > 1 means more shear
     strain_norm = np.linalg.norm(ff.data.strain[0:2,0:2])
@@ -87,12 +94,12 @@ df = pd.merge(df, df.loc[df['strain_id'] == 0, ['ads_sid','slab_E']], on='ads_si
 df['strain_delta'] = df['ads_energy_x'] - df['ads_energy_y']
 df.rename(columns={'ads_energy_x':'ads_energy', 'ads_energy_y':'ground_state_energy', 'slab_E_x':'slab_E', 'slab_E_y':'slab_ground_state_energy'}, inplace=True)
 
-max_atoms = df['total_natoms'].max()
+# sys.exit()
 
 print(len(rows))
 print(len(df))
 print(len(glist_full))
-test_targets = []
+
 
 for di, dd in enumerate(df['strain_delta'].values):
     
@@ -110,6 +117,9 @@ reduced_list = a2g_strain_rlx.convert_all(glist_reduced)
 
 data_norms = pd.DataFrame(np.vstack([np.mean(strains, axis=0).flatten(), np.std(strains, axis=0).flatten()]).T, index=['strain_xx', 'strain_xy', 'strain_yx', 'strain_yy'],columns=['mean', 'std'])
 
+full_weights = compute_class_weight('balanced', classes=np.unique(full_atom_targets), y=full_atom_targets)
+reduced_weights = compute_class_weight('balanced', classes=np.unique(reduced_atom_targets), y=reduced_atom_targets)
+
 outdir = datadir + 'strained_full_structures'
 outfile = 'binaryCu-relax-moleculesubset.lmdb'
 target_col = "y_relaxed"
@@ -118,18 +128,28 @@ mean, std = write_lmbd(full_list, target_col, outdir, outfile)
 print(mean, std)
 data_norms.loc['target'] = [mean, std]
 data_norms.loc['max_atoms'] = [int(np.amax(full_natoms)), int(np.amax(full_natoms))]
+data_norms.loc['global_min_target'] = [0, 0]
+data_norms.loc['num_targets'] = 3
+for ti in np.arange(data_norms.loc['num_targets'][0]):
+    data_norms.loc['classweight_'+str(int(ti))] = full_weights[int(ti)]
 data_norms.to_csv(outdir + '/data.stats')
 fulldb = SinglePointLmdbDataset({"src": outdir + '/' + outfile})
 reshuffle_lmdb_splits(outdir + '/' + outfile, [0.8, 0.1, 0.1], outdir = outdir, ood=False)
 reshuffle_lmdb_splits(outdir + '/' + outfile, [0.8, 0.1, 0.1], outdir = outdir, ood=True)
 
+
+data_norms = pd.DataFrame(np.vstack([np.mean(strains, axis=0).flatten(), np.std(strains, axis=0).flatten()]).T, index=['strain_xx', 'strain_xy', 'strain_yx', 'strain_yy'],columns=['mean', 'std'])
 outdir = datadir + 'strained_reduced_structures'
 outfile = 'binaryCu-relax-moleculesubset.lmdb'
 target_col = "y_relaxed"
 mean, std = write_lmbd(reduced_list, target_col, outdir, outfile)
 
-print(mean, std)
+data_norms.loc['target'] = [mean, std]
 data_norms.loc['max_atoms'] = [int(np.amax(reduced_natoms)), int(np.amax(reduced_natoms))]
+data_norms.loc['global_min_target'] = [1, 1]
+data_norms.loc['num_targets'] = 2
+for ti in np.arange(data_norms.loc['num_targets'][0]):
+    data_norms.loc['classweight_'+str(int(ti))] = reduced_weights[int(ti)]
 data_norms.to_csv(outdir + '/data.stats')
 
 reduceddb = SinglePointLmdbDataset({"src": outdir + '/' + outfile})

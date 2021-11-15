@@ -27,7 +27,7 @@ model:
 #   the lr_milestones and warmup_steps need to be adjusted accordingly.
 
 optim:
-  batch_size: 3
+  batch_size: 4
   eval_batch_size: 2
   num_workers: 2
   lr_initial: 0.01
@@ -36,6 +36,6 @@ optim:
     - 20000
     - 40000
     - 60000
-  warmup_steps: 10000
+  warmup_steps: 10
   warmup_factor: 0.2
   max_epochs: 20
