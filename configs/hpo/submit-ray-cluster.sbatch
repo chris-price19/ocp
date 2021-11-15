@@ -23,6 +23,7 @@ module load gpu/cuda/10.2
 ulimit -s unlimited
 ulimit -n 4096
 
+eval "$(conda shell.bash hook)"
 # source activate ocp-models
 source activate ocp-gpu
 

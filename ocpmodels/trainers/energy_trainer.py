@@ -175,8 +175,18 @@ class EnergyTrainer(BaseTrainer):
                     std=self.normalizer["target_std"],
                     device=self.device,
                 )
+        # if self.normalizer.get("normalize_labels", False):
+            if "data_mean" in self.normalizer:
+                self.normalizers["data"] = Normalizer(
+                    mean=self.normalizer["data_mean"],
+                    std=self.normalizer["data_std"],
+                    device=self.device,
+                )
             else:
                 raise NotImplementedError
+
+            # print(self.normalizers["data"].mean)
+            # print(self.normalizers["data"].std)
 
     @torch.no_grad()
     def predict(
@@ -254,6 +264,7 @@ class EnergyTrainer(BaseTrainer):
         ):
             self.train_sampler.set_epoch(epoch_int)
             skip_steps = self.step % len(self.train_loader)
+            # print(skip_steps)
             train_loader_iter = iter(self.train_loader)
 
             for i in range(skip_steps, len(self.train_loader)):
@@ -264,6 +275,14 @@ class EnergyTrainer(BaseTrainer):
                 # Get a batch.
                 batch = next(train_loader_iter)
 
+                # print(batch)
+                # print(batch[0].strain)
+                # print(batch[0].natoms)
+                # if "data_mean" in self.normalizer:
+                #     batch[0].strain = self.normalizers["data"].norm(batch[0].strain)
+                # print(batch[0].strain)
+                # sys.exit()
+
                 # Forward, loss, backward.
                 with torch.cuda.amp.autocast(enabled=self.scaler is not None):
                     out = self._forward(batch)
@@ -271,6 +290,9 @@ class EnergyTrainer(BaseTrainer):
                 loss = self.scaler.scale(loss) if self.scaler else loss
                 self._backward(loss)
                 scale = self.scaler.get_scale() if self.scaler else 1.0
+
+                # if i == 1:
+                #     sys.exit()
 
                 # Compute metrics.
                 self.metrics = self._compute_metrics(

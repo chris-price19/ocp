@@ -1,8 +1,11 @@
 includes:
 - configs/is2re/10k/base.yml
 
+# checkpoint: '~/checkpoint.pt'
+# strict_load: False
+
 model:
-  name: dimenetplusplus
+  name: dimenetplusplus_strain
   hidden_channels: 64
   out_emb_channels: 48
   num_blocks: 3
@@ -12,6 +15,9 @@ model:
   num_before_skip: 1
   num_after_skip: 2
   num_output_layers: 3
+  num_strain_layers: 2
+  strain_projection_channels: 16
+  final_dim: 16
   regress_forces: False
   use_pbc: True
 

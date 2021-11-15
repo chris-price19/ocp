@@ -378,6 +378,11 @@ def build_config(args, args_override):
         config, _ = merge_dicts(config, overrides)
 
     # Some other flags.
+    # print(args.distributed_backend)
+    # # print(args.run_dir)
+    # print(config["distributed_backend"])
+    # # sys.exit()
+
     config["mode"] = args.mode
     config["identifier"] = args.identifier
     config["timestamp_id"] = args.timestamp_id
@@ -398,6 +403,10 @@ def build_config(args, args_override):
     config["world_size"] = args.num_nodes * args.num_gpus
     config["distributed_backend"] = args.distributed_backend
 
+    if args_override != []:
+        overrides = create_dict_from_args(args_override)
+        config, _ = merge_dicts(config, overrides)
+        
         # Check for overriden parameters.
     # if args_override != []:
     #     print('overriding')
@@ -412,10 +421,15 @@ def build_config(args, args_override):
     #     dd["target_std"] = datastats['std'].values[0]
 
     # read mean, std from target.stats, apply to training dataset (dataset[0])
-    if os.path.isfile(os.path.dirname(config["dataset"][0]["src"]) + '/target.stats'):
-        datastats = pd.read_csv(os.path.dirname(config["dataset"][0]["src"]) + '/target.stats', sep='\t')
-        config["dataset"][0]["target_mean"] = datastats['mean'].values[0]
-        config["dataset"][0]["target_std"] = datastats['std'].values[0]
+    if os.path.isfile(os.path.dirname(config["dataset"][0]["src"]) + '/data.stats'):
+        datastats = pd.read_csv(os.path.dirname(config["dataset"][0]["src"]) + '/data.stats', index_col=0)
+        config["dataset"][0]["target_mean"] = datastats.loc['target']['mean'] # .values[0]
+        config["dataset"][0]["target_std"] = datastats.loc['target']['std']
+
+        config["dataset"][0]["data_mean"] = datastats.filter(regex='strain', axis=0)['mean'].values
+        config["dataset"][0]["data_std"] = datastats.filter(regex='strain', axis=0)['std'].values
+
+        config["model"]["max_atoms"] = int(datastats.loc["max_atoms"]["mean"])
 
     print(config)
 

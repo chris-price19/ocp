@@ -68,9 +68,8 @@ def main():
         num_output_layers=tune.choice([2, 3, 4]),
     )
 
-    lr_milestones = [[7000, 14000, 21000],
-                      [10000, 20000, 34000],
-                      [15000, 25000]]
+    lr_milestones = [[30000, 60000, 12000],
+                      [75000, 125000]]
 
     ## I think something like - update yes this works
     config["optim"].update(

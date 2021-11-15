@@ -320,7 +320,9 @@ class BaseTrainer(ABC):
                 self.model, device_ids=[self.device]
             )
 
-    def load_checkpoint(self, checkpoint_path):
+        print(self.model.state_dict())
+
+    def load_checkpoint(self, checkpoint_path, strict_load=True):
         if not os.path.isfile(checkpoint_path):
             raise FileNotFoundError(
                 errno.ENOENT, "Checkpoint file not found", checkpoint_path
@@ -340,14 +342,14 @@ class BaseTrainer(ABC):
             # No need for OrderedDict since dictionaries are technically ordered
             # since Python 3.6 and officially ordered since Python 3.7
             new_dict = {k[7:]: v for k, v in checkpoint["state_dict"].items()}
-            self.model.load_state_dict(new_dict)
+            self.model.load_state_dict(new_dict, strict=strict_load)
         elif distutils.initialized() and first_key.split(".")[1] != "module":
             new_dict = {
                 f"module.{k}": v for k, v in checkpoint["state_dict"].items()
             }
-            self.model.load_state_dict(new_dict)
+            self.model.load_state_dict(new_dict, strict=strict_load)
         else:
-            self.model.load_state_dict(checkpoint["state_dict"])
+            self.model.load_state_dict(checkpoint["state_dict"], strict=strict_load)
 
         if "optimizer" in checkpoint:
             self.optimizer.load_state_dict(checkpoint["optimizer"])
