@@ -38,7 +38,7 @@ a2g_strain_rlx = StrainAtomsToGraphs(
     r_energy_delta = True,
 )
 
-base_datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/'
+datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/'
 dft_datadir = '/scratch/vshenoy1/chrispr/catalysis/dft/'
 
 database = dft_datadir + 'total-calc-plan.db'
