@@ -160,12 +160,16 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
 
     glist_full = []
     glist_reduced = []
+    full_atom_targets = []
+    reduced_atom_targets = []
 
     for bi, bb in enumerate(binary_inds):
         
         rlxatoms = relaxed_atoms_from_lmdb(traindb, bb)
         
         saveconstraints = rlxatoms.constraints.copy()
+
+        full_atom_targets = full_atom_targets + rlxatoms.info['tags'].tolist()        
 
         rcell, Q = rlxatoms.cell.standard_form()
         rlxatoms.cell = rlxatoms.cell @ Q.T
@@ -185,6 +189,7 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
 
         # if filteratoms:
         surfatoms = filter_atoms_by_tag(rlxatoms, keep=np.array([1,2]))
+        reduced_atom_targets = reduced_atom_targets + surfatoms.info['tags'].tolist()
         glist_reduced.append(surfatoms)
         # else:
         glist_full.append(rlxatoms)
@@ -192,6 +197,6 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
     glist_full = graph_builder.convert_all(glist_full)
     glist_reduced = graph_builder.convert_all(glist_reduced)
 
-    return glist_full, glist_reduced
+    return glist_full, glist_reduced, full_atom_targets, reduced_atom_targets
 
 

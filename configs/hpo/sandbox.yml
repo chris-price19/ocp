@@ -1,4 +1,5 @@
-trainer: energy
+#trainer: energy
+trainer: multitask_energy
 
 dataset:
   # - src: data/is2re/100k/train/binaryCu-relax.lmdb

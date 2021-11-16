@@ -18,6 +18,7 @@ def ocp_trainable(config, checkpoint_dir=None):
     # wait_for_gpu()
     setup_imports()
     # trainer defaults are changed to run HPO
+    print(config.get("trainer", "energy"))
     trainer = registry.get_trainer_class(config.get("trainer", "energy"))(
         task=config["task"],
         model=config["model"],
@@ -50,6 +51,7 @@ def main():
     parser = flags.get_parser()
     args, override_args = parser.parse_known_args()
     config = build_config(args, override_args)
+        
     # add parameters to tune using grid or random search
     # config["model"].update(
     #     hidden_channels=tune.choice([256, 384, 512, 640, 704]),

@@ -429,12 +429,14 @@ def build_config(args, args_override):
         config["dataset"][0]["target_mean"] = datastats.loc['target']['mean'] # .values[0]
         config["dataset"][0]["target_std"] = datastats.loc['target']['std']
 
-        config["dataset"][0]["data_mean"] = datastats.filter(regex='strain', axis=0)['mean'].values
-        config["dataset"][0]["data_std"] = datastats.filter(regex='strain', axis=0)['std'].values
+        if 'strain_xx' in datastats.index.values:
+            config["dataset"][0]["data_mean"] = datastats.filter(regex='strain', axis=0)['mean'].values
+            config["dataset"][0]["data_std"] = datastats.filter(regex='strain', axis=0)['std'].values
+            config["model"]["max_atoms"] = int(datastats.loc["max_atoms"]["mean"])
 
-        config["model"]["max_atoms"] = int(datastats.loc["max_atoms"]["mean"])
-        config["dataset"][0]["global_min_target"] = int(datastats.loc["global_min_target"]["mean"])
-        config["dataset"][0]["class_weights"] = torch.FloatTensor(datastats.filter(regex='class', axis=0)['mean'].values)
+        if 'global_min_target' in datastats.index.values:
+            config["dataset"][0]["global_min_target"] = int(datastats.loc["global_min_target"]["mean"])
+            config["dataset"][0]["class_weights"] = torch.FloatTensor(datastats.filter(regex='class', axis=0)['mean'].values)
 
     print(config)
 
