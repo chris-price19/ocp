@@ -44,6 +44,11 @@ dft_datadir = '/scratch/vshenoy1/chrispr/catalysis/dft/'
 database = dft_datadir + 'total-calc-plan.db'
 with ase.db.connect(database) as db:
     selection = db.select(filter=lambda x: (x.data.status=='full' and x.data.ads_E != 999 and x.data.slab_E != 999 and x.data.mol_E != 999))
+
+with ase.db.connect(database) as db:
+    ground_states = db.select(filter=lambda x: (x.data.status=='full' and x.data.ads_E != 999 and x.data.strain_id == 0))
+
+ground_states = list(ground_states)
     
 rows = []
 glist_full = []
