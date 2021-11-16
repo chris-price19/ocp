@@ -383,7 +383,7 @@ class BaseTrainer(ABC):
             elif loss_name == "l2mae":
                 self.loss_fn[loss] = L2MAELoss()
             elif loss_name == "crossentropy":
-                self.loss_fn[loss] = nn.CrossEntropyLoss(weight=self.config["dataset"].get("class_weights", None))
+                self.loss_fn[loss] = nn.CrossEntropyLoss(weight=self.config["dataset"].get("class_weights", None).to(self.device))
             else:
                 raise NotImplementedError(
                     f"Unknown loss function name: {loss_name}"
