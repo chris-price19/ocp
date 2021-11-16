@@ -129,7 +129,7 @@ def f1(prediction, target):
     # print(target.keys())
     # print(preds.shape)
     # print(target["classify"].shape)
-    f1 = f1_score(target["classify"], preds, labels=np.unique(target["classify"]), average='weighted')
+    f1 = f1_score(target["classify"], preds, labels=torch.unique(target["classify"]), average='weighted')
     # print(target["classify"])
     # print(preds)
     # print(f1)
