@@ -1,13 +1,13 @@
 includes:
-- configs/is2re/10k/base.yml
+- ../ocp/configs/is2re/10k/base_multitarget.yml
 
 # checkpoint: '~/checkpoint.pt'
 # strict_load: False
 
 model:
   name: dimenetplusplus_strain
-  hidden_channels: 64
-  out_emb_channels: 48
+  hidden_channels: 32
+  out_emb_channels: 16
   num_blocks: 3
   cutoff: 6.0
   num_radial: 3
@@ -27,7 +27,7 @@ model:
 #   the lr_milestones and warmup_steps need to be adjusted accordingly.
 
 optim:
-  batch_size: 4
+  batch_size: 6
   eval_batch_size: 2
   num_workers: 2
   lr_initial: 0.01
@@ -38,4 +38,4 @@ optim:
     - 60000
   warmup_steps: 10
   warmup_factor: 0.2
-  max_epochs: 20
+  max_epochs: 1

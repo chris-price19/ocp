@@ -15,6 +15,8 @@ import re
 import ase
 import ase.db
 
+from sklearn.utils.class_weight import compute_class_weight
+
 from pymatgen.io.ase import AseAtomsAdaptor
 from pymatgen.analysis.adsorption import reorient_z
 from ase.io import read, write

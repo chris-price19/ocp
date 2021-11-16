@@ -382,6 +382,7 @@ def build_config(args, args_override):
     # # print(args.run_dir)
     # print(config["distributed_backend"])
     # # sys.exit()
+    print(args.amp)
 
     config["mode"] = args.mode
     config["identifier"] = args.identifier
@@ -407,6 +408,7 @@ def build_config(args, args_override):
         overrides = create_dict_from_args(args_override)
         config, _ = merge_dicts(config, overrides)
         
+    print(config["amp"])
         # Check for overriden parameters.
     # if args_override != []:
     #     print('overriding')

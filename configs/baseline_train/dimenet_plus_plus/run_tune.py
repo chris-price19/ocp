@@ -60,8 +60,8 @@ def main():
     # )
     ## dpp - what about optimizer params? can anything in config.yml go here?
     config["model"].update(
-        hidden_channels=tune.choice([32, 64, 96, 128, ]),
-        out_emb_channels=tune.choice([24, 48, 64, 96, ]),
+        hidden_channels=tune.choice([32, 64, 96, 128, ]), # cut down for full dataset
+        out_emb_channels=tune.choice([24, 48, 64, 96, ]), # cut down for full dataset
         num_blocks=tune.choice([2, 3,]),
         num_radial=tune.choice([4, 5, 6, ]),
         num_spherical=tune.choice([4, 5, 6,]),
@@ -75,7 +75,7 @@ def main():
     config["optim"].update(
         lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
         lr_milestones=tune.sample_from(lambda spec: lr_milestones[np.random.randint(len(lr_milestones))]),
-        batch_size=tune.choice([16, 32, 64]),
+        batch_size=tune.choice([16, 32, 64]), # cut down for full dataset
         warmup_steps=tune.choice([50, 200]),
     )
     # define scheduler

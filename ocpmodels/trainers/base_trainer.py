@@ -117,6 +117,7 @@ class BaseTrainer(ABC):
         #     )
         # # catch instances where code is not being run from a git repo
         # except Exception:
+        print(amp)
 
         ## disable commit logging for now
         commit_hash = None

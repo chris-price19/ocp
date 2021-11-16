@@ -9,13 +9,15 @@ dataset:
     target_std: 2.279365062713623
   # - src: /home/ccprice/catalysis-data/ocp/data/is2re/all/val_id/data.lmdb
   - src: /home/ccprice/catalysis-data/ocp/data/strained_reduced_structures/binaryCu-relax-moleculesubset_valid.lmdb
+  - src: /home/ccprice/catalysis-data/ocp/data/strained_reduced_structures/binaryCu-relax-moleculesubset_test.lmdb
 
 logger: tensorboard
+amp: True
 
 task:
   dataset: single_point_lmdb
   num_targets: 2
-  loss_balance: 1
+  loss_balance: 0.1
   description: "Relaxed state energy prediction from initial structure."
   type: regression
   metric: mae

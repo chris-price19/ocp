@@ -523,6 +523,9 @@ class MultiEnergyTrainer(BaseTrainer):
             slurm=slurm,
         )
 
+        print('amp')
+        print(amp)
+
     def load_task(self):
         assert (
             self.config["task"]["dataset"] == "single_point_lmdb"
@@ -584,7 +587,9 @@ class MultiEnergyTrainer(BaseTrainer):
             )
 
         self.num_targets = self.config["task"].get("num_targets", 1)
+        self.loss_balance = self.config["task"].get("loss_balance", 1.)
         self.min_target = self.config["dataset"].get("global_min_target", 0)
+
         # print('targets')
         # print(self.num_targets)
 
@@ -853,7 +858,7 @@ class MultiEnergyTrainer(BaseTrainer):
 
         # print(loss1 / loss2)
 
-        loss = loss1 + loss2 * 0.5
+        loss = loss1 + loss2 * self.loss_balance
 
         return loss
 

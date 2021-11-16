@@ -57,10 +57,12 @@ class Runner(submitit.helpers.Checkpointable):
                 seed=config.get("seed", 0),
                 logger=config.get("logger", "tensorboard"),
                 local_rank=config["local_rank"],
-                amp=config.get("amp", False),
+                amp=config.get("amp", True),
                 cpu=config.get("cpu", False),
                 slurm=config.get("slurm", {}),
             )
+            # print(config.get("amp", False),)
+            # sys.exit()
             self.task = registry.get_task_class(config["mode"])(self.config)
             self.task.setup(self.trainer)
             start_time = time.time()
