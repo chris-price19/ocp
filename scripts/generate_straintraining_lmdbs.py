@@ -56,10 +56,12 @@ reduced_atom_targets = []
 
 for fi, ff in enumerate(selection):
     
-#     print(type(ff.data.tags))
-#     print(type(ff.data['strain']))
-    
-    rlxatoms = ff.toatoms()
+    rlxatoms = [i.toatoms() for i in ground_states if i.data.ads_sid == ff.data.ads_sid]
+    if len(rlxatoms) > 0:
+        rlxatoms = rlxatoms[0]
+    else:
+        continue
+    # rlxatoms = ff.toatoms()
     rlxatoms.info['tags'] = ff.data.tags
     rlxatoms.info['sid'] = ff.data.ads_sid
     rlxatoms.info['energy'] = ff.data['ads_E'] - ff.data['slab_E'] - ff.data['mol_E']
@@ -139,7 +141,7 @@ fulldb = SinglePointLmdbDataset({"src": outdir + '/' + outfile})
 reshuffle_lmdb_splits(outdir + '/' + outfile, [0.8, 0.1, 0.1], outdir = outdir, ood=False)
 reshuffle_lmdb_splits(outdir + '/' + outfile, [0.8, 0.1, 0.1], outdir = outdir, ood=True)
 
-
+##############
 data_norms = pd.DataFrame(np.vstack([np.mean(strains, axis=0).flatten(), np.std(strains, axis=0).flatten()]).T, index=['strain_xx', 'strain_xy', 'strain_yx', 'strain_yy'],columns=['mean', 'std'])
 outdir = datadir + 'strained_reduced_structures'
 outfile = 'binaryCu-relax-moleculesubset.lmdb'

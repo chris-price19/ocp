@@ -611,7 +611,8 @@ class MultiEnergyTrainer(BaseTrainer):
                     device=self.device,
                 )
             else:
-                raise NotImplementedError
+                print('no strain')
+                # raise NotImplementedError
 
             # print(self.normalizers["data"].mean)
             # print(self.normalizers["data"].std)
@@ -852,6 +853,8 @@ class MultiEnergyTrainer(BaseTrainer):
             target_normed = self.normalizers["target"].norm(energy_target)
         else:
             target_normed = energy_target
+
+        # print(out)
 
         loss1 = self.loss_fn["energy"](out["energy"], target_normed) 
         loss2 = self.loss_fn["classify"](out["classify"], class_target)
