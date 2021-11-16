@@ -125,11 +125,11 @@ class Evaluator:
 
 def f1(prediction, target):
     # correct = torch.sum(torch.argmax(prediction["classify"], dim=1) == target)
-    preds = torch.argmax(prediction["classify"], dim=1)
+    preds = torch.argmax(prediction["classify"], dim=1).cpu()
     # print(target.keys())
     # print(preds.shape)
     # print(target["classify"].shape)
-    f1 = f1_score(target["classify"], preds, labels=torch.unique(target["classify"]), average='weighted')
+    f1 = f1_score(target["classify"].cpu(), preds, labels=torch.unique(target["classify"]).cpu(), average='weighted')
     # print(target["classify"])
     # print(preds)
     # print(f1)
