@@ -2,7 +2,6 @@
 trainer: multitask_energy
 
 dataset:
-  
   - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/reduced_structures/binaryCu-relax-moleculesubset_train.lmdb
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/full_structures/binaryCu-relax-moleculesubset_train.lmdb
     normalize_labels: True
@@ -13,12 +12,10 @@ dataset:
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/reduced_structures/binaryCu-relax-moleculesubset_valid_ood.lmdb
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/full_structures/binaryCu-relax-moleculesubset_valid_ood.lmdb
   
-  - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/reduced_structures/binaryCu-relax-moleculesubset_test.lmdb
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/full_structures/binaryCu-relax-moleculesubset_test.lmdb
-  
-# logger: tensorboard
-logger: None
-is_hpo: True
+    - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/reduced_structures/binaryCu-relax-moleculesubset_test.lmdb
+    
+logger: tensorboard
 
 task:
   dataset: single_point_lmdb
