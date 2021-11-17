@@ -540,10 +540,14 @@ class DimeNetPlusPlusWrap(DimeNetPlusPlus):
         # print(P.shape)
         # print(scatter(P, batch, dim=0))
         # sys.exit()
-        SP = P.sum(dim=-1)
-        energy = SP.sum(dim=0) if batch is None else scatter(SP, batch, dim=0)
+
+        # SP = P.sum(dim=-1)
+        # energy = SP.sum(dim=0) if batch is None else scatter(SP, batch, dim=0)
+
+        energy = P[:,0].sum(dim=0) if batch is None else scatter(P[:,0], batch, dim=0)
+
         if self.num_targets > 1:            
-            return energy, P
+            return energy, P[:,1:]
         else:
             return energy
 

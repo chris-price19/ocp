@@ -62,7 +62,7 @@ def main():
     # )
     ## dpp - what about optimizer params? can anything in config.yml go here?
     config["task"].update(
-        loss_balance=tune.choice([0.1, 1., 10.]), # cut down for full dataset
+        loss_balance=tune.choice([0.1, 0.5,  1.,]), # cut down for full dataset
     )
 
     config["model"].update(
@@ -117,6 +117,7 @@ def main():
             "epochs": "epochs",
             "training_iteration": "training_iteration",
             "val_loss": "val_loss",
+            "train_energy_mae": "train_energy_mae",
             "val_energy_mae": "val_energy_mae",
             "test_energy_mae": "test_energy_mae",
         },

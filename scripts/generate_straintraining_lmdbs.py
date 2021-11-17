@@ -138,7 +138,7 @@ print(mean, std)
 data_norms.loc['target'] = [mean, std]
 data_norms.loc['max_atoms'] = [int(np.amax(full_natoms)), int(np.amax(full_natoms))]
 data_norms.loc['global_min_target'] = [0, 0]
-data_norms.loc['num_targets'] = 3
+data_norms.loc['num_targets'] = 4
 for ti in np.arange(data_norms.loc['num_targets'][0]):
     data_norms.loc['classweight_'+str(int(ti))] = full_weights[int(ti)]
 data_norms.to_csv(outdir + '/data.stats')
@@ -156,7 +156,7 @@ mean, std = write_lmbd(reduced_list, target_col, outdir, outfile)
 data_norms.loc['target'] = [mean, std]
 data_norms.loc['max_atoms'] = [int(np.amax(reduced_natoms)), int(np.amax(reduced_natoms))]
 data_norms.loc['global_min_target'] = [1, 1]
-data_norms.loc['num_targets'] = 2
+data_norms.loc['num_targets'] = 3
 for ti in np.arange(data_norms.loc['num_targets'][0]):
     data_norms.loc['classweight_'+str(int(ti))] = reduced_weights[int(ti)]
 data_norms.to_csv(outdir + '/data.stats')
