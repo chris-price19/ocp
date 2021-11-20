@@ -99,7 +99,7 @@ mean, std = write_lmbd(full_list, target_col, outdir, outfile)
 data_norms = pd.DataFrame([[mean, std]], index=['target'], columns=['mean', 'std'])
 data_norms.loc['global_min_target'] = [0, 0]
 data_norms.loc['num_targets'] = 4
-for ti in np.arange(data_norms.loc['num_targets'][0]):
+for ti in np.arange(data_norms.loc['num_targets'][0]-1):
     data_norms.loc['classweight_'+str(int(ti))] = full_weights[int(ti)]
 data_norms.to_csv(outdir + '/data.stats')
 
@@ -120,7 +120,7 @@ data_norms = pd.DataFrame([[mean, std]], index=['target'], columns=['mean', 'std
 data_norms.loc['target'] = [mean, std]
 data_norms.loc['global_min_target'] = [1, 1]
 data_norms.loc['num_targets'] = 3
-for ti in np.arange(data_norms.loc['num_targets'][0]):
+for ti in np.arange(data_norms.loc['num_targets'][0]-1):
     data_norms.loc['classweight_'+str(int(ti))] = full_weights[int(ti)]
 data_norms.to_csv(outdir + '/data.stats')
 
