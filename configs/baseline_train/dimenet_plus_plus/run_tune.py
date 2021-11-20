@@ -118,7 +118,7 @@ def main():
             "training_iteration": "training_iteration",
             # "val_loss": "val_loss",
             "train_energy_mae": "train_energy_mae",
-            "val_f1": "val_f1"
+            "val_f1": "val_f1",
             "val_energy_mae": "val_energy_mae",
             "test_energy_mae": "test_energy_mae",
         },
