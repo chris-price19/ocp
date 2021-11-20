@@ -66,12 +66,12 @@ def main():
     )
 
     config["model"].update(
-        hidden_channels=tune.choice([32, 64, 96, ]), # cut down for full dataset
-        out_emb_channels=tune.choice([24, 48, 64, 96 ]), # cut down for full dataset
-        num_blocks=tune.choice([2, 3,]),
-        num_radial=tune.choice([4, 5, 6, ]),
-        num_spherical=tune.choice([4, 5, 6,]),
-        num_output_layers=tune.choice([2, 4]),
+        hidden_channels=tune.choice([8, 16, 24]), # cut down for full dataset
+        out_emb_channels=tune.choice([4, 8, 12 ]), # cut down for full dataset
+        num_blocks=tune.choice([1, 2, 3,]),
+        num_radial=tune.choice([3, 4, 5, ]),
+        num_spherical=tune.choice([3, 4, 5,]),
+        num_output_layers=tune.choice([2, 3,]),
     )
 
     lr_milestones = [[30000, 60000, 12000],
@@ -116,8 +116,9 @@ def main():
             "steps": "steps",
             "epochs": "epochs",
             "training_iteration": "training_iteration",
-            "val_loss": "val_loss",
+            # "val_loss": "val_loss",
             "train_energy_mae": "train_energy_mae",
+            "val_f1": "val_f1"
             "val_energy_mae": "val_energy_mae",
             "test_energy_mae": "test_energy_mae",
         },

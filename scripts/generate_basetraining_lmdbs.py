@@ -49,7 +49,8 @@ else:
 map_dict = np.load(base_datadir + 'oc20_data_mapping.pkl', allow_pickle=True)
 cat_map = np.load(base_datadir + 'mapping_adslab_slab.pkl', allow_pickle=True)
 regexp = re.compile(r'Cu')
-binary_coppers = regex_symbol_filter(map_dict, regexp, nelements=2, molecules=ads_id_keep_to_start)
+# binary_coppers = regex_symbol_filter(map_dict, regexp, nelements=2, molecules=ads_id_keep_to_start)
+binary_coppers = regex_symbol_filter(map_dict, regexp, nelements=3) #, molecules=ads_id_keep_to_start)
 
 a2g_rlx = AtomsToGraphs(
     max_neigh=60,
@@ -91,7 +92,7 @@ for di, dd in enumerate(datadirs):
 full_weights = compute_class_weight('balanced', classes=np.unique(full_targets), y=full_targets)
 reduced_weights = compute_class_weight('balanced', classes=np.unique(reduced_targets), y=reduced_targets)
 
-outdir = base_datadir + 'full_structures'
+outdir = base_datadir + 'hybrid_full_structures'
 outfile = 'binaryCu-relax-moleculesubset.lmdb'
 target_col = "y_relaxed"
 mean, std = write_lmbd(full_list, target_col, outdir, outfile)
@@ -110,7 +111,7 @@ fulldb = SinglePointLmdbDataset({"src": outdir + '/' + outfile})
 
 ############
 
-outdir = base_datadir + 'reduced_structures'
+outdir = base_datadir + 'hybrid_reduced_structures'
 outfile = 'binaryCu-relax-moleculesubset.lmdb'
 target_col = "y_relaxed"
 mean, std = write_lmbd(reduced_list, target_col, outdir, outfile)
