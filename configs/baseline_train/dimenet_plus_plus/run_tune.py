@@ -81,7 +81,7 @@ def main():
     config["optim"].update(
         lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
         lr_milestones=tune.sample_from(lambda spec: lr_milestones[np.random.randint(len(lr_milestones))]),
-        batch_size=tune.choice([4, 8, 12]), # cut down for full dataset
+        batch_size=tune.choice([4, 6, 8, ]), # cut down for full dataset
         warmup_steps=tune.choice([100, 500]),
     )
     # define scheduler
