@@ -68,21 +68,22 @@ def main():
     config["model"].update(
         hidden_channels=tune.choice([8, 16, 24]), # cut down for full dataset
         out_emb_channels=tune.choice([4, 8, 12 ]), # cut down for full dataset
-        num_blocks=tune.choice([1, 2, 3,]),
+        num_blocks=tune.choice([1, 2, 3, 4]),
         num_radial=tune.choice([3, 4, 5, ]),
         num_spherical=tune.choice([3, 4, 5,]),
         num_output_layers=tune.choice([2, 3,]),
     )
 
-    lr_milestones = [[30000, 60000, 12000],
-                      [75000, 125000]]
+    lr_milestones = [
+                    [60000, 120000],
+                      ]
 
     ## I think something like - update yes this works
     config["optim"].update(
-        lr_initial=tune.choice([1e-2, 5e-3, 1e-3]),
+        lr_initial=tune.choice([2e-3, 1e-3]),
         lr_milestones=tune.sample_from(lambda spec: lr_milestones[np.random.randint(len(lr_milestones))]),
         batch_size=tune.choice([4, 6, 8, ]), # cut down for full dataset
-        warmup_steps=tune.choice([100, 500]),
+        warmup_steps=tune.choice([1000, 500]),
     )
     # define scheduler
     scheduler = ASHAScheduler(
