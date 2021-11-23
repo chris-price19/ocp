@@ -705,7 +705,7 @@ class MultiEnergyTrainer(BaseTrainer):
                 # Get a batch.
                 batch = next(train_loader_iter)
 
-                # print(batch)
+                print(batch.device)
                 # print(batch[0].strain)
                 # print(batch[0].natoms)
                 if "data_mean" in self.normalizer:

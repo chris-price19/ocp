@@ -28,6 +28,9 @@ class Normalizer(object):
             self.mean = torch.tensor(mean, dtype=torch.float).to(device)
             self.std = torch.tensor(std, dtype=torch.float).to(device)
 
+            print(self.mean.device)
+            print(self.std.device)
+
     def to(self, device):
         self.mean = self.mean.to(device)
         self.std = self.std.to(device)
