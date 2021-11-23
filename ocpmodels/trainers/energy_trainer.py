@@ -713,7 +713,7 @@ class MultiEnergyTrainer(BaseTrainer):
                     # print(self.normalizers["data"].mean.type())
                     # print(self.normalizers["data"].std.type())
                     # sys.exit()
-                    batch[0].strain = self.normalizers["data"].to(device).norm(batch[0].strain)
+                    batch[0].strain = self.normalizers["data"].norm(batch[0].strain)
                 # print(batch[0].strain)
                 # sys.exit()
 
