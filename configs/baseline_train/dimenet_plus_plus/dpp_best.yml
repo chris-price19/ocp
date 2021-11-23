@@ -33,3 +33,4 @@ optim:
   # eval_every: 20
   
 checkpoint: ../checkpoints/hybrid_full_dimenet_best/best_checkpoint.pt
+strict_load: False

@@ -240,17 +240,18 @@ class StrainBlock(torch.nn.Module):
         
         splits = torch.tensor_split(x, torch.cumsum(natoms, 0)[:-1].cpu())
         x = pad_sequence(splits, batch_first=True) # .view(-1)
-        # print(x)
+        # print(x.type())
         # print(x.shape)
         p = torch.nn.ConstantPad1d((0, self.max_atoms - x.shape[-1]), 0.)
-        # print(p(x))
+        # print(p(x).type())
         # print(p(x).shape)
         # print(strains)
         x = torch.cat((p(x), strains), dim=1)
 
         # print('v3')
         # print(self.max_atoms)
-        # print(x)
+        # print(strains.type())
+        # print(x.type())
         # print(x.shape)
         # print(strains.shape)
         # sys.exit()
@@ -530,19 +531,6 @@ class DimeNetPlusPlusWrap(DimeNetPlusPlus):
         ):
             x = interaction_block(x, rbf, sbf, idx_kj, idx_ji)
             P += output_block(x, rbf, i, num_nodes=pos.size(0))
-
-        # print('v2')
-        # print(x.shape)
-        # print(P.shape)
-        # P = self.strain_block(P, data.natoms, data.strain)
-        ## node level predictions to be made here on P
-        # print(P)
-        # print(P.shape)
-        # print(scatter(P, batch, dim=0))
-        # sys.exit()
-
-        # SP = P.sum(dim=-1)
-        # energy = SP.sum(dim=0) if batch is None else scatter(SP, batch, dim=0)
 
         energy = P[:,0].sum(dim=0) if batch is None else scatter(P[:,0], batch, dim=0)
 
