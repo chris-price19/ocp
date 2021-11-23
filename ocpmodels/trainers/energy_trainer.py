@@ -705,7 +705,7 @@ class MultiEnergyTrainer(BaseTrainer):
                 # Get a batch.
                 batch = next(train_loader_iter)
 
-                print(batch.device)
+                # print(batch.device)
                 # print(batch[0].strain)
                 # print(batch[0].natoms)
                 if "data_mean" in self.normalizer:
@@ -713,7 +713,7 @@ class MultiEnergyTrainer(BaseTrainer):
                     # print(self.normalizers["data"].mean.type())
                     # print(self.normalizers["data"].std.type())
                     # sys.exit()
-                    batch[0].strain = self.normalizers["data"].norm(batch[0].strain)
+                    batch[0].strain = self.normalizers["data"].norm(batch[0].strain.cuda())
                 # print(batch[0].strain)
                 # sys.exit()
 
