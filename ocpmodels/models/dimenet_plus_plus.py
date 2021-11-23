@@ -712,7 +712,7 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
         # print(x.shape)
         # print(P.shape)
         # sys.exit()
-        SP = self.strain_block(P.sum(dim=-1), data.natoms, data.strain)
+        SP = self.strain_block(P[:,0], data.natoms, data.strain)
         ## node level predictions to be made here on P
         # print(P)
         # print(P.shape)
@@ -721,11 +721,9 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
         energy = SP.sum(dim=-1)
 
         if self.num_targets > 1:
-            return energy, P
+            return energy, P[:,1:]
         else:
-            return energy        
-
-        # energy = P.sum(dim=0) if batch is None else scatter(P, batch, dim=0)
+            return energy
         
 
     def forward(self, data):

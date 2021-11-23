@@ -279,8 +279,8 @@ class EnergyTrainer(BaseTrainer):
                 # print(batch)
                 # print(batch[0].strain)
                 # print(batch[0].natoms)
-                # if "data_mean" in self.normalizer:
-                #     batch[0].strain = self.normalizers["data"].norm(batch[0].strain)
+                if "data_mean" in self.normalizer:
+                    batch[0].strain = self.normalizers["data"].norm(batch[0].strain)
                 # print(batch[0].strain)
                 # sys.exit()
 
@@ -704,6 +704,14 @@ class MultiEnergyTrainer(BaseTrainer):
 
                 # Get a batch.
                 batch = next(train_loader_iter)
+
+                # print(batch)
+                # print(batch[0].strain)
+                # print(batch[0].natoms)
+                if "data_mean" in self.normalizer:
+                    batch[0].strain = self.normalizers["data"].norm(batch[0].strain)
+                # print(batch[0].strain)
+                # sys.exit()
 
                 # Forward, loss, backward.
                 with torch.cuda.amp.autocast(enabled=self.scaler is not None):

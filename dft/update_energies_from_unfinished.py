@@ -57,12 +57,12 @@ for li, ll in enumerate(lines):
     calcstring = ll.rstrip().split('/')[-1]
 
     os.chdir(ads_sid + '.' + strain_id + '/' + calcstring)
-    updated_energy = outcarparse('OUTCAR')
-
-    # print(ads_sid)
-    # print(strain_id)
-    # print(calcstring)
+    
+    print(ads_sid)
+    print(strain_id)
+    print(calcstring)
     ## pausing here - need to get the energy from outcar here and then change dirs back at the end
+    updated_energy = outcarparse('OUTCAR')
 
     with ase.db.connect(cwd + '/' + total_database) as db:
 
