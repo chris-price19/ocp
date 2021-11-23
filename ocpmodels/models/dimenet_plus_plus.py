@@ -238,7 +238,7 @@ class StrainBlock(torch.nn.Module):
 
     def forward(self, x, natoms, strains):
         
-        splits = torch.tensor_split(x, torch.cumsum(natoms, 0)[:-1])
+        splits = torch.tensor_split(x, torch.cumsum(natoms, 0)[:-1].cpu())
         x = pad_sequence(splits, batch_first=True) # .view(-1)
         # print(x)
         # print(x.shape)
