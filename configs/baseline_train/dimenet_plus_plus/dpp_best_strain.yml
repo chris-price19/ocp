@@ -1,6 +1,6 @@
 includes:
 # - configs/is2re/100k/binaryCu.yml
-# - ../ocp/configs/is2re/10k/base_multitarget.yml
+#  - ../ocp/configs/is2re/10k/base_multitarget.yml
 #  - ../ocp/configs/baseline_train/base_multitarget.yml
   - /mnt/io2/scratch_vshenoy1/chrispr/catalysis/ocp/configs/baseline_train/base_multitarget_strain.yml
 
@@ -32,4 +32,5 @@ optim:
   max_epochs: 250
   # eval_every: 20
   
-checkpoint: ../checkpoints/hybrid_full_dimenet_best/best_checkpoint.pt
+checkpoint: ../checkpoints/train/2021-11-22-21-08-00/best_checkpoint.pt
+strict_load: False

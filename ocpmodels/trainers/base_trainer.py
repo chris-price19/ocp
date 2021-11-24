@@ -330,6 +330,8 @@ class BaseTrainer(ABC):
                 errno.ENOENT, "Checkpoint file not found", checkpoint_path
             )
 
+        print("loading checkpoint")
+        print(f"Loading checkpoint from: {checkpoint_path} with strict_load {strict_load}")
         logging.info(f"Loading checkpoint from: {checkpoint_path}")
         map_location = torch.device("cpu") if self.cpu else self.device
         checkpoint = torch.load(checkpoint_path, map_location=map_location)

@@ -13,12 +13,15 @@ import torch_geometric
 import ase
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib import colors as m2colors
+
 from ase.visualize.plot import plot_atoms
 from ase.constraints import FixAtoms
 
 from pymatgen.analysis.adsorption import reorient_z
 from pymatgen.io.ase import AseAtomsAdaptor
 
+mcolors = dict(m2colors.BASE_COLORS, **m2colors.CSS4_COLORS)
 
 def get_cat_sids(cat_map, sids):
 
@@ -134,7 +137,7 @@ def plot_atom_graph(data_obj):
 
     carac = pd.DataFrame({'ID':np.arange(len(node_labels)), 
                           'type': data_obj.atomic_numbers.numpy(),
-                          'size': data_obj.atomic_numbers.numpy() / np.amax(data_obj.atomic_numbers.numpy())})
+                          'size': data_obj.atomic_numbers.numpy() }) #/ np.amax(data_obj.atomic_numbers.numpy())
 
     carac = carac.set_index('ID')
     carac = carac.reindex(g.nodes())
@@ -144,9 +147,10 @@ def plot_atom_graph(data_obj):
 #     print(carac)
     # Specify colors
     cmap = matplotlib.colors.ListedColormap(['red', 'darkorange', 'green', 'blue', 'purple', 'yellow', 'gray'])
+    cmap = matplotlib.colors.ListedColormap([mcolors['mistyrose'], mcolors['red'],  mcolors['saddlebrown'], mcolors['mediumblue'], mcolors['peru'],  ]) #, 'yellow', 'gray'])
 
     # Draw graph
-    nx.draw(g, with_labels=False, node_color=carac['type'].cat.codes, node_size = carac['size'] * 500, cmap=cmap)
+    nx.draw(g, with_labels=False, node_color=carac['type'].cat.codes, node_size = carac['size'] * 10, cmap=cmap)
     # can use edgecolors attribute to color border of nodes by tag
     
     return ax
