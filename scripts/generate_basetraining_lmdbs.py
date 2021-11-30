@@ -32,7 +32,7 @@ cwd = os.getcwd()
 if 'scratch' in cwd:
     base_datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/'
     datadirs = [
-            base_datadir + 'is2re/all/train/data.lmdb',
+            base_datadir + 'is2re/10k/train/data.lmdb',
             base_datadir + 'is2re/all/val_id/data.lmdb',
             base_datadir + 'is2re/all/val_ood_ads/data.lmdb',
             base_datadir + 'is2re/all/val_ood_both/data.lmdb',

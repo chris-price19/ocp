@@ -164,7 +164,7 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
 
     if corrections:
 
-        corrections = pd.read_csv('../dft/baseline_y_relaxed_corrections_by_molsid.csv')
+        vdwdf = pd.read_csv('../dft/baseline_y_relaxed_corrections_by_molsid.csv')
 
     glist_full = []
     glist_reduced = []
@@ -176,9 +176,10 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
         rlxatoms = relaxed_atoms_from_lmdb(traindb, bb)
 
         if corrections:
+            
             print(rlxatoms.info['energy'])
             molsid = mapping['random'+str(rlxatoms.info['sid'])]['ads_id']
-            adder = corrections.loc[corrections['mol_sid'] == molsid, 'ads_gs_delta']
+            adder = vdwdf.loc[vdwdf['mol_sid'] == molsid, 'ads_gs_delta']
             rlxatoms.info['energy'] -= adder
             print(rlxatoms.info['energy'])
 
