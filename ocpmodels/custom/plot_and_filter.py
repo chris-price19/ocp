@@ -177,15 +177,15 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
 
         if corrections:
 
-            print(rlxatoms.info['energy'])
+            # print(rlxatoms.info['energy'])
             molsid = mapping['random'+str(rlxatoms.info['sid'])]['ads_id']
-            print(rlxatoms.get_chemical_symbols())
-            print(molsid)
-            adder = vdwdf.loc[vdwdf['mol_sid'] == molsid, 'ads_gs_delta'].values
+            # print(rlxatoms.get_chemical_symbols())
+            # print(molsid)
+            adder = vdwdf.loc[vdwdf['mol_sid'] == molsid, 'ads_gs_delta'].values[0]
             rlxatoms.info['energy'] -= adder
-            print(rlxatoms.info['energy'])
+            # print(rlxatoms.info['energy'])
 
-        sys.exit()
+        # sys.exit()
         
         saveconstraints = rlxatoms.constraints.copy()
 
