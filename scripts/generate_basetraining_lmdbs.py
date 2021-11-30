@@ -82,7 +82,7 @@ for di, dd in enumerate(datadirs):
     else:
         continue
 
-    glist_full, glist_reduced, full_atom_targets, reduced_atom_targets = filter_lmdbs_and_graphs(traindb, binary_inds, a2g_rlx, filteratoms=False, corrections=True, mapping=pd.DataFrame.from_dict(map_dict, orient='index'))
+    glist_full, glist_reduced, full_atom_targets, reduced_atom_targets = filter_lmdbs_and_graphs(traindb, binary_inds, a2g_rlx, filteratoms=False, corrections=True, mapping=map_dict) # pd.DataFrame.from_dict(map_dict, orient='index')
 
     full_list = full_list + glist_full
     reduced_list = reduced_list + glist_reduced
