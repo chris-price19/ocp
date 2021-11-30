@@ -156,11 +156,15 @@ def plot_atom_graph(data_obj):
     return ax
 
 
-def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=True):
+def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=True, corrections=True, mapping=None):
 
     ## train lmdb
 
     # binary_inds = sids2inds(traindb, list(sids.keys()))
+
+    if corrections:
+
+        corrections = pd.read_csv('../dft/baseline_y_relaxed_corrections_by_molsid.csv')
 
     glist_full = []
     glist_reduced = []
@@ -170,6 +174,15 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
     for bi, bb in enumerate(binary_inds):
         
         rlxatoms = relaxed_atoms_from_lmdb(traindb, bb)
+
+        if corrections:
+            print(rlxatoms.info['energy'])
+            molsid = mapping['random'+str(rlxatoms.info['sid'])]['ads_id']
+            adder = corrections.loc[corrections['mol_sid'] == molsid, 'ads_gs_delta']
+            rlxatoms.info['energy'] -= adder
+            print(rlxatoms.info['energy'])
+
+        sys.exit()
         
         saveconstraints = rlxatoms.constraints.copy()
 

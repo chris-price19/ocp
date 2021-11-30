@@ -48,6 +48,7 @@ else:
 
 map_dict = np.load(base_datadir + 'oc20_data_mapping.pkl', allow_pickle=True)
 cat_map = np.load(base_datadir + 'mapping_adslab_slab.pkl', allow_pickle=True)
+# corrections = pd.read_csv('../dft/baseline_y_relaxed_corrections_by_molsid.csv')
 regexp = re.compile(r'Cu')
 # binary_coppers = regex_symbol_filter(map_dict, regexp, nelements=2, molecules=ads_id_keep_to_start)
 binary_coppers = regex_symbol_filter(map_dict, regexp, nelements=3) #, molecules=ads_id_keep_to_start)
@@ -81,7 +82,7 @@ for di, dd in enumerate(datadirs):
     else:
         continue
 
-    glist_full, glist_reduced, full_atom_targets, reduced_atom_targets = filter_lmdbs_and_graphs(traindb, binary_inds, a2g_rlx, filteratoms=False)
+    glist_full, glist_reduced, full_atom_targets, reduced_atom_targets = filter_lmdbs_and_graphs(traindb, binary_inds, a2g_rlx, filteratoms=False, corrections=True, mapping=pd.DataFrame.from_dict(map_dict, orient='index'))
 
     full_list = full_list + glist_full
     reduced_list = reduced_list + glist_reduced
