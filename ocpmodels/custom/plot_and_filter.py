@@ -181,7 +181,10 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
             molsid = mapping['random'+str(rlxatoms.info['sid'])]['ads_id']
             # print(rlxatoms.get_chemical_symbols())
             # print(molsid)
-            adder = vdwdf.loc[vdwdf['mol_sid'] == molsid, 'ads_gs_delta'].values[0]
+            if molsid in vdwdf['mol_sid'].values:
+                adder = vdwdf.loc[vdwdf['mol_sid'] == molsid, 'ads_gs_delta'].values[0]
+            else:
+                adder = 0.
             rlxatoms.info['energy'] -= adder
             # print(rlxatoms.info['energy'])
 
