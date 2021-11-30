@@ -176,10 +176,12 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
         rlxatoms = relaxed_atoms_from_lmdb(traindb, bb)
 
         if corrections:
-            
+
             print(rlxatoms.info['energy'])
             molsid = mapping['random'+str(rlxatoms.info['sid'])]['ads_id']
-            adder = vdwdf.loc[vdwdf['mol_sid'] == molsid, 'ads_gs_delta']
+            print(rlxatoms.get_chemical_symbols())
+            print(molsid)
+            adder = vdwdf.loc[vdwdf['mol_sid'] == molsid, 'ads_gs_delta'].values
             rlxatoms.info['energy'] -= adder
             print(rlxatoms.info['energy'])
 
