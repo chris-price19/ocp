@@ -25,7 +25,8 @@ from ase.calculators.vasp import Vasp
 
 number_of_tensors = 6
 max_magnitude = 0.03
-ads_id_keep_to_start = [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,62,63,65,69,70,71,72,73,74,75,76,77,78,81]
+ads_id_keep_to_start = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,62,63,65,69,70,71,72,73,74,75,76,77,78,81]
+ads_id_keep_to_start = [5]
 
 db = ase.db.connect('total-calc-plan.db')
 
@@ -89,6 +90,7 @@ for di, dd in enumerate(datadirs):
             #     stat = 1
             # else:
             #     stat = np.NaN
+            print(map_dict['random'+str(rlxatoms.info['sid'])]['ads_id'])
 
             data = {
                     'status': '',
@@ -111,6 +113,8 @@ for di, dd in enumerate(datadirs):
             # print([type(value) for (key, value) in data.items()])
             satoms = rotatoms.copy()
             satoms = strain_atoms(rotatoms, aa)
+
+            # sys.exit()
             
             db.write(satoms, data=data)
 

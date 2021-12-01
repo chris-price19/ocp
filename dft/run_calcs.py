@@ -40,7 +40,7 @@ def strfdelta(tdelta, fmt):
     return t.substitute(**d)
 
 VASP_FLAGS = {'ibrion': 2,
-          'nsw': 300,
+          'nsw': 600,
           # 'nelm': 5,  # turn this off!
           'isif': 0,
           'isym': 0,
@@ -193,7 +193,10 @@ def main():
         with ase.db.connect(database) as db:
             # this has been tested on command line, should work
             # use only numbers and strings, skip the NaNs... too much fuckery
-            selection = db.select(filter=lambda x: (x.data.status=='' or x.data.status=='half') and x.id not in skip_ids)
+
+            # selection = db.select(filter=lambda x: (x.data.status=='' or x.data.status=='half') and x.id not in skip_ids)
+            ## adding CH in
+            selection = db.select(filter=lambda x: (x.data.status=='' or x.data.status=='half') and x.id not in skip_ids and (x.mol_sid == 5 or x.mol_sid == 6 or x.mol_sid == 71)) # or x.mol_sid == 7 or x.mol_sid == 8
         
         # if not len(selection):
         # print(selection)
