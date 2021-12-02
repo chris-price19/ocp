@@ -71,11 +71,18 @@ for fi, ff in enumerate(selection):
     rlxatoms.info['sid'] = ff.data.ads_sid
     rlxatoms.info['energy'] = ff.data['ads_E'] - ff.data['slab_E'] - ff.data['mol_E']
     rlxatoms.info['strain_id'] = ff.data['strain_id']
+    rlxatoms.info['og_strain'] = ff.data['strain']
     rlxatoms.info['strain'] = np.expand_dims((ff.data['strain'] - np.eye(3))[0:2,0:2].flatten(),0)*100  ## xx, xy, yx, yy
+    rlxatoms.info['hand'] = 'R'
+    augatoms = reflect_atoms(rlxatoms)
+
     strains.append((ff.data['strain'] - np.eye(3))[0:2,0:2]*100)
+    strains.append(augatoms.info['strain'].squeeze().flatten())
+
+    print(strains)
     full_natoms.append(len(rlxatoms.get_chemical_symbols()))
 #     print(np.shape(np.expand_dims((ff.data['strain'] - np.eye(3))[0:2,0:2].flatten(),0)))
-#     sys.exit()
+    sys.exit()
 #     print(rlxatoms.info)
     glist_full.append(rlxatoms)
     reduced_atoms = filter_atoms_by_tag(rlxatoms, keep=np.array([1,2]))

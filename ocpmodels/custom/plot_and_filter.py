@@ -72,7 +72,7 @@ def init_atoms_from_lmdb(db, ind):
                       # info={'energy':db[ind].y_relaxed, 'sid':db[ind].sid, 'tags': db[ind].tags.numpy()}
                       )
     
-    if 'y_relaxed' in db[ind].keys():
+    if 'y_relaxed' in db[ind].keys:
         atoms['info'] = {'energy':db[ind].y_relaxed, 'sid':db[ind].sid, 'tags': db[ind].tags.numpy()}
     else:
         atoms['info'] = {'energy':999., 'sid':db[ind].sid, 'tags': db[ind].tags.numpy()}
