@@ -135,7 +135,7 @@ print(len(df))
 print(len(glist_full))
 print(df.loc[df['strain_delta'].isna()])
 
-sys.exit()
+# sys.exit()
 
 
 for di, dd in enumerate(df['strain_delta'].values):
