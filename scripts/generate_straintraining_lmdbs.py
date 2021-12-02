@@ -133,6 +133,9 @@ df.rename(columns={'ads_energy_x':'ads_energy', 'ads_energy_y':'ground_state_ene
 print(len(rows))
 print(len(df))
 print(len(glist_full))
+print(df.loc[df['strain_delta'].isna()])
+
+sys.exit()
 
 
 for di, dd in enumerate(df['strain_delta'].values):
