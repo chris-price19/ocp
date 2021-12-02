@@ -386,7 +386,7 @@ class StrainAtomsToGraphs:
         elif self.r_energy == 'pass_through':
             data.y_relaxed = atoms.info['energy']
         elif self.r_energy == 'energy_delta':
-            data.y_relaxed == atoms.info['energy_delta']
+            data.y_relaxed = atoms.info['energy_delta']
         if self.r_forces:
             forces = torch.Tensor(atoms.get_forces(apply_constraint=False))
             data.force = forces
