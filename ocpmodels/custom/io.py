@@ -53,7 +53,7 @@ def write_lmbd(data_objects, target_col, location, filename):
         data.fid = fid # becomes ind
 
         # compute mean and std.
-        target.append(data.y_relaxed)
+        target.append(data[target_col])
 
         # no neighbor edge case check
         if data.edge_index.shape[1] == 0:

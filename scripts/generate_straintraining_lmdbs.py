@@ -24,7 +24,7 @@ from ase.calculators.vasp import Vasp
 
 
 cwd = os.getcwd()
-# ads_id_keep_to_start = [0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,62,63,65,69,70,71,72,73,74,75,76,77,78,81]
+# ads_id_keep_to_start = [0,1,2,3,4, 5, 6,7,8,9,10,11,12,13,14,15,62,63,65,69,70,71,72,73,74,75,76,77,78,81]
 
 a2g_strain_rlx = StrainAtomsToGraphs(
     max_neigh=60,
