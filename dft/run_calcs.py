@@ -196,7 +196,7 @@ def main():
 
             # selection = db.select(filter=lambda x: (x.data.status=='' or x.data.status=='half') and x.id not in skip_ids)
             ## adding CH in
-            selection = db.select(filter=lambda x: (x.data.status=='' or x.data.status=='half') and x.id not in skip_ids and (x.mol_sid == 6 or x.mol_sid == 71)) # x.mol_sid == 5 or x.mol_sid == 7 or x.mol_sid == 8
+            selection = db.select(filter=lambda x: (x.data.status=='' or x.data.status=='half') and x.id not in skip_ids and (x.data.mol_sid == 6 or x.data.mol_sid == 71)) # x.mol_sid == 5 or x.mol_sid == 7 or x.mol_sid == 8
         
         # if not len(selection):
         # print(selection)
