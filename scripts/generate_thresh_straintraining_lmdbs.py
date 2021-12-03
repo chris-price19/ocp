@@ -125,7 +125,7 @@ print(df.loc[df['strain_delta'].isna()])
 
 energy_targets = []
 for di, dd in enumerate(df['strain_delta'].values):
-    
+    print(dd)
     glist_full[di].info['energy_delta'] = dd
 
     if dd < -0.025:
