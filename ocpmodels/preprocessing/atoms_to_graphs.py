@@ -394,6 +394,8 @@ class StrainAtomsToGraphs:
                 data.y_relaxed = 1
             elif atoms.info['energy_delta'] > 0.025:
                 data.y_relaxed = 2
+            else:
+                raise NotImplementedError
         if self.r_forces:
             forces = torch.Tensor(atoms.get_forces(apply_constraint=False))
             data.force = forces
