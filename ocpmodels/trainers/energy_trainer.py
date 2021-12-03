@@ -519,12 +519,12 @@ class MultiEnergyTrainer(BaseTrainer):
             local_rank=local_rank,
             amp=amp,
             cpu=cpu,
-            name="multitask",
+            name="multitask_thresh",
             slurm=slurm,
         )
 
-        print('amp')
-        print(amp)
+        # print('amp')
+        # print(amp)
 
     def load_task(self):
         assert (
@@ -598,21 +598,22 @@ class MultiEnergyTrainer(BaseTrainer):
         self.normalizers = {}
         if self.normalizer.get("normalize_labels", False):
             if "target_mean" in self.normalizer:
+                # print('normalize true')
                 self.normalizers["target"] = Normalizer(
                     mean=self.normalizer["target_mean"],
                     std=self.normalizer["target_std"],
                     device=self.device,
                 )
         # if self.normalizer.get("normalize_labels", False):
-            if "data_mean" in self.normalizer:
-                self.normalizers["data"] = Normalizer(
-                    mean=self.normalizer["data_mean"],
-                    std=self.normalizer["data_std"],
-                    device=self.device,
-                )
             else:
                 print('no strain')
                 # raise NotImplementedError
+        if "data_mean" in self.normalizer:
+            self.normalizers["data"] = Normalizer(
+                mean=self.normalizer["data_mean"],
+                std=self.normalizer["data_std"],
+                device=self.device,
+            )
 
             # print(self.normalizers["data"].mean)
             # print(self.normalizers["data"].std)
@@ -713,13 +714,14 @@ class MultiEnergyTrainer(BaseTrainer):
                     # print(self.normalizers["data"].mean.type())
                     # print(self.normalizers["data"].std.type())
                     # sys.exit()
-                    batch[0].strain = self.normalizers["data"].norm(batch[0].strain.cuda())
+                    batch[0].strain = self.normalizers["data"].norm(batch[0].strain.to(self.device))
                 # print(batch[0].strain)
                 # sys.exit()
 
                 # Forward, loss, backward.
                 with torch.cuda.amp.autocast(enabled=self.scaler is not None):
                     out = self._forward(batch)
+                    # print(out)
                     loss = self._compute_loss(out, batch)
                 loss = self.scaler.scale(loss) if self.scaler else loss
                 self._backward(loss)
@@ -844,6 +846,8 @@ class MultiEnergyTrainer(BaseTrainer):
         if output[0].shape[-1] == 1:
             eng_out = output[0].view(-1)
         else:
+            # print('**')
+            # print(output[0])
             eng_out = output[0]
 
         return {
@@ -856,20 +860,23 @@ class MultiEnergyTrainer(BaseTrainer):
         energy_target = torch.cat(
             [batch.y_relaxed.to(self.device) for batch in batch_list], dim=0
         )
+        # print(energy_target)
 
         class_target = torch.cat(
             [batch.tags.to(self.device) - self.min_target for batch in batch_list], dim=0
         )
 
         if self.normalizer.get("normalize_labels", False):
+            print(self.normalizers["target"])
             target_normed = self.normalizers["target"].norm(energy_target)
         else:
             target_normed = energy_target
 
-        # print(out)
+        # print(target_normed)
+        # print(class_target)
 
-        loss1 = self.loss_fn["energy"](out["energy"], target_normed) 
-        loss2 = self.loss_fn["classify"](out["classify"], class_target)
+        loss1 = self.loss_fn["graph_classify"](out["energy"], target_normed) 
+        loss2 = self.loss_fn["node_classify"](out["classify"], class_target)
 
         # print(loss1 / loss2)
 

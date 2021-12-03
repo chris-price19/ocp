@@ -387,6 +387,13 @@ class StrainAtomsToGraphs:
             data.y_relaxed = atoms.info['energy']
         elif self.r_energy == 'energy_delta':
             data.y_relaxed = atoms.info['energy_delta']
+        elif self.r_energy == 'energy_delta_thresh':
+            if atoms.info['energy_delta'] < -0.025:
+                data.y_relaxed = 0 # atoms.info['energy_delta']
+            if atoms.info['energy_delta'] >= -0.025 or atoms.info['energy_delta'] <= 0.025:
+                data.y_relaxed = 1
+            if atoms.info['energy_delta'] > 0.025:
+                data.y_relaxed = 2
         if self.r_forces:
             forces = torch.Tensor(atoms.get_forces(apply_constraint=False))
             data.force = forces

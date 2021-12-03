@@ -6,8 +6,8 @@ includes:
 
 model:
   name: dimenetplusplus_strain
-  hidden_channels: 32
-  out_emb_channels: 16
+  hidden_channels: 24
+  out_emb_channels: 12
   num_blocks: 3
   cutoff: 6.0
   num_radial: 3
@@ -20,6 +20,7 @@ model:
   final_dim: 16
   regress_forces: False
   use_pbc: True
+  num_graph_targets: 3
 
 # *** Important note ***
 #   The total number of gpus used for this run was 1.
@@ -27,7 +28,7 @@ model:
 #   the lr_milestones and warmup_steps need to be adjusted accordingly.
 
 optim:
-  batch_size: 6
+  batch_size: 5
   eval_batch_size: 2
   num_workers: 2
   lr_initial: 0.01
