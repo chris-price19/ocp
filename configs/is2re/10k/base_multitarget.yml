@@ -1,5 +1,5 @@
 # trainer: energy
-trainer: multitask_energy
+trainer: multitask_thresh
 
 dataset:
   # - src: /home/ccprice/catalysis-data/ocp/data/is2re/10k/train/data.lmdb
