@@ -135,19 +135,19 @@ for di, dd in enumerate(df['strain_delta'].values):
     if dd > 0.025:
         energy_targets.append(2)
 
-print(test)
-print(np.mean(test))
-print(np.nanmean(test))
-print(np.where(np.isnan(test)))
+# print(test)
+# print(np.mean(test))
+# print(np.nanmean(test))
+# print(np.where(np.isnan(test)))
 # print(glist_full[np.where(np.isnan(test))[0][0]])
 
 full_list = a2g_strain_rlx.convert_all(glist_full)
 
-test = []
-for di, dd in enumerate(full_list):
-    test.append(dd.y_relaxed)
-print(test)
-print(np.mean(test))
+# test = []
+# for di, dd in enumerate(full_list):
+#     test.append(dd.y_relaxed)
+# print(test)
+# print(np.mean(test))
 
 data_norms = pd.DataFrame(np.vstack([np.mean(strains, axis=0).flatten(), np.std(strains, axis=0).flatten()]).T, index=['strain_xx', 'strain_xy', 'strain_yx', 'strain_yy'],columns=['mean', 'std'])
 
