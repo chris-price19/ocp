@@ -122,10 +122,10 @@ print(len(glist_full))
 print(df.loc[df['strain_delta'].isna()])
 
 # sys.exit()
-
+test = []
 energy_targets = []
 for di, dd in enumerate(df['strain_delta'].values):
-    print(dd)
+    test.append(glist_full[di].info['y_relaxed'])
     glist_full[di].info['energy_delta'] = dd
 
     if dd < -0.025:
@@ -134,6 +134,12 @@ for di, dd in enumerate(df['strain_delta'].values):
         energy_targets.append(1)
     if dd > 0.025:
         energy_targets.append(2)
+
+print(test)
+print(np.mean(test))
+print(np.nanmean(test))
+print(np.where(np.isnan(test)))
+print(glist_full[np.where(np.isnan(test))[0][0]])
 
 full_list = a2g_strain_rlx.convert_all(glist_full)
 
