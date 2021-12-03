@@ -390,7 +390,7 @@ class StrainAtomsToGraphs:
         elif self.r_energy == 'energy_delta_thresh':
             if atoms.info['energy_delta'] < -0.025:
                 data.y_relaxed = 0 # atoms.info['energy_delta']
-            if atoms.info['energy_delta'] >= -0.025 or atoms.info['energy_delta'] <= 0.025:
+            if atoms.info['energy_delta'] >= -0.025 and atoms.info['energy_delta'] <= 0.025:
                 data.y_relaxed = 1
             if atoms.info['energy_delta'] > 0.025:
                 data.y_relaxed = 2

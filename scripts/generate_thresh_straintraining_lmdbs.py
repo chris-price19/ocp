@@ -130,7 +130,7 @@ for di, dd in enumerate(df['strain_delta'].values):
 
     if dd < -0.025:
         energy_targets.append(0)
-    if dd >= -0.025 or dd <= 0.025:
+    if dd >= -0.025 and dd <= 0.025:
         energy_targets.append(1)
     if dd > 0.025:
         energy_targets.append(2)
