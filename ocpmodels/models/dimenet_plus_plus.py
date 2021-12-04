@@ -211,15 +211,17 @@ class StrainBlock(torch.nn.Module):
         strain_projection_channels,
         num_layers,
         max_atoms,
+        num_targets=1,
         act=swish,
     ):
         super(StrainBlock, self).__init__()
 
         self.max_atoms = max_atoms
+        self.num_targets = num_targets
         self.act = act
         self.lins = torch.nn.ModuleList()
 
-        self.lins.append(nn.Linear(self.max_atoms + 4, strain_projection_channels))
+        self.lins.append(nn.Linear((self.max_atoms + 4), strain_projection_channels))
         for _ in range(num_layers):
             self.lins.append(nn.Linear(strain_projection_channels, strain_projection_channels))
         
@@ -237,17 +239,27 @@ class StrainBlock(torch.nn.Module):
 
 
     def forward(self, x, natoms, strains):
-        
+        # print(x.shape)
         splits = torch.tensor_split(x, torch.cumsum(natoms, 0)[:-1].cpu())
+        # print(x.shape)
         x = pad_sequence(splits, batch_first=True) # .view(-1)
         # print(x.type())
         # print(x.shape)
-        p = torch.nn.ConstantPad1d((0, self.max_atoms - x.shape[-1]), 0.)
+        # p = torch.nn.ConstantPad1d((0, self.max_atoms - x.shape[1]), 0.)
+        # x[0,80,1] = 1.
+        x = torch.nn.functional.pad(x, pad=(0,0,0,self.max_atoms - x.shape[1], 0, 0), mode='constant', value=0.)
+        # print(x[0,80,1])
+        # print(x[0,82,1])
         # print(p(x).type())
-        # print(p(x).shape)
-        # print(strains)
-        x = torch.cat((p(x), strains), dim=1)
+        # print(x.shape)
+        # print(strains.shape)
 
+        # print(strains.unsqueeze(-1).repeat(1,1,x.shape[-1]).shape)
+        x = torch.cat((x, strains.unsqueeze(-1).repeat(1,1,x.shape[-1])), dim=1).permute(0,2,1)
+        # saveshape = x.shape
+        # print(x.reshape(x.shape[0], x.shape[1]*x.shape[-1]).shape)
+        # x = x.reshape(x.shape[0], x.shape[1]*x.shape[-1])
+        # print(x.shape)
         # print('v3')
         # print(self.max_atoms)
         # print(strains.type())
@@ -571,6 +583,7 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
         num_atoms,
         bond_feat_dim,  # not used
         num_targets,
+        num_graph_targets=1,
         use_pbc=True,
         regress_forces=True,
         hidden_channels=128,
@@ -592,6 +605,7 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
         max_atoms=0,
     ):
         self.num_targets = num_targets
+        self.num_graph_targets = num_graph_targets
         self.regress_forces = regress_forces
         self.use_pbc = use_pbc
         self.cutoff = cutoff
@@ -614,7 +628,7 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
             num_output_layers=num_output_layers,
         )
 
-        self.strain_block = StrainBlock(final_dim, strain_projection_channels, num_strain_layers, self.max_atoms)
+        self.strain_block = StrainBlock(final_dim, strain_projection_channels, num_strain_layers, self.max_atoms, self.num_graph_targets)
 
 
     @conditional_grad(torch.enable_grad())
@@ -700,16 +714,20 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
         # print(x.shape)
         # print(P.shape)
         # sys.exit()
-        SP = self.strain_block(P[:,0], data.natoms, data.strain)
+        SP = self.strain_block(P[:,:self.num_graph_targets], data.natoms, data.strain)
         ## node level predictions to be made here on P
         # print(P)
-        # print(P.shape)
+        # print(SP.shape)
         # print(scatter(P, batch, dim=0))
         # sys.exit()
         energy = SP.sum(dim=-1)
 
+        # print(energy)
+        # print(energy.shape)
+        # sys.exit()
+
         if self.num_targets > 1:
-            return energy, P[:,1:]
+            return energy, P[:,self.num_graph_targets:]
         else:
             return energy
         

@@ -376,7 +376,8 @@ class BaseTrainer(ABC):
         self.loss_fn = {}
         self.loss_fn["energy"] = self.config["optim"].get("loss_energy", "mae")
         self.loss_fn["force"] = self.config["optim"].get("loss_force", "mae")
-        self.loss_fn["classify"] = self.config["optim"].get("loss_classify", "crossentropy")
+        self.loss_fn["graph_classify"] = self.config["optim"].get("loss_graph_classify", "crossentropy_graph")
+        self.loss_fn["node_classify"] = self.config["optim"].get("loss_node_classify", "crossentropy_node")
         for loss, loss_name in self.loss_fn.items():
             if loss_name in ["l1", "mae"]:
                 self.loss_fn[loss] = nn.L1Loss()
@@ -384,8 +385,10 @@ class BaseTrainer(ABC):
                 self.loss_fn[loss] = nn.MSELoss()
             elif loss_name == "l2mae":
                 self.loss_fn[loss] = L2MAELoss()
-            elif loss_name == "crossentropy":
-                self.loss_fn[loss] = nn.CrossEntropyLoss(weight=self.config["dataset"].get("class_weights", None).to(self.device))
+            elif loss_name == "crossentropy_graph":
+                self.loss_fn[loss] = nn.CrossEntropyLoss(weight=self.config["dataset"].get("graph_class_weights", None).to(self.device))
+            elif loss_name == "crossentropy_node":
+                self.loss_fn[loss] = nn.CrossEntropyLoss(weight=self.config["dataset"].get("node_class_weights", None).to(self.device))
             else:
                 raise NotImplementedError(
                     f"Unknown loss function name: {loss_name}"

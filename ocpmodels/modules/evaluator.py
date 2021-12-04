@@ -48,26 +48,30 @@ class Evaluator:
             "positions_mse",
         ],
         "is2re": ["energy_mae", "energy_mse", "energy_within_threshold"],
-        "multitask": ["energy_mae", "energy_mse", "energy_within_threshold", "f1"]
+        "multitask": ["energy_mae", "energy_mse", "energy_within_threshold", "f1_node"],
+        "multitask_thresh":["f1_graph", "f1_node"]
     }
 
     task_attributes = {
         "s2ef": ["energy", "forces", "natoms"],
         "is2rs": ["positions", "cell", "pbc", "natoms"],
         "is2re": ["energy"],
-        "multitask":["energy", "classify"]
+        "multitask":["energy", "classify"],
+        "multitask_thresh":["energy", "classify"]
     }
 
     task_primary_metric = {
         "s2ef": "energy_force_within_threshold",
         "is2rs": "average_distance_within_threshold",
         "is2re": "energy_mae",
-        "multitask": "energy_mae"
+        "multitask": "energy_mae",
+        "multitask_thresh": "f1_graph"
     }
 
     def __init__(self, task=None):
-        assert task in ["s2ef", "is2rs", "is2re", "multitask"]
+        assert task in ["s2ef", "is2rs", "is2re", "multitask", "multitask_thresh"]
         self.task = task
+        # print(self.task)
         self.metric_fn = self.task_metrics[task]
 
     def eval(self, prediction, target, prev_metrics={}):
@@ -123,7 +127,7 @@ class Evaluator:
 
         return metrics
 
-def f1(prediction, target):
+def f1_node(prediction, target):
     # correct = torch.sum(torch.argmax(prediction["classify"], dim=1) == target)
     preds = torch.argmax(prediction["classify"], dim=1).cpu()
     # print(target.keys())
@@ -134,6 +138,13 @@ def f1(prediction, target):
     # print(preds)
     # print(f1)
     # sys.exit()
+    return f1
+
+def f1_graph(prediction, target):
+
+    preds = torch.argmax(prediction["energy"], dim=1).cpu()
+    f1 = f1_score(target["energy"].cpu(), preds, labels=torch.unique(target["energy"]).cpu(), average='weighted')
+
     return f1
 
 def energy_mae(prediction, target):

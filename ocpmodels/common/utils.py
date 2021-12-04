@@ -436,20 +436,41 @@ def build_config(args, args_override):
     if os.path.isfile(os.path.dirname(config["dataset"][0]["src"]) + '/data.stats'):
         datastats = pd.read_csv(os.path.dirname(config["dataset"][0]["src"]) + '/data.stats', index_col=0)
         # print(datastats)
-        config["dataset"][0]["target_mean"] = datastats.loc['target']['mean'] # .values[0]
-        config["dataset"][0]["target_std"] = datastats.loc['target']['std']
 
+        ## energy regression
+        if 'target' in datastats.index.values:
+            config["dataset"][0]["target_mean"] = datastats.loc['target']['mean'] # .values[0]
+            config["dataset"][0]["target_std"] = datastats.loc['target']['std']
+
+        ### input datastats
         if 'strain_xx' in datastats.index.values:
             config["dataset"][0]["data_mean"] = datastats.filter(regex='strain', axis=0)['mean'].values
             config["dataset"][0]["data_std"] = datastats.filter(regex='strain', axis=0)['std'].values
             config["model"]["max_atoms"] = int(datastats.loc["max_atoms"]["mean"])
 
+        ### regular node level target stuff
         if 'global_min_target' in datastats.index.values:
             config["task"]["num_targets"] = int(datastats.loc["num_targets"]["mean"])
             config["dataset"][0]["global_min_target"] = int(datastats.loc["global_min_target"]["mean"])
-            config["dataset"][0]["class_weights"] = torch.FloatTensor(datastats.filter(regex='class', axis=0)['mean'].values)
+            config["dataset"][0]["node_class_weights"] = torch.FloatTensor(datastats.filter(regex='class', axis=0)['mean'].values)
+
+        ### energy threshold section
+        if 'num_graph_targets' in datastats.index.values:
+            config["dataset"][0]["global_min_target"] = int(datastats.loc["global_min_node_target"]["mean"])
+
+            config["task"]["num_graph_targets"] = int(datastats.loc["num_graph_targets"]["mean"])
+            config["task"]["num_node_targets"] = int(datastats.loc["num_node_targets"]["mean"])
+           
+            config["dataset"][0]["graph_class_weights"] = torch.FloatTensor(datastats.filter(regex='graph_class', axis=0)['mean'].values)
+            config["dataset"][0]["node_class_weights"] = torch.FloatTensor(datastats.filter(regex='node_class', axis=0)['mean'].values)
+        # if 'num_node_targets' in datastats.index.values:
+           
+            config["task"]["num_targets"] = config["task"]["num_node_targets"] + config["task"]["num_graph_targets"]
 
     print(config)
+    print(config["task"])
+    print(config["dataset"][0])
+    # sys.exit()
 
     return config
 
