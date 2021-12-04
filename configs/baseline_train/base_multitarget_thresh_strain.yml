@@ -1,25 +1,25 @@
 # trainer: energy
-trainer: multitask_energy
+trainer: multitask_thresh
 
 dataset:
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/reduced_structures/binaryCu-relax-moleculesubset_train.lmdb
-  - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/strained_full_structures/binaryCu-relax-moleculesubset_train.lmdb
-    normalize_labels: True
+  - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/aug_thresh_strained_full_structures/binaryCu-relax-moleculesubset_train.lmdb
+    normalize_labels: False
     target_mean: -0.08756357
     target_std: 1.97406909
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/reduced_structures/binaryCu-relax-moleculesubset_valid.lmdb
-  - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/strained_full_structures/binaryCu-relax-moleculesubset_valid.lmdb
+  - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/aug_thresh_strained_full_structures/binaryCu-relax-moleculesubset_valid.lmdb
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/reduced_structures/binaryCu-relax-moleculesubset_valid_ood.lmdb
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/full_structures/binaryCu-relax-moleculesubset_valid_ood.lmdb
   
-  - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/strained_full_structures/binaryCu-relax-moleculesubset_test.lmdb
+  - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/aug_thresh_strained_full_structures/binaryCu-relax-moleculesubset_test.lmdb
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/reduced_structures/binaryCu-relax-moleculesubset_test.lmdb
     
 logger: tensorboard
 
 task:
   dataset: single_point_lmdb
-  num_targets: 4
+  num_targets: 6
   loss_balance: 0.1
   description: "Relaxed state energy prediction from initial structure."
   type: regression
