@@ -42,8 +42,8 @@ def ocp_trainable(config, checkpoint_dir=None):
         checkpoint = os.path.join(checkpoint_dir, "checkpoint")
         trainer.load_pretrained(checkpoint)
     # start training
-    print('traintype', flush=True)
-    print(type(trainer), flush=True)
+    # print('traintype', flush=True)
+    # print(type(trainer), flush=True)
 
     trainer.train()
 
@@ -126,9 +126,9 @@ def main():
             "training_iteration": "training_iteration",
             "val_loss": "val_loss",
             "val_f1_graph": "val_f1_graph",
-            "val_f1_node": "val_f1_node",
+            # "val_f1_node": "val_f1_node",
             "train_f1_graph": "train_f1_graph",
-            "train_f1_node": "train_f1_node",
+            # "train_f1_node": "train_f1_node",
         },
     )
 
