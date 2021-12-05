@@ -211,13 +211,13 @@ class StrainBlock(torch.nn.Module):
         strain_projection_channels,
         num_layers,
         max_atoms,
-        num_targets=1,
+        # num_targets=1,
         act=swish,
     ):
         super(StrainBlock, self).__init__()
 
         self.max_atoms = max_atoms
-        self.num_targets = num_targets
+        # self.num_targets = num_targets
         self.act = act
         self.lins = torch.nn.ModuleList()
 
@@ -601,7 +601,7 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
         num_output_layers=3,
         strain_projection_channels = 16,
         num_strain_layers = 2,
-        final_dim = 16,
+        strain_final_dim = 16,
         max_atoms=0,
     ):
         self.num_targets = num_targets
@@ -628,7 +628,7 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
             num_output_layers=num_output_layers,
         )
 
-        self.strain_block = StrainBlock(final_dim, strain_projection_channels, num_strain_layers, self.max_atoms, self.num_graph_targets)
+        self.strain_block = StrainBlock(strain_final_dim, strain_projection_channels, num_strain_layers, self.max_atoms,)
 
 
     @conditional_grad(torch.enable_grad())
