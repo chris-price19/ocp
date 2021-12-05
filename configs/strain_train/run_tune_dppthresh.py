@@ -87,7 +87,7 @@ def main():
     config["optim"].update(
         lr_initial=tune.choice([1e-2, 1e-3, 1e-4]),
         lr_milestones=tune.sample_from(lambda spec: lr_milestones[np.random.randint(len(lr_milestones))]),
-        batch_size=tune.choice([8, 12]),
+        batch_size=tune.choice([4, 8]),
         warmup_steps=tune.choice([1000, 5000,]),
     )
 
