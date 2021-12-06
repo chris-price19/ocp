@@ -68,12 +68,12 @@ def main():
         hidden_channels=tune.choice([4, 12, 17, 24, 27]),
         out_emb_channels=tune.choice([4, 11, 16, 23, 32]),
         num_blocks=tune.choice([2, 3, 4]),
-        num_radial=tune.choice([4,5,6,7]),
-        num_spherical=tune.choice([4, 5, 6]),
+        num_radial=tune.choice([4,5,]),
+        num_spherical=tune.choice([3,4,]),
         num_output_layers=tune.choice([1,2,3]),
         num_before_skip=tune.choice([1,2]),
         num_after_skip=tune.choice([1,2,3]),
-        strain_projection_channels=tune.choice([2,6,10,14]),
+        strain_projection_channels=tune.choice([3,6,9,14]),
         num_strain_layers=tune.choice([1,2,4]),
         strain_final_dim=tune.choice([4, 8, 12]),
     )
@@ -87,8 +87,8 @@ def main():
     config["optim"].update(
         lr_initial=tune.choice([1e-2, 1e-3, 1e-4]),
         lr_milestones=tune.sample_from(lambda spec: lr_milestones[np.random.randint(len(lr_milestones))]),
-        batch_size=tune.choice([4, 8]),
-        warmup_steps=tune.choice([1000, 5000,]),
+        batch_size=tune.choice([5, 8]),
+        # warmup_steps=tune.choice([1000, 5000,]),
     )
 
 
@@ -141,7 +141,7 @@ def main():
         config=config,
         fail_fast=True,
         local_dir=config.get("run_dir", "./"),
-        num_samples=1024,
+        num_samples=512,
         progress_reporter=reporter,
         scheduler=scheduler,
 
