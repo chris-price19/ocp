@@ -222,7 +222,7 @@ class MultiThreshTrainer(BaseTrainer):
 
         if self.normalizers is not None and "target" in self.normalizers:
             self.normalizers["target"].to(self.device)
-        predictions = {"id": [], "energy": [], "classify": []}
+        predictions = {"ads_sid": [], "strain_id": [], "energy": [], "classify": []}
 
         for i, batch in tqdm(
             enumerate(loader),
@@ -231,24 +231,36 @@ class MultiThreshTrainer(BaseTrainer):
             desc="device {}".format(rank),
             disable=disable_tqdm,
         ):
+
+            if "data_mean" in self.normalizer:
+                batch[0].strain = self.normalizers["data"].norm(batch[0].strain.to(self.device))
+
             with torch.cuda.amp.autocast(enabled=self.scaler is not None):
                 out = self._forward(batch)
 
-            if self.normalizers is not None and "target" in self.normalizers:
+            if self.normalizers is not None and "target" in self.normalizers and self.normalizer.get("normalize_labels", False):
                 out["energy"] = self.normalizers["target"].denorm(
                     out["energy"]
                 )
 
             if per_image:
-                predictions["id"].extend(
+                predictions["ads_sid"].extend(
                     [str(i) for i in batch[0].sid.tolist()]
                 )
-                predictions["energy"].extend(out["energy"].tolist())
+                predictions["strain_id"].extend(
+                    [str(i) for i in batch[0].strain_id.tolist()]
+                )
+                predictions["energy"].extend(torch.argmax(out["energy"], dim=1).tolist())
+                predictions["classify"].extend(torch.argmax(out["classify"], dim=1).detach())
             else:
-                predictions["energy"] = out["energy"].detach()
+                predictions["energy"] = torch.argmax(out["energy"], dim=1).detach()
+                predictions["classify"] = torch.argmax(out["classify"], dim=1).detach()
+
                 return predictions
 
-        self.save_results(predictions, results_file, keys=["energy"])
+        print(predictions)
+        
+        self.save_results(predictions, results_file, keys=["energy", "classify"])
 
         if self.ema:
             self.ema.restore()
