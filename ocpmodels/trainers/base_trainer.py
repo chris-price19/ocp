@@ -386,12 +386,12 @@ class BaseTrainer(ABC):
             elif loss_name == "l2mae":
                 self.loss_fn[loss] = L2MAELoss()
             elif loss_name == "crossentropy_graph":
-                if self.config["dataset"].get("graph_class_weights", None):
+                if self.config["dataset"].get("graph_class_weights", None) is not None:
                     self.loss_fn[loss] = nn.CrossEntropyLoss(weight=self.config["dataset"].get("graph_class_weights", None).to(self.device))
                 else:
                     self.loss_fn[loss] = nn.CrossEntropyLoss()
             elif loss_name == "crossentropy_node":
-                if self.config["dataset"].get("node_class_weights", None):
+                if self.config["dataset"].get("node_class_weights", None) is not None:
                     self.loss_fn[loss] = nn.CrossEntropyLoss(weight=self.config["dataset"].get("node_class_weights", None).to(self.device))
                 else:
                     self.loss_fn[loss] = nn.CrossEntropyLoss()
