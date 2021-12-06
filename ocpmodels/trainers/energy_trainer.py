@@ -641,7 +641,7 @@ class MultiEnergyTrainer(BaseTrainer):
 
         if self.normalizers is not None and "target" in self.normalizers:
             self.normalizers["target"].to(self.device)
-        predictions = {"ads_sid": [], "strain_id": [], "energy": [], "classify": []}
+        predictions = {"ads_sid": [], "strain_id": [], "energy": [],} # "classify": []}
 
         for i, batch in tqdm(
             enumerate(loader),
@@ -670,16 +670,16 @@ class MultiEnergyTrainer(BaseTrainer):
                     [str(i) for i in batch[0].strain_id.tolist()]
                 )
                 predictions["energy"].extend(out["energy"].tolist())
-                predictions["classify"].extend(torch.argmax(out["classify"], dim=1).detach())
+                # predictions["classify"].extend(torch.argmax(out["classify"], dim=1).detach())
             else:
                 predictions["energy"] = out["energy"].detach()
-                predictions["classify"] = torch.argmax(out["classify"], dim=1).detach()
+                # predictions["classify"] = torch.argmax(out["classify"], dim=1).detach()
 
                 return predictions
 
         print(predictions)
         
-        self.save_results(predictions, results_file, keys=["energy", "classify"])
+        self.save_results(predictions, results_file, keys=["energy",]) # "classify"])
 
         if self.ema:
             self.ema.restore()
