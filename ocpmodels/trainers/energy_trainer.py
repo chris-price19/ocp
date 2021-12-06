@@ -857,6 +857,9 @@ class MultiEnergyTrainer(BaseTrainer):
         else:
             eng_out = output[0]
 
+        print(eng_out)
+        sys.exit()
+
         return {
             "energy": eng_out,
             # "classify": torch.abs(output[1].squeeze()),
