@@ -668,7 +668,7 @@ class BaseTrainer(ABC):
         )
         np.savez_compressed(
             results_file_path,
-            # ids=predictions["id"],
+            ads_sid=predictions["id"],
             **{key: predictions[key] for key in keys},
         )
 
