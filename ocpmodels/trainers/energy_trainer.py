@@ -848,7 +848,7 @@ class MultiEnergyTrainer(BaseTrainer):
 
     def _forward(self, batch_list):
         output = self.model(batch_list)
-        print(output)
+        # print(output)
 
         # for oi, oo in enumerate(output):
             # print(output[oi])
@@ -857,8 +857,8 @@ class MultiEnergyTrainer(BaseTrainer):
         else:
             eng_out = output[0]
 
-        print(eng_out)
-        sys.exit()
+        # print(eng_out)
+        # sys.exit()
 
         return {
             "energy": eng_out,
