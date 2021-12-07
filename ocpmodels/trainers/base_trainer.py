@@ -668,12 +668,13 @@ class BaseTrainer(ABC):
         )
         np.savez_compressed(
             results_file_path,
-            ids=predictions["id"],
+            # ids=predictions["id"],
             **{key: predictions[key] for key in keys},
         )
 
         distutils.synchronize()
         if distutils.is_master():
+            print('distutils')
             gather_results = defaultdict(list)
             full_path = os.path.join(
                 self.config["cmd"]["results_dir"],
@@ -686,7 +687,7 @@ class BaseTrainer(ABC):
                     f"{self.name}_{results_file}_{i}.npz",
                 )
                 rank_results = np.load(rank_path, allow_pickle=True)
-                gather_results["ids"].extend(rank_results["ids"])
+                # gather_results["ids"].extend(rank_results["ids"])
                 for key in keys:
                     gather_results[key].extend(rank_results[key])
                 os.remove(rank_path)
