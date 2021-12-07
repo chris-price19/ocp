@@ -26,15 +26,28 @@ from ocpmodels.custom.structure_mod import reflect_atoms
 mcolors = dict(m2colors.BASE_COLORS, **m2colors.CSS4_COLORS)
 
 
-def convert_asedb_to_dataframe(database, aug=False):
+def convert_asedb_to_dataframe(datadir, database, aug=False, kT=0.025):
 
     ## strained data
 
     # database = datadir + 'strain-snapshot.db'
-    with ase.db.connect(database) as db:
+    moleculesdb = datadir + 'adsorbates.db'
+    with ase.db.connect(moleculesdb) as db:
+        molselection = db.select()
+
+    rows = []
+    for fi, ff in enumerate(molselection):
+    #     print(ff);    print(ff.id-1);    print(ff.toatoms());    print(ff.data);    print(ff.symbols);    print(ff.natoms);    print(ff.data.SMILE); break
+    #     print(type(ff.symbols))
+    #     sys.exit()
+        rows.append([ff.id-1, ff.data.SMILE, ff.natoms, ff.symbols])
+
+    moldf = pd.DataFrame(rows, columns=["mol_sid", "smile", "mol_natoms", "symbols"])
+
+    with ase.db.connect(datadir + database) as db:
         selection = db.select(filter=lambda x: (x.data.status=='full' and x.data.ads_E != 999 and x.data.slab_E != 999 and x.data.mol_E != 999))
 
-    with ase.db.connect(database) as db:
+    with ase.db.connect(datadir + database) as db:
         ground_states = db.select(filter=lambda x: (x.data.status=='full' and x.data.ads_E != 999 and x.data.strain_id == 0))
 
     ground_states = list(ground_states)
@@ -97,12 +110,13 @@ def convert_asedb_to_dataframe(database, aug=False):
             # reduced_atom_targets = reduced_atom_targets + (reduced_atoms.info['tags'].tolist()) + (reduced_aug_atoms.info['tags'].tolist())
 
         rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, ff.data.strain_id, ff.natoms, rlxatoms.info['hand'], ff.data.ads_E, ff.data.slab_E, ff.data.mol_E, area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, cu_concentration, non_cu_atoms])
-        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, ff.data.strain_id, ff.natoms, augatoms.info['hand'], ff.data.ads_E, ff.data.slab_E, ff.data.mol_E, area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, cu_concentration, non_cu_atoms])
+        if aug:
+            rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, ff.data.strain_id, ff.natoms, augatoms.info['hand'], ff.data.ads_E, ff.data.slab_E, ff.data.mol_E, area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, cu_concentration, non_cu_atoms])
     #     rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, ff.data.strain_id, ff.natoms, ff.data.ads_E, ff.data.slab_E, ff.data.mol_E, area_strain, sv1, sv2, sv3, strain_anisotropy, cu_concentration, non_cu_atoms])
 
     # sys.exit()
     df = pd.DataFrame(rows, columns=["ads_sid", "slab_sid", "mol_sid", "strain_id", "total_natoms", "hand", "ads_E", "slab_E", "mol_E", "area_strain", "strain_norm", "shear_norm", "uniaxial_norm", "strain_anisotropy", "cu_concentration", "alloy_element"])
-    print(len(df))
+    
     df['ads_energy'] = df['ads_E'] - df['slab_E'] - df['mol_E']
 
     df = pd.merge(df, df.loc[df['strain_id'] == 0, ['ads_sid','ads_energy']], on='ads_sid', how='left')
@@ -113,7 +127,12 @@ def convert_asedb_to_dataframe(database, aug=False):
 
     df['real_ads_atoms'] = df['symbols'].apply(lambda x: ''.join(np.unique(x).tolist()))
     df['majority_Cu'] = np.where(df['cu_concentration'] > 0.5, True, False)
+
+    df['strain_delta_bin'] = np.where(df['strain_delta'].abs() <= kT, 1, np.where(df['strain_delta'] > kT, 2, 0))
+
     data_norms = pd.DataFrame(np.vstack([np.mean(strains, axis=0).flatten(), np.std(strains, axis=0).flatten()]).T, index=['strain_xx', 'strain_xy', 'strain_yx', 'strain_yy'],columns=['mean', 'std'])
 
+    print(len(df))
+    print(df.columns)
 
     return df

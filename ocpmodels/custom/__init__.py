@@ -17,6 +17,7 @@ __all__ = [
     "filter_lmdbs_and_graphs",
     "reshuffle_lmdb_splits",
     "reflect_atoms",
+    "convert_asedb_to_dataframe",
     # "init_atoms_from_lmdb",
 
 ]

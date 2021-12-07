@@ -233,7 +233,7 @@ class MultiThreshTrainer(BaseTrainer):
         ):
 
             if "data_mean" in self.normalizer:
-                # print('normalizing strains')
+                print('normalizing strains')
                 batch[0].strain = self.normalizers["data"].norm(batch[0].strain.to(self.device))
 
             with torch.cuda.amp.autocast(enabled=self.scaler is not None):
@@ -253,9 +253,10 @@ class MultiThreshTrainer(BaseTrainer):
                     [i for i in batch[0].strain_id.tolist()]
                 )
                 predictions["energy"].extend(torch.argmax(out["energy"].detach(), dim=1).tolist())
-                predictions["true"].extend(
-                    [i for i in batch[0].y_relaxed.tolist()]
-                )
+                if "y_relaxed" in batch[0].keys():
+                    predictions["true"].extend(
+                        [i for i in batch[0].y_relaxed.tolist()]
+                    )
                 # predictions["classify"].extend(torch.argmax(out["classify"], dim=1).detach())
             else:
                 predictions["energy"] = torch.argmax(out["energy"], dim=1).detach()
@@ -264,8 +265,10 @@ class MultiThreshTrainer(BaseTrainer):
                 return predictions
 
         # print(predictions)
-        
-        self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "true"]) # "classify"])
+        if "true" in predictions.keys():
+            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "true"]) # "classify"])
+        else:
+            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy",]) # "classify"])
 
         if self.ema:
             self.ema.restore()

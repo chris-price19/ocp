@@ -53,7 +53,8 @@ def write_lmbd(data_objects, target_col, location, filename):
         data.fid = fid # becomes ind
 
         # compute mean and std.
-        target.append(data[target_col])
+        if target_col is not None:
+            target.append(data[target_col])
 
         # no neighbor edge case check
         if data.edge_index.shape[1] == 0:
@@ -71,8 +72,12 @@ def write_lmbd(data_objects, target_col, location, filename):
 
     db.close()
     
-    mean = np.mean(target)
-    std = np.std(target)
+    if target_col is not None:
+        mean = np.mean(target)
+        std = np.std(target)
+    else:
+        mean = None
+        std = None
 
     return mean, std
 
