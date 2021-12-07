@@ -222,7 +222,7 @@ class MultiThreshTrainer(BaseTrainer):
 
         if self.normalizers is not None and "target" in self.normalizers:
             self.normalizers["target"].to(self.device)
-        predictions = {"ads_sid": [], "strain_id": [], "energy": [], "classify": []}
+        predictions = {"ads_sid": [], "strain_id": [], "energy": [], "true": []}
 
         for i, batch in tqdm(
             enumerate(loader),
@@ -245,22 +245,25 @@ class MultiThreshTrainer(BaseTrainer):
 
             if per_image:
                 predictions["ads_sid"].extend(
-                    [str(i) for i in batch[0].sid.tolist()]
+                    [i for i in batch[0].sid.tolist()]
                 )
                 predictions["strain_id"].extend(
-                    [str(i) for i in batch[0].strain_id.tolist()]
+                    [i for i in batch[0].strain_id.tolist()]
                 )
                 predictions["energy"].extend(torch.argmax(out["energy"], dim=1).tolist())
-                predictions["classify"].extend(torch.argmax(out["classify"], dim=1).detach())
+                predictions["true"].extend(
+                    [i for i in batch[0].y_relaxed.tolist()]
+                )
+                # predictions["classify"].extend(torch.argmax(out["classify"], dim=1).detach())
             else:
                 predictions["energy"] = torch.argmax(out["energy"], dim=1).detach()
-                predictions["classify"] = torch.argmax(out["classify"], dim=1).detach()
+                # predictions["classify"] = torch.argmax(out["classify"], dim=1).detach()
 
                 return predictions
 
         print(predictions)
         
-        self.save_results(predictions, results_file, keys=["energy", "classify"])
+        self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "true"]) # "classify"])
 
         if self.ema:
             self.ema.restore()
