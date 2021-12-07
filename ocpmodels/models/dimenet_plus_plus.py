@@ -724,8 +724,8 @@ class StrainDimeNetPlusPlusWrap(DimeNetPlusPlus):
 
         # print(energy)
         # print(energy.shape)
-        print(self.num_graph_targets)
-        sys.exit()
+        # print(self.num_graph_targets)
+        # sys.exit()
 
         if self.num_targets > 1:
             return energy, P[:,self.num_graph_targets:]
