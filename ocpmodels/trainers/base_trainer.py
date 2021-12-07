@@ -710,3 +710,12 @@ class BaseTrainer(ABC):
 
             logging.info(f"Writing results to {full_path}")
             np.savez_compressed(full_path, **gather_results)
+
+        if os.path.isfile(self.config["test_dataset"].split('.')[0] + '.csv'):
+            print('updating CSV')
+            dffile = self.config["test_dataset"].split('.')[0] + '.csv'
+            infdf = pd.read_csv(dffile)
+            preds = np.load(full_path)
+            predsdf = pd.DataFrame.from_dict({item: preds[item] for item in preds.files}, orient='columns')
+            infdf = infdf.merge(predsdf, on=['ads_sid','strain_id'], how='inner', suffixes=('', '_'+self.task["type"]))
+            infdf.to_csv(dffile)

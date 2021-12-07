@@ -21,7 +21,7 @@ task:
   num_targets: 6
   loss_balance: 0.1
   description: "Relaxed state energy prediction from initial structure."
-  type: regression
+  type: classification
   metric: mae
   labels:
     - relaxed energy

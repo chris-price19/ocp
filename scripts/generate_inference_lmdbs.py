@@ -64,6 +64,10 @@ for fi, ff in enumerate(ground_states):
     man_strains = generate_strain_tensors(number_of_tensors, max_mag = max_magnitude)
 
     for ai, aa in enumerate(man_strains):
+
+        if aa.eid == 0:
+            # skip the ground state for inference since we already know the answer
+            continue
         
         rlxatoms = ff.toatoms()
         rlxatoms.info['tags'] = ff.data.tags
