@@ -250,7 +250,7 @@ class MultiThreshTrainer(BaseTrainer):
                 predictions["strain_id"].extend(
                     [i for i in batch[0].strain_id.tolist()]
                 )
-                predictions["energy"].extend(torch.argmax(out["energy"], dim=1).tolist())
+                predictions["energy"].extend(torch.argmax(out["energy"].detach(), dim=1).tolist())
                 predictions["true"].extend(
                     [i for i in batch[0].y_relaxed.tolist()]
                 )
@@ -261,7 +261,7 @@ class MultiThreshTrainer(BaseTrainer):
 
                 return predictions
 
-        print(predictions)
+        # print(predictions)
         
         self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "true"]) # "classify"])
 
