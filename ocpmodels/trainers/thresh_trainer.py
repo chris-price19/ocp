@@ -233,12 +233,14 @@ class MultiThreshTrainer(BaseTrainer):
         ):
 
             if "data_mean" in self.normalizer:
+                # print('normalizing strains')
                 batch[0].strain = self.normalizers["data"].norm(batch[0].strain.to(self.device))
 
             with torch.cuda.amp.autocast(enabled=self.scaler is not None):
                 out = self._forward(batch)
 
             if self.normalizers is not None and "target" in self.normalizers and self.normalizer.get("normalize_labels", False):
+                # print('denormalizing energies')
                 out["energy"] = self.normalizers["target"].denorm(
                     out["energy"]
                 )
