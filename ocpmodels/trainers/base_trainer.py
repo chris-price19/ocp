@@ -668,7 +668,7 @@ class BaseTrainer(ABC):
         )
         np.savez_compressed(
             results_file_path,
-            ads_sid=predictions["ads_sid"],
+            ids = np.arange(len(predictions["ads_sid"])),
             **{key: predictions[key] for key in keys},
         )
 
@@ -687,15 +687,15 @@ class BaseTrainer(ABC):
                     f"{self.name}_{results_file}_{i}.npz",
                 )
                 rank_results = np.load(rank_path, allow_pickle=True)
-                gather_results["ads_sid"].extend(rank_results["ads_sid"])
+                gather_results["ids"].extend(rank_results["ids"])
                 for key in keys:
                     gather_results[key].extend(rank_results[key])
                 os.remove(rank_path)
 
             # Because of how distributed sampler works, some system ids
             # might be repeated to make no. of samples even across GPUs.
-            _, idx = np.unique(gather_results["ads_sid"], return_index=True)
-            gather_results["ads_sid"] = np.array(gather_results["ads_sid"])[idx]
+            _, idx = np.unique(gather_results["ids"], return_index=True)
+            gather_results["ids"] = np.array(gather_results["ids"])[idx]
             for k in keys:
                 if k == "forces":
                     gather_results[k] = np.concatenate(

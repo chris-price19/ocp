@@ -679,7 +679,7 @@ class MultiEnergyTrainer(BaseTrainer):
 
         print(predictions)
         
-        self.save_results(predictions, results_file, keys=["strain_id", "energy",]) # "classify"])
+        self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy",]) # "classify"])
 
         if self.ema:
             self.ema.restore()
