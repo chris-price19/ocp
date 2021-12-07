@@ -17,7 +17,7 @@ model:
   num_output_layers: 3
   regress_forces: False
   use_pbc: True
-  num_graph_targets: 3
+#  num_graph_targets: 3
 
 optim:
   batch_size: 8

@@ -455,6 +455,7 @@ def build_config(args, args_override):
             print('config3')
             config["task"]["num_targets"] = int(datastats.loc["num_targets"]["mean"])
             config["task"]["num_graph_targets"] = 1
+            config["task"]["num_node_targets"] = config["task"]["num_targets"] - config["task"]["num_graph_targets"]
             config["dataset"][0]["global_min_target"] = int(datastats.loc["global_min_target"]["mean"])
             config["dataset"][0]["node_class_weights"] = torch.FloatTensor(datastats.filter(regex='class', axis=0)['mean'].values)
 
