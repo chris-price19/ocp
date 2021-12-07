@@ -439,17 +439,20 @@ def build_config(args, args_override):
 
         ## energy regression
         if 'target' in datastats.index.values:
+            print('config1')
             config["dataset"][0]["target_mean"] = datastats.loc['target']['mean'] # .values[0]
             config["dataset"][0]["target_std"] = datastats.loc['target']['std']
 
         ### input datastats
         if 'strain_xx' in datastats.index.values:
+            print('config2')
             config["dataset"][0]["data_mean"] = datastats.filter(regex='strain', axis=0)['mean'].values
             config["dataset"][0]["data_std"] = datastats.filter(regex='strain', axis=0)['std'].values
             config["model"]["max_atoms"] = int(datastats.loc["max_atoms"]["mean"])
 
         ### regular node level target stuff
         if 'global_min_target' in datastats.index.values:
+            print('config3')
             config["task"]["num_targets"] = int(datastats.loc["num_targets"]["mean"])
             config["task"]["num_graph_targets"] = 1
             config["dataset"][0]["global_min_target"] = int(datastats.loc["global_min_target"]["mean"])
@@ -457,6 +460,7 @@ def build_config(args, args_override):
 
         ### energy threshold section
         if 'num_graph_targets' in datastats.index.values:
+            print('config4')
             config["dataset"][0]["global_min_target"] = int(datastats.loc["global_min_node_target"]["mean"])
 
             config["task"]["num_graph_targets"] = int(datastats.loc["num_graph_targets"]["mean"])
