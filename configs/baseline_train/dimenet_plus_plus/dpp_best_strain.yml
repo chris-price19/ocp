@@ -33,5 +33,5 @@ optim:
   max_epochs: 250
   # eval_every: 20
   
-checkpoint: ../checkpoints/train/2021-11-22-21-08-00/best_checkpoint.pt
-strict_load: False
+#checkpoint: ../checkpoints/train/2021-11-22-21-08-00/best_checkpoint.pt
+#strict_load: False
