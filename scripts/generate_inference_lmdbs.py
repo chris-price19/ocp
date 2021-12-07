@@ -60,6 +60,7 @@ number_of_tensors = 10
 max_magnitude = 0.03
 
 for fi, ff in enumerate(ground_states):
+
     man_strains = generate_strain_tensors(number_of_tensors, max_mag = max_magnitude)
 
     for ai, aa in enumerate(man_strains):
@@ -92,8 +93,8 @@ for fi, ff in enumerate(ground_states):
         strain_norm = np.linalg.norm(aa.eps[0:2,0:2])
         strain_anisotropy = np.abs(np.diff(np.diag(aa.eps[0:2,0:2])))[0]
 
-        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, rlxatoms.info['hand'], rlxatoms.info['gs_energy'], strain_norm, shear_ratio, strain_anisotropy, rlxatoms.info['strain'][0], rlxatoms.info['strain'][1], rlxatoms.info['strain'][-1]])
-        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, augatoms.info['hand'], rlxatoms.info['gs_energy'], strain_norm, shear_ratio, strain_anisotropy, augatoms.info['strain'][0], augatoms.info['strain'][1], augatoms.info['strain'][-1]])
+        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, rlxatoms.info['hand'], rlxatoms.info['gs_energy'], strain_norm, shear_ratio, strain_anisotropy, rlxatoms.info['strain'].squeeze()[0], rlxatoms.info['strain'].squeeze()[1], rlxatoms.info['strain'].squeeze()[-1]])
+        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, augatoms.info['hand'], rlxatoms.info['gs_energy'], strain_norm, shear_ratio, strain_anisotropy, augatoms.info['strain'].squeeze()[0], augatoms.info['strain'].squeeze()[1], augatoms.info['strain'].squeeze()[-1]])
 
 df = pd.DataFrame(rows, columns=["ads_sid", "slab_sid", "mol_sid", "strain_id", "total_natoms", "hand", "gs_energy", "strain_norm", "shear_ratio", "strain_anisotropy", "strain_xx", "strain_xy", "strain_yy"])
 # df['ads_energy'] = df['ads_E'] - df['slab_E'] - df['mol_E']
