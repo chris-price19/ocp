@@ -11,7 +11,8 @@ dataset:
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/reduced_structures/binaryCu-relax-moleculesubset_valid_ood.lmdb
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/full_structures/binaryCu-relax-moleculesubset_valid_ood.lmdb
   
-  - src: /home/ccprice/catalysis-data/ocp/data/aug_thresh_strained_full_structures/binaryCu-relax-moleculesubset_test.lmdb
+  - src: /home/ccprice/catalysis-data/ocp/data/inference_aug_strained_full_structures/traindomain_inference.lmdb
+  # - src: /home/ccprice/catalysis-data/ocp/data/aug_thresh_strained_full_structures/binaryCu-relax-moleculesubset_test.lmdb
   # - src: /home/chrispr/mem/chrispr/catalysis/ocp/data/reduced_structures/binaryCu-relax-moleculesubset_test.lmdb
     
 logger: tensorboard

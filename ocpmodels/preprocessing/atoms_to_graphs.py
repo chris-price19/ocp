@@ -288,6 +288,7 @@ class StrainAtomsToGraphs:
         r_tags = True,
         r_strain = True,
         r_energy_delta = False,
+        r_hand = True
     ):
         self.max_neigh = max_neigh
         self.radius = radius
@@ -300,6 +301,7 @@ class StrainAtomsToGraphs:
         self.r_tags = r_tags
         self.r_strain = r_strain
         self.r_energy_delta = r_energy_delta
+        self.r_hand = r_hand
 
     def _get_neighbors_pymatgen(self, atoms):
         """Preforms nearest neighbor search and returns edge index, distances,
@@ -423,6 +425,9 @@ class StrainAtomsToGraphs:
 
         if self.r_energy_delta:
             data.energy_delta = atoms.info['energy_delta']
+
+        if self.r_hand:
+            data.hand = atoms.info['hand']
 
         return data
 

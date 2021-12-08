@@ -706,16 +706,24 @@ class BaseTrainer(ABC):
                         np.array(gather_results[k])[idx]
                     )[:-1]
                 else:
+                    print(k)
                     gather_results[k] = np.array(gather_results[k])[idx]
 
             logging.info(f"Writing results to {full_path}")
             np.savez_compressed(full_path, **gather_results)
 
-        if os.path.isfile(self.config["test_dataset"].split('.')[0] + '.csv'):
+        dffile = self.config["test_dataset"]["src"].split('.')[0] + '.csv'
+        if os.path.isfile(dffile):
+            import pandas as pd
             print('updating CSV')
-            dffile = self.config["test_dataset"].split('.')[0] + '.csv'
             infdf = pd.read_csv(dffile)
+            # print(len(infdf))
             preds = np.load(full_path)
+            # print(len(preds))
             predsdf = pd.DataFrame.from_dict({item: preds[item] for item in preds.files}, orient='columns')
-            infdf = infdf.merge(predsdf, on=['ads_sid','strain_id'], how='inner', suffixes=('', '_'+self.task["type"]))
+            predsdf.columns = [str(col) + '_' + self.config["task"]["type"] for col in predsdf.columns if col in ['energy']]
+            # print(len(predsdf))
+            # print(predsdf)
+            infdf = infdf.merge(predsdf, on=['ads_sid','strain_id', 'hand'], how='inner',)
+            # print(len(infdf))
             infdf.to_csv(dffile)

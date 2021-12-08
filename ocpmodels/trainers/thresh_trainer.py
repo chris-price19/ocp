@@ -222,7 +222,7 @@ class MultiThreshTrainer(BaseTrainer):
 
         if self.normalizers is not None and "target" in self.normalizers:
             self.normalizers["target"].to(self.device)
-        predictions = {"ads_sid": [], "strain_id": [], "energy": [], "true": []}
+        predictions = {"ads_sid": [], "strain_id": [], "energy": [], "hand": [], "true": []}
 
         for i, batch in tqdm(
             enumerate(loader),
@@ -246,29 +246,41 @@ class MultiThreshTrainer(BaseTrainer):
                 )
 
             if per_image:
+                print(batch[0].hand)
                 predictions["ads_sid"].extend(
                     [i for i in batch[0].sid.tolist()]
                 )
                 predictions["strain_id"].extend(
                     [i for i in batch[0].strain_id.tolist()]
                 )
+
+                predictions["hand"].extend(
+                    [i for i in batch[0].hand]
+                )
+
                 predictions["energy"].extend(torch.argmax(out["energy"].detach(), dim=1).tolist())
-                if "y_relaxed" in batch[0].keys():
+
+
+                if "y_relaxed" in batch[0].keys:
                     predictions["true"].extend(
                         [i for i in batch[0].y_relaxed.tolist()]
                     )
+                else:
+                    if "true" in predictions.keys():
+                        predictions.pop("true")
                 # predictions["classify"].extend(torch.argmax(out["classify"], dim=1).detach())
             else:
-                predictions["energy"] = torch.argmax(out["energy"], dim=1).detach()
+                predictions["strain_id"] = batch[0].strain_id.tolist()
+                predictions["energy"] = torch.argmax(out["energy"], dim=1).detach().tolist()
                 # predictions["classify"] = torch.argmax(out["classify"], dim=1).detach()
 
                 return predictions
 
         # print(predictions)
         if "true" in predictions.keys():
-            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "true"]) # "classify"])
+            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "hand", "true"]) # "classify"])
         else:
-            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy",]) # "classify"])
+            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "hand",]) # "classify"])
 
         if self.ema:
             self.ema.restore()

@@ -56,7 +56,7 @@ glist_full = []
 # full_natoms = []
 # full_atom_targets = []
 
-number_of_tensors = 10
+number_of_tensors = 500
 max_magnitude = 0.03
 
 for fi, ff in enumerate(ground_states):
