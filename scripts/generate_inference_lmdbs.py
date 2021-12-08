@@ -36,6 +36,7 @@ a2g_strain_rlx = StrainAtomsToGraphs(
     r_tags=True,
     r_strain = True,
     # r_energy_delta = True,
+    r_hand = True,
 )
 
 datadir = '/scratch/vshenoy1/chrispr/catalysis/ocp/data/'
