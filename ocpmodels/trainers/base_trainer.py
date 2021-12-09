@@ -674,7 +674,7 @@ class BaseTrainer(ABC):
 
         distutils.synchronize()
         if distutils.is_master():
-            print('distutils')
+            # print('distutils')
             gather_results = defaultdict(list)
             full_path = os.path.join(
                 self.config["cmd"]["results_dir"],
@@ -706,7 +706,7 @@ class BaseTrainer(ABC):
                         np.array(gather_results[k])[idx]
                     )[:-1]
                 else:
-                    print(k)
+                    # print(k)
                     gather_results[k] = np.array(gather_results[k])[idx]
 
             logging.info(f"Writing results to {full_path}")
