@@ -10,6 +10,7 @@ import pickle
 import lzma
 
 import os
+import sys
 
 from ocpmodels.datasets import SinglePointLmdbDataset
 from ocpmodels.custom.plot_and_filter import sids2inds
@@ -143,6 +144,14 @@ def reshuffle_lmdb_splits(base_lmdb, splits, outdir = os.getcwd(), ood=False):
         trainsids = pd.merge(merged.reset_index(), traingroups, on=domain_cols, how='inner')
         valsids = pd.merge(merged.reset_index(), valgroups, on=domain_cols, how='inner')
         testsids = pd.merge(merged.reset_index(), testgroups, on=domain_cols, how='inner')
+
+        # print(trainsids.loc[trainsids['ads_id'].isin(testsids['ads_id'])])
+        # print(testsids.loc[testsids['ads_id'].isin(trainsids['ads_id'])])
+
+        # print(trainsids.loc[trainsids['bulk_mpid'].isin(testsids['bulk_mpid'])])
+        # print(testsids.loc[testsids['bulk_mpid'].isin(trainsids['bulk_mpid'])])
+
+        # sys.exit()
 
         # convert to indices in base database
         ind_train = sids2inds(basedb, trainsids['index'].tolist())

@@ -721,7 +721,7 @@ class BaseTrainer(ABC):
             preds = np.load(full_path)
             # print(len(preds))
             predsdf = pd.DataFrame.from_dict({item: preds[item] for item in preds.files}, orient='columns')
-            predsdf.columns = [str(col) + '_' + self.config["task"]["type"] for col in predsdf.columns if col in ['energy']]
+            predsdf.columns = [col + '_' + self.config["task"]["type"] if col in ['energy'] else col for col in predsdf.columns]
             # print(len(predsdf))
             # print(predsdf)
             infdf = infdf.merge(predsdf, on=['ads_sid','strain_id', 'hand'], how='inner',)
