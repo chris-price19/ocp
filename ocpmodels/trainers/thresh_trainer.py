@@ -246,7 +246,7 @@ class MultiThreshTrainer(BaseTrainer):
                 )
 
             if per_image:
-                print(batch[0].hand)
+                # print(batch[0].hand)
                 predictions["ads_sid"].extend(
                     [i for i in batch[0].sid.tolist()]
                 )
@@ -254,12 +254,15 @@ class MultiThreshTrainer(BaseTrainer):
                     [i for i in batch[0].strain_id.tolist()]
                 )
 
-                predictions["hand"].extend(
-                    [i for i in batch[0].hand]
-                )
-
                 predictions["energy"].extend(torch.argmax(out["energy"].detach(), dim=1).tolist())
 
+                if "hand" in batch[0].keys:
+                    predictions["hand"].extend(
+                        [i for i in batch[0].hand]
+                    )
+                else:
+                    if "hand" in predictions.keys():
+                        predictions.pop("hand")
 
                 if "y_relaxed" in batch[0].keys:
                     predictions["true"].extend(
@@ -277,10 +280,14 @@ class MultiThreshTrainer(BaseTrainer):
                 return predictions
 
         # print(predictions)
-        if "true" in predictions.keys():
+        if "true" in predictions.keys() and "hand" in predictions.keys():
             self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "hand", "true"]) # "classify"])
-        else:
+        elif "hand" in predictions.keys():
             self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "hand",]) # "classify"])
+        elif "true" in predictions.keys():
+            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "true",]) # "classify"])
+        else:
+            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", ]) # "classify"])
 
         if self.ema:
             self.ema.restore()
