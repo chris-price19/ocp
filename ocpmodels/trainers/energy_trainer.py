@@ -888,7 +888,7 @@ class MultiEnergyTrainer(BaseTrainer):
         # print(out)
 
         loss1 = self.loss_fn["energy"](out["energy"], target_normed) 
-        loss2 = self.loss_fn["classify"](out["classify"], class_target)
+        loss2 = self.loss_fn["node_classify"](out["classify"], class_target)
 
         # print(loss1 / loss2)
 

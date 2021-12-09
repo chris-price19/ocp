@@ -38,7 +38,7 @@ model:
   num_output_layers: 3
   regress_forces: False
   use_pbc: True
-  num_graph_targets: 3
+  num_graph_targets: 1
   strain_projection_channels: 16
   num_strain_layers: 2
   strain_final_dim: 16
