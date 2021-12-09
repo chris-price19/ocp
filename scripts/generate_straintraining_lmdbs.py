@@ -191,4 +191,4 @@ data_norms.to_csv(outdir + '/data.stats')
 
 reduceddb = SinglePointLmdbDataset({"src": outdir + '/' + outfile})
 reshuffle_lmdb_splits(outdir + '/' + outfile, [0.8, 0.1, 0.1], outdir = outdir, ood=False)
-reshuffle_lmdb_splits(outdir + '/' + outfile, [0.8, 0.1, 0.1], outdir = outdir, ood=True)
+reshuffle_lmdb_splits(outdir + '/' + outfile, [0.85, 0.05, 0.1], outdir = outdir, ood=True)
