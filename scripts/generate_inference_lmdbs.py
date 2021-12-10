@@ -93,15 +93,26 @@ for fi, ff in enumerate(ground_states):
 
         # full_atom_targets = full_atom_targets + (rlxatoms.info['tags'].tolist()) + (augatoms.info['tags'].tolist())
             
-        shear_ratio = (np.sum(np.abs(aa.eps)) - np.trace(np.abs(aa.eps)) + 3) / np.trace(np.abs(aa.eps))
-        # magnitude of off diagaonal elements / magnitude of diagonal elements. < 1 means more uniaxial, > 1 means more shear
-        strain_norm = np.linalg.norm(aa.eps[0:2,0:2])
-        strain_anisotropy = np.abs(np.diff(np.diag(aa.eps[0:2,0:2])))[0]
+        # shear_ratio = (np.sum(np.abs(aa.eps)) - np.trace(np.abs(aa.eps)) + 3) / np.trace(np.abs(aa.eps))
+        # # magnitude of off diagaonal elements / magnitude of diagonal elements. < 1 means more uniaxial, > 1 means more shear
+        # strain_norm = np.linalg.norm(aa.eps[0:2,0:2])
+        # strain_anisotropy = np.abs(np.diff(np.diag(aa.eps[0:2,0:2])))[0]
 
-        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, rlxatoms.info['hand'], rlxatoms.info['gs_energy'], strain_norm, shear_ratio, strain_anisotropy, rlxatoms.info['strain'].squeeze()[0], rlxatoms.info['strain'].squeeze()[1], rlxatoms.info['strain'].squeeze()[-1]])
-        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, augatoms.info['hand'], rlxatoms.info['gs_energy'], strain_norm, shear_ratio, strain_anisotropy, augatoms.info['strain'].squeeze()[0], augatoms.info['strain'].squeeze()[1], augatoms.info['strain'].squeeze()[-1]])
+        shear_norm = np.linalg.norm(ff.data.strain) - np.linalg.norm(np.diag(ff.data.strain))
+        uniaxial_norm = np.linalg.norm(np.diag(ff.data.strain)) # - np.linalg.norm(np.eye(3))
+        
+    #     sv1 = np.trace(ff.data.strain) - 3
+    #     sv2 = (np.trace(ff.data.strain)**2 - np.trace(ff.data.strain**2))/2
+    #     sv3 = np.linalg.det(ff.data.strain)
+        
+        strain_norm = np.linalg.norm(ff.data.strain) - np.linalg.norm(np.eye(3))
+        area_strain = (ff.toatoms().cell.area(2) - rlxatoms.cell.area(2)) / rlxatoms.cell.area(2)
+        strain_anisotropy = np.abs(np.linalg.norm(ff.data.strain[0:]) / np.linalg.norm(ff.data.strain[1:]))
 
-df = pd.DataFrame(rows, columns=["ads_sid", "slab_sid", "mol_sid", "strain_id", "total_natoms", "hand", "gs_energy", "strain_norm", "shear_ratio", "strain_anisotropy", "strain_xx", "strain_xy", "strain_yy"])
+        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, rlxatoms.info['hand'], rlxatoms.info['gs_energy'], area_strain, strain_norm, shear_norm, uniaxial_norm, rlxatoms.info['strain'].squeeze()[0], rlxatoms.info['strain'].squeeze()[1], rlxatoms.info['strain'].squeeze()[-1]])
+        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, augatoms.info['hand'], rlxatoms.info['gs_energy'], area_strain, strain_norm, shear_norm, uniaxial_norm, augatoms.info['strain'].squeeze()[0], augatoms.info['strain'].squeeze()[1], augatoms.info['strain'].squeeze()[-1]])
+
+df = pd.DataFrame(rows, columns=["ads_sid", "slab_sid", "mol_sid", "strain_id", "total_natoms", "hand", "gs_energy", "area_strain", "strain_norm", "shear_norm", "uniaxial_norm", "strain_anisotropy", "strain_xx", "strain_xy", "strain_yy"])
 # df['ads_energy'] = df['ads_E'] - df['slab_E'] - df['mol_E']
 # df = pd.merge(df, df.loc[(df['strain_id'] == 0) & (df['hand'] == 'R'), ['ads_sid','ads_energy']], on='ads_sid', how='left')
 # df = pd.merge(df, df.loc[(df['strain_id'] == 0) & (df['hand'] == 'R'), ['ads_sid','slab_E']], on='ads_sid', how='left')
