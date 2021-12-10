@@ -726,4 +726,4 @@ class BaseTrainer(ABC):
             # print(predsdf)
             infdf = infdf.merge(predsdf, on=['ads_sid','strain_id', 'hand'], how='inner',)
             # print(len(infdf))
-            infdf.to_csv(dffile.split('.')[0] + '_amended.csv')
+            infdf.to_csv(dffile.split('.')[0] + '_' + self.config["task"]["type"] + '.csv')
