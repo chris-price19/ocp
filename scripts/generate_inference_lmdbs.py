@@ -109,8 +109,8 @@ for fi, ff in enumerate(ground_states):
         area_strain = (ff.toatoms().cell.area(2) - rlxatoms.cell.area(2)) / rlxatoms.cell.area(2)
         strain_anisotropy = np.abs(np.linalg.norm(ff.data.strain[0:]) / np.linalg.norm(ff.data.strain[1:]))
 
-        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, rlxatoms.info['hand'], rlxatoms.info['gs_energy'], area_strain, strain_norm, shear_norm, uniaxial_norm, rlxatoms.info['strain'].squeeze()[0], rlxatoms.info['strain'].squeeze()[1], rlxatoms.info['strain'].squeeze()[-1]])
-        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, augatoms.info['hand'], rlxatoms.info['gs_energy'], area_strain, strain_norm, shear_norm, uniaxial_norm, augatoms.info['strain'].squeeze()[0], augatoms.info['strain'].squeeze()[1], augatoms.info['strain'].squeeze()[-1]])
+        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, rlxatoms.info['hand'], rlxatoms.info['gs_energy'], area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, rlxatoms.info['strain'].squeeze()[0], rlxatoms.info['strain'].squeeze()[1], rlxatoms.info['strain'].squeeze()[-1]])
+        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, augatoms.info['hand'], rlxatoms.info['gs_energy'], area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, augatoms.info['strain'].squeeze()[0], augatoms.info['strain'].squeeze()[1], augatoms.info['strain'].squeeze()[-1]])
 
 df = pd.DataFrame(rows, columns=["ads_sid", "slab_sid", "mol_sid", "strain_id", "total_natoms", "hand", "gs_energy", "area_strain", "strain_norm", "shear_norm", "uniaxial_norm", "strain_anisotropy", "strain_xx", "strain_xy", "strain_yy"])
 # df['ads_energy'] = df['ads_E'] - df['slab_E'] - df['mol_E']
