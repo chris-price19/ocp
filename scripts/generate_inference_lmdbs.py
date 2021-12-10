@@ -71,6 +71,7 @@ for fi, ff in enumerate(ground_states):
             continue
         
         rlxatoms = ff.toatoms()
+        strainatoms = strain_atoms(rlxatoms, aa)
         rlxatoms.info['tags'] = ff.data.tags
         rlxatoms.info['sid'] = ff.data.ads_sid
         rlxatoms.info['gs_energy'] = ff.data['ads_E'] - ff.data['slab_E'] - ff.data['mol_E']
@@ -98,16 +99,16 @@ for fi, ff in enumerate(ground_states):
         # strain_norm = np.linalg.norm(aa.eps[0:2,0:2])
         # strain_anisotropy = np.abs(np.diff(np.diag(aa.eps[0:2,0:2])))[0]
 
-        shear_norm = np.linalg.norm(ff.data.strain) - np.linalg.norm(np.diag(ff.data.strain))
-        uniaxial_norm = np.linalg.norm(np.diag(ff.data.strain)) # - np.linalg.norm(np.eye(3))
+        shear_norm = np.linalg.norm(rlxatoms.info['og_strain']) - np.linalg.norm(np.diag(rlxatoms.info['og_strain']))
+        uniaxial_norm = np.linalg.norm(np.diag(rlxatoms.info['og_strain'])) # - np.linalg.norm(np.eye(3))
         
     #     sv1 = np.trace(ff.data.strain) - 3
     #     sv2 = (np.trace(ff.data.strain)**2 - np.trace(ff.data.strain**2))/2
     #     sv3 = np.linalg.det(ff.data.strain)
         
-        strain_norm = np.linalg.norm(ff.data.strain) - np.linalg.norm(np.eye(3))
-        area_strain = (ff.toatoms().cell.area(2) - rlxatoms.cell.area(2)) / rlxatoms.cell.area(2)
-        strain_anisotropy = np.abs(np.linalg.norm(ff.data.strain[0:]) / np.linalg.norm(ff.data.strain[1:]))
+        strain_norm = np.linalg.norm(rlxatoms.info['og_strain']) - np.linalg.norm(np.eye(3))
+        area_strain = (strainatoms.cell.area(2) - rlxatoms.cell.area(2)) / rlxatoms.cell.area(2)
+        strain_anisotropy = np.abs(np.linalg.norm(rlxatoms.info['og_strain'][0:]) / np.linalg.norm(rlxatoms.info['og_strain'][1:]))
 
         rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, rlxatoms.info['hand'], rlxatoms.info['gs_energy'], area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, rlxatoms.info['strain'].squeeze()[0], rlxatoms.info['strain'].squeeze()[1], rlxatoms.info['strain'].squeeze()[-1]])
         rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, aa.eid, ff.natoms, augatoms.info['hand'], rlxatoms.info['gs_energy'], area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, augatoms.info['strain'].squeeze()[0], augatoms.info['strain'].squeeze()[1], augatoms.info['strain'].squeeze()[-1]])
