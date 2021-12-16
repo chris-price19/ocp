@@ -32,7 +32,7 @@ def read_lzma_to_atoms(inpfile, ofile='temp.extxyz'):
     atoms = ase.io.read(ofile, "-1")
     return atoms
 
-def write_lmbd(data_objects, target_col, location, filename):
+def write_lmbd(data_objects, target_col, location, filename, append=False):
     
     ## data_objects must be iterable of Data()
     
@@ -44,6 +44,11 @@ def write_lmbd(data_objects, target_col, location, filename):
         meminit=False,
         map_async=True,
     )
+
+    if append:
+        adder = env.stat()["entries"]
+    else:
+        adder = 0
 
     target = []
     for fid, data in enumerate(data_objects):
@@ -63,7 +68,7 @@ def write_lmbd(data_objects, target_col, location, filename):
             continue
 
         txn = db.begin(write=True)
-        txn.put(f"{fid}".encode("ascii"), pickle.dumps(data, protocol=-1))
+        txn.put(f"{fid + adder}".encode("ascii"), pickle.dumps(data, protocol=-1))
         txn.commit()
 
         # txn = db.begin(write=True)

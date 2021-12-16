@@ -136,7 +136,7 @@ full_list = a2g_strain_rlx.convert_all(glist_full)
 outdir = datadir + 'inference_aug_strained_full_structures'
 outfile = 'traindomain_inference.lmdb'
 target_col = None # "y_relaxed"
-mean, std = write_lmbd(full_list, target_col, outdir, outfile)
+mean, std = write_lmbd(full_list, target_col, outdir, outfile, append=False)
 
 df.to_csv(outdir + '/' + outfile.split('.')[0] + '.csv')
 
