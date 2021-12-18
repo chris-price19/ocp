@@ -181,7 +181,7 @@ def run_cat_calc(basedir, atoms, data):
 
 adssid = 1436007
 
-base_datadir = '../../dft/'
+base_datadir = '/mnt/io2/scratch_vshenoy1/chrispr/catalysis/dft/'
 
 existing_strain_ids = os.listdir(base_datadir)
 existing_strain_ids = [i.split('.')[0] for i in existing_strain_ids if i.split('.')[0] == str(adssid)]
