@@ -203,6 +203,16 @@ slabgroundstate = strain_atoms(slabgroundstate, strain_tensor_list[-1])
 os.makedirs(str(adssid) + '.' + str(max_strain_ids))
 os.chdir(str(adssid) + '.' + str(max_strain_ids))
 
+os.makedirs('ads')
+os.chdir('ads')
+
+print(os.getcwd())
+
+os.chdir('..')
+os.makeidrs('slab')
+print(os.getcwd())
+os.chdir('..')
+
 # vasp_flags = VASP_FLAGS.copy()
 # vasp_flags['kpts'] = calculate_surface_k_points(atoms)
 # calc = Vasp(setups='recommended', **vasp_flags)
