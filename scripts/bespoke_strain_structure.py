@@ -27,8 +27,8 @@ adssid = 1436007
 
 base_datadir = '../../dft/'
 
-adsgroundstate = read(base_datadir + adssid + '.0/ads/CONTCAR')
-slabgroundstate = read(base_datadir + adssid + '.0/slab/CONTCAR') 
+adsgroundstate = read(base_datadir + str(adssid) + '.0/ads/CONTCAR')
+slabgroundstate = read(base_datadir + str(adssid) + '.0/slab/CONTCAR') 
 
 straintensor = np.array([0.99565088, 1.02005077, 0.01211224, ])
 
