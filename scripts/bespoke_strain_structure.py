@@ -25,13 +25,12 @@ from ase.calculators.vasp import Vasp
 
 adssid = 1436007
 
-adsgroundstate = read(adssid + '.0/ads/CONTCAR')
-slabgroundstate = read(adssid + '.0/slab/CONTCAR') 
+base_datadir = '../../dft/'
 
-straintensor = np.array([[0.99565088, 0.01211224, 0.        ],
-                           [0.01211224, 1.02005077, 0.        ],
-                           [0.        , 0.        , 1.        ]])
+adsgroundstate = read(base_datadir + adssid + '.0/ads/CONTCAR')
+slabgroundstate = read(base_datadir + adssid + '.0/slab/CONTCAR') 
 
+straintensor = np.array([0.99565088, 1.02005077, 0.01211224, ])
 
 straintensor = np.eye(3) - straintensor
 
