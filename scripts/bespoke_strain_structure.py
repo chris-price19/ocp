@@ -200,8 +200,8 @@ strain_tensor_list = generate_strain_tensors(1, man_override=straintensor)
 adsgroundstate = strain_atoms(adsgroundstate, strain_tensor_list[-1])
 slabgroundstate = strain_atoms(slabgroundstate, strain_tensor_list[-1])
 
-os.makedirs(str(adssid) + '.' + str(max_strain_ids))
-os.chdir(str(adssid) + '.' + str(max_strain_ids))
+os.makedirs(base_datadir + str(adssid) + '.' + str(max_strain_ids))
+os.chdir(base_datadir + str(adssid) + '.' + str(max_strain_ids))
 
 os.makedirs('ads')
 os.chdir('ads')
@@ -209,7 +209,7 @@ os.chdir('ads')
 print(os.getcwd())
 
 os.chdir('..')
-os.makeidrs('slab')
+os.makedirs('slab')
 print(os.getcwd())
 os.chdir('..')
 
