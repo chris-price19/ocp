@@ -191,7 +191,7 @@ adsgroundstate = read(base_datadir + str(adssid) + '.0/ads/CONTCAR')
 slabgroundstate = read(base_datadir + str(adssid) + '.0/slab/CONTCAR')
 
 
-straintensor = np.eye(3) - np.array([[0.99565088, 1.02005077, 0.01211224, ]])
+straintensor = np.array([[0.99565088-1, 1.02005077-1, 0.01211224, ]])
 
 # straintensor = np.eye(3) - straintensor
 
