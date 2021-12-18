@@ -206,6 +206,12 @@ os.chdir(base_datadir + str(adssid) + '.' + str(max_strain_ids))
 os.makedirs('ads')
 os.chdir('ads')
 
+vasp_flags = VASP_FLAGS.copy()
+vasp_flags['kpts'] = calculate_surface_k_points(adsgroundstate)
+calc = Vasp(setups='recommended', **vasp_flags)
+adsgroundstate.calc = calc
+energy = adsgroundstate.get_potential_energy()
+
 print(os.getcwd())
 
 os.chdir('..')
@@ -213,11 +219,11 @@ os.makedirs('slab')
 print(os.getcwd())
 os.chdir('..')
 
-# vasp_flags = VASP_FLAGS.copy()
-# vasp_flags['kpts'] = calculate_surface_k_points(atoms)
-# calc = Vasp(setups='recommended', **vasp_flags)
-# atoms.calc = calc
-# energy = atoms.get_potential_energy()
+vasp_flags = VASP_FLAGS.copy()
+vasp_flags['kpts'] = calculate_surface_k_points(slabgroundstate)
+calc = Vasp(setups='recommended', **vasp_flags)
+slabgroundstate.calc = calc
+energy = slabgroundstate.get_potential_energy()
 
 print(os.getcwd())
 
