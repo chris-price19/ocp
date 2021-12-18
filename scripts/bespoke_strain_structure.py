@@ -27,8 +27,13 @@ adssid = 1436007
 
 base_datadir = '../../dft/'
 
+existing_strain_ids = os.listdir(base_datadir)
+existing_strain_ids = [i.split('.')[0] for i in existing_strain_ids if i.split('.')[0] == str(adssid)]
+
 adsgroundstate = read(base_datadir + str(adssid) + '.0/ads/CONTCAR')
-slabgroundstate = read(base_datadir + str(adssid) + '.0/slab/CONTCAR') 
+slabgroundstate = read(base_datadir + str(adssid) + '.0/slab/CONTCAR')
+
+
 
 straintensor = np.array([[0.99565088, 1.02005077, 0.01211224, ]])
 
