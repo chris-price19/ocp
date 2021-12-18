@@ -36,5 +36,5 @@ straintensor = np.array([[0.99565088, 1.02005077, 0.01211224, ]])
 
 strain_tensor_list = generate_strain_tensors(1, man_override=straintensor)
 
-print(strain_tensor_list[0])
-print(strain_tensor_list[1])
+print(strain_tensor_list[0].eps)
+print(strain_tensor_list[1].eps)
