@@ -218,6 +218,7 @@ print(os.getcwd())
 
 os.chdir('..')
 os.makedirs('slab')
+os.chdir('slab')
 
 write('CONTCAR', slabgroundstate, format='vasp')
 
