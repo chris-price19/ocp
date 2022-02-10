@@ -73,6 +73,8 @@ def generate_strain_tensors(number_of_tensors, max_mag = 0.01, man_override = No
 
     return strain_tensor_list
 
+# def bespoke_strain(strain_list)
+
 def strain_atoms(atoms, eps):
 
     ## eps is a 3x3 deformation gradient matrix (symmetric)

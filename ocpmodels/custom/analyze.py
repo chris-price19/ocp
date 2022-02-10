@@ -74,6 +74,7 @@ def convert_asedb_to_dataframe(datadir, database, aug=False, kT=0.025):
         full_natoms.append(len(rlxatoms.get_chemical_symbols()))
         
         slab_atomic_numbers = np.array(rlxatoms.get_chemical_symbols())[[True if i in [0,1] else False for i in rlxatoms.info['tags']]]
+        surface_atoms = np.array(rlxatoms.get_chemical_symbols())[[True if i == 1 else False for i in rlxatoms.info['tags']]]
     #     slab_symbols = [i for i in rlxatoms.get_chemical_symbols() if slab_atomic_numbers]
     #     print(slab_atomic_numbers)
     #     sys.exit()
@@ -96,7 +97,9 @@ def convert_asedb_to_dataframe(datadir, database, aug=False, kT=0.025):
         
         strain_norm = np.linalg.norm(ff.data.strain) - np.linalg.norm(np.eye(3))
         area_strain = (ff.toatoms().cell.area(2) - rlxatoms.cell.area(2)) / rlxatoms.cell.area(2)
+
         strain_anisotropy = np.abs(np.linalg.norm(ff.data.strain[0:]) / np.linalg.norm(ff.data.strain[1:]))
+        # strain_anisotropy = (ff.data.strain[0,0] - 1)/ (ff.data.strain[1,1] -1 )
 
         if aug:
             augatoms = reflect_atoms(rlxatoms)
@@ -109,13 +112,17 @@ def convert_asedb_to_dataframe(datadir, database, aug=False, kT=0.025):
             # full_atom_targets = full_atom_targets + (augatoms.info['tags'].tolist())
             # reduced_atom_targets = reduced_atom_targets + (reduced_atoms.info['tags'].tolist()) + (reduced_aug_atoms.info['tags'].tolist())
 
-        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, ff.data.strain_id, ff.natoms, rlxatoms.info['hand'], ff.data.ads_E, ff.data.slab_E, ff.data.mol_E, area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, cu_concentration, non_cu_atoms])
+        rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, ff.data.strain_id, ff.natoms, len(surface_atoms), rlxatoms.info['hand'], ff.data.ads_E, 
+            ff.data.slab_E, ff.data.mol_E, area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, cu_concentration, non_cu_atoms])
+
         if aug:
-            rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, ff.data.strain_id, ff.natoms, augatoms.info['hand'], ff.data.ads_E, ff.data.slab_E, ff.data.mol_E, area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, cu_concentration, non_cu_atoms])
+            rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, ff.data.strain_id, ff.natoms, len(surface_atoms), augatoms.info['hand'], ff.data.ads_E, 
+                ff.data.slab_E, ff.data.mol_E, area_strain, strain_norm, shear_norm, uniaxial_norm, strain_anisotropy, cu_concentration, non_cu_atoms])
     #     rows.append([ff.data.ads_sid, ff.data.slab_sid, ff.data.mol_sid, ff.data.strain_id, ff.natoms, ff.data.ads_E, ff.data.slab_E, ff.data.mol_E, area_strain, sv1, sv2, sv3, strain_anisotropy, cu_concentration, non_cu_atoms])
 
     # sys.exit()
-    df = pd.DataFrame(rows, columns=["ads_sid", "slab_sid", "mol_sid", "strain_id", "total_natoms", "hand", "ads_E", "slab_E", "mol_E", "area_strain", "strain_norm", "shear_norm", "uniaxial_norm", "strain_anisotropy", "cu_concentration", "alloy_element"])
+    df = pd.DataFrame(rows, columns=["ads_sid", "slab_sid", "mol_sid", "strain_id", "total_natoms", "surface_natoms", "hand", "ads_E", 
+        "slab_E", "mol_E", "area_strain", "strain_norm", "shear_norm", "uniaxial_norm", "strain_anisotropy", "cu_concentration", "alloy_element"])
     
     df['ads_energy'] = df['ads_E'] - df['slab_E'] - df['mol_E']
 
