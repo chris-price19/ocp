@@ -22,9 +22,59 @@ from pymatgen.analysis.adsorption import reorient_z
 from pymatgen.io.ase import AseAtomsAdaptor
 
 from ocpmodels.custom.structure_mod import reflect_atoms
+from ocpmodels.datasets import SinglePointLmdbDataset
 
 mcolors = dict(m2colors.BASE_COLORS, **m2colors.CSS4_COLORS)
 
+def generate_tags(atoms):
+
+    adsorbates = ['C', 'N', 'O', 'H']
+    constrained = atoms.constraints[0].get_indices()
+    symbols = atoms.get_chemical_symbols()
+    tags = np.zeros(len(atoms), dtype=np.int32)
+
+    for ti in range(len(tags)):
+        if ti not in constrained:
+            tags[ti] = 1
+
+        if ti not in constrained and symbols[ti] in adsorbates:
+            tags[ti] = 2
+
+    return tags.tolist()
+
+
+def load_map_frame(datadir, defaultloc = 'is2re/all/train/binaryCu-relax.lmdb', filtering=True):
+
+    map_frame = pd.DataFrame.from_dict(np.load(datadir + 'oc20_data_mapping.pkl', allow_pickle=True), orient='index')
+    cat_frame = pd.DataFrame.from_dict(np.load(datadir + 'mapping_adslab_slab.pkl', allow_pickle=True), orient='index', columns=['slab'])
+
+    dbloc = {"src": datadir + defaultloc}
+
+    redb = SinglePointLmdbDataset(dbloc)
+    print(len(redb))
+
+    merged =  pd.merge(map_frame, cat_frame, left_index=True, right_index=True, how='inner')
+    if filtering:
+        sids =  ['random'+str(aa.sid) for aa in redb]
+        map_frame = merged.loc[merged.index.isin(sids)]
+    else:
+        map_frame = merged
+    map_frame = map_frame.reset_index()
+    map_frame['index'] = map_frame['index'].apply(lambda x: int(x.split('random')[-1]))
+    map_frame.rename(columns={'index':'ads_sid'}, inplace=True)
+
+    return map_frame
+
+def generate_new_sid(sid_range):
+    max_sid = np.amax(sid_range)
+    min_sid = np.amin(sid_range)
+
+    sid = sid_range[0]
+
+    while sid in sid_range:
+        sid = np.random.randint(min_sid, max_sid)
+
+    return sid
 
 def convert_asedb_to_dataframe(datadir, database, aug=False, kT=0.025):
 

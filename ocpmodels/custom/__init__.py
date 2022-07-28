@@ -18,6 +18,7 @@ __all__ = [
     "reshuffle_lmdb_splits",
     "reflect_atoms",
     "convert_asedb_to_dataframe",
+    # "load_map_frame"
     # "init_atoms_from_lmdb",
 
 ]
