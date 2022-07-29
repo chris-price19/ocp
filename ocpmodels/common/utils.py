@@ -21,7 +21,7 @@ from bisect import bisect
 from itertools import product
 from pathlib import Path
 
-import demjson
+import demjson3
 import numpy as np
 import pandas as pd
 import torch
