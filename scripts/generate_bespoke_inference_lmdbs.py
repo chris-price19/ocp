@@ -82,7 +82,7 @@ for fi, ff in enumerate(base_ads_sids):
 
     man_strains = generate_strain_tensors(number_of_tensors, max_mag = max_magnitude)
 
-    submapframe = map_frame.loc[map_frame['ads_sid'] == ff]
+    submapframe = map_frame.loc[map_frame['ads_sid'] == ff].copy()
     submapframe['slab_sid'] = submapframe['slab'].apply(lambda x: int(x.split('random')[-1]))
 
     for ai, aa in enumerate(man_strains):
