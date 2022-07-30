@@ -27,6 +27,8 @@ from ocpmodels.custom.analyze import generate_new_sid, load_map_frame
 from ase.io import read, write
 from ase.build import add_adsorbate
 
+import pickle
+
 VASP_FLAGS = {'ibrion': 2,
           'nsw': 600,
           # 'nelm': 5,  # turn this off!
