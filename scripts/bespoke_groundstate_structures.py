@@ -92,12 +92,14 @@ with ase.db.connect(datadir + 'adsorbates.db') as db:
     rows = list(db.select())
     
 for ni, nn in enumerate(new_ads):
+
+    print(nn)
     adsorb = Atoms(rows[nn].toatoms())
     new_atoms = slabatoms.copy()
 
     px = np.random.random()*np.linalg.norm(slabatoms.cell[0,:])
     py = np.random.random()*np.linalg.norm(slabatoms.cell[1,:])
-    h = atoms.positions[:,2].max() + 0.85
+    h = new_atoms.positions[:,2].max() + 0.85
     add_adsorbate(new_atoms, adsorb, .85, (px, py))
 
     vasp_flags = VASP_FLAGS.copy()
@@ -129,3 +131,5 @@ for ni, nn in enumerate(new_ads):
     slabdict['random' + str(new_sids[ni])] = 'random397927'
     with open(datadir + 'mapping_adslab_slab.pkl', 'wb') as handle:
         pickle.dump(slabdict, handle, protocol=4)
+
+    print('done')
