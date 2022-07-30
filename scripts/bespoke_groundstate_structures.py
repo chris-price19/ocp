@@ -107,7 +107,7 @@ for ni, nn in enumerate(new_ads):
     calc = Vasp(setups='recommended', **vasp_flags)
     new_atoms.calc = calc
 
-    new_dir = str(new_sids[ni]+'.0/ads')
+    new_dir = str(new_sids[ni])+'.0/ads'
     # new_slab_dir = str(new_sids[ni]+'.0/slab')
 
     os.makedirs(dft_datadir + new_dir, exist_ok=True)
