@@ -124,7 +124,6 @@ for ni, nn in enumerate(new_ads):
     mapdict = np.load(datadir + 'oc20_data_mapping.pkl', allow_pickle=True)
     d1 = {'bulk_id': 3204, 'ads_id': nn, 'bulk_mpid': 'mp-1225835', 'bulk_symbols': 'Cu4S2', 'ads_symbols': rows[nn].data['SMILE'], 'miller_index': (1, 1, 0), 'shift': 0.217, 'top': False, 'adsorption_site': ((px, py, h),)}
     mapdict['random' + str(new_sids[ni])] = d1
-
     with open(datadir + 'oc20_data_mapping.pkl', 'wb') as handle:
         pickle.dump(mapdict, handle, protocol=4)
 
