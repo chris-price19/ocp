@@ -78,6 +78,7 @@ max_magnitude = 0.03
 
 base_ads_sids = [2238472, 2345755]
 base_ads_sids = [514753, 671160, 1908636, 1266822, 216803, 2345755, 2238472]
+base_ads_sids = [626101, 1816765, 408139, 502539, 1903863, 612645, 217639]
 
 for fi, ff in enumerate(base_ads_sids):
 
@@ -169,7 +170,7 @@ full_list = a2g_strain_rlx.convert_all(glist_full)
 # energy_class_weights = compute_class_weight('balanced', classes=np.unique(energy_targets), y=energy_targets)
 
 outdir = datadir + 'inference_aug_strained_full_structures'
-outfile = 'n2_traindomain_inference.lmdb'
+outfile = 'cu8s4_traindomain_inference.lmdb'
 target_col = None # "y_relaxed"
 mean, std = write_lmbd(full_list, target_col, outdir, outfile, append=False)
 
