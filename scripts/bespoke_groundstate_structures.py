@@ -121,7 +121,7 @@ for ni, nn in enumerate(new_ads):
     new_atoms.calc = calc
 
     new_dir = str(new_sids[ni])+'.0/ads'
-    new_slab_dir = str(new_sids[ni]+'.0/slab')
+    new_slab_dir = str(new_sids[ni])+'.0/slab'
 
     os.makedirs(dft_datadir + new_dir, exist_ok=True)
     os.makedirs(dft_datadir + new_slab_dir, exist_ok=True)
