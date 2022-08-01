@@ -84,9 +84,20 @@ dft_datadir = '/scratch/vshenoy1/chrispr/catalysis/dft/'
 new_ads = [1, 77, 82, 71, 72]
 new_sids = [1266822, 216803, 1908636, 671160, 514753]
 
-base_slab = dft_datadir + "2207859.0/slab/CONTCAR"
+# cu8s4
+new_ads = [1, 77, 82, 71, 72, 69, 74] # 74
+new_sids = [626101,
+1816765,
+408139,
+502539,
+1903863,
+612645,
+217639]
+
+# base_slab = dft_datadir + "2207859.0/slab/CONTCAR"
+base_slab = dft_datadir + "532831.0/slab/"
 adsdb = datadir+"adsorbates.db"
-slabatoms = read(base_slab)
+slabatoms = read(base_slab + "CONTCAR")
 
 cwd = os.getcwd()
 
@@ -110,9 +121,11 @@ for ni, nn in enumerate(new_ads):
     new_atoms.calc = calc
 
     new_dir = str(new_sids[ni])+'.0/ads'
-    # new_slab_dir = str(new_sids[ni]+'.0/slab')
+    new_slab_dir = str(new_sids[ni]+'.0/slab')
 
     os.makedirs(dft_datadir + new_dir, exist_ok=True)
+    os.makedirs(dft_datadir + new_slab_dir, exist_ok=True)
+
     os.chdir(dft_datadir + new_dir)
 
     new_atoms.get_calculator().initialize(new_atoms)
@@ -122,14 +135,16 @@ for ni, nn in enumerate(new_ads):
     os.chdir(cwd)
 
     mapdict = np.load(datadir + 'oc20_data_mapping.pkl', allow_pickle=True)
-    d1 = {'bulk_id': 3204, 'ads_id': nn, 'bulk_mpid': 'mp-1225835', 'bulk_symbols': 'Cu4S2', 'ads_symbols': rows[nn].data['SMILE'], 'miller_index': (1, 1, 0), 'shift': 0.217, 'top': False, 'adsorption_site': ((px, py, h),)}
+    # d1 = {'bulk_id': 3204, 'ads_id': nn, 'bulk_mpid': 'mp-1225835', 'bulk_symbols': 'Cu4S2', 'ads_symbols': rows[nn].data['SMILE'], 'miller_index': (1, 1, 0), 'shift': 0.217, 'top': False, 'adsorption_site': ((px, py, h),)}
+    d1 = {'bulk_id': 775, 'ads_id': nn, 'bulk_mpid': 'mp-618991', 'bulk_symbols': 'Cu8S4', 'ads_symbols': rows[nn].data['SMILE'], 'miller_index': (2, 0, 1), 'shift': 0.065, 'top': True, 'adsorption_site': ((px, py, h),)}
     mapdict['random' + str(new_sids[ni])] = d1
     with open(datadir + 'oc20_data_mapping.pkl', 'wb') as handle:
         pickle.dump(mapdict, handle, protocol=4)
 
 
     slabdict = np.load(datadir + 'mapping_adslab_slab.pkl', allow_pickle=True)
-    slabdict['random' + str(new_sids[ni])] = 'random397927'
+    # slabdict['random' + str(new_sids[ni])] = 'random397927'
+    slabdict['random' + str(new_sids[ni])] = 'random532831'
     with open(datadir + 'mapping_adslab_slab.pkl', 'wb') as handle:
         pickle.dump(slabdict, handle, protocol=4)
 
