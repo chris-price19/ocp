@@ -73,7 +73,7 @@ glist_full = []
 # full_natoms = []
 # full_atom_targets = []
 
-number_of_tensors = 500
+number_of_tensors = 1000
 max_magnitude = 0.03
 
 base_ads_sids = [2238472, 2345755]
