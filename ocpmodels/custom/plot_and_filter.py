@@ -13,12 +13,15 @@ import torch_geometric
 import ase
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib import colors as m2colors
+
 from ase.visualize.plot import plot_atoms
 from ase.constraints import FixAtoms
 
 from pymatgen.analysis.adsorption import reorient_z
 from pymatgen.io.ase import AseAtomsAdaptor
 
+mcolors = dict(m2colors.BASE_COLORS, **m2colors.CSS4_COLORS)
 
 def get_cat_sids(cat_map, sids):
 
@@ -66,8 +69,14 @@ def init_atoms_from_lmdb(db, ind):
     atoms = ase.Atoms(cell=db[ind].cell.numpy().squeeze(), 
                       positions=db[ind].pos.numpy(), 
                       numbers=db[ind].atomic_numbers.numpy(), pbc=True, 
-                      info={'energy':db[ind].y_relaxed, 'sid':db[ind].sid, 'tags': db[ind].tags.numpy()})
+                      # info={'energy':db[ind].y_relaxed, 'sid':db[ind].sid, 'tags': db[ind].tags.numpy()}
+                      )
     
+    if 'y_relaxed' in db[ind].keys:
+        atoms.info = {'energy':db[ind].y_relaxed, 'sid':db[ind].sid, 'tags': db[ind].tags.numpy()}
+    else:
+        atoms.info = {'energy':999., 'sid':db[ind].sid, 'tags': db[ind].tags.numpy()}
+
     mask = [True if i == 0 else False for i in atoms.info['tags']]
     atoms.constraints += [FixAtoms(mask=mask)]
 
@@ -134,7 +143,7 @@ def plot_atom_graph(data_obj):
 
     carac = pd.DataFrame({'ID':np.arange(len(node_labels)), 
                           'type': data_obj.atomic_numbers.numpy(),
-                          'size': data_obj.atomic_numbers.numpy() / np.amax(data_obj.atomic_numbers.numpy())})
+                          'size': data_obj.atomic_numbers.numpy() }) #/ np.amax(data_obj.atomic_numbers.numpy())
 
     carac = carac.set_index('ID')
     carac = carac.reindex(g.nodes())
@@ -144,28 +153,52 @@ def plot_atom_graph(data_obj):
 #     print(carac)
     # Specify colors
     cmap = matplotlib.colors.ListedColormap(['red', 'darkorange', 'green', 'blue', 'purple', 'yellow', 'gray'])
+    cmap = matplotlib.colors.ListedColormap([mcolors['mistyrose'], mcolors['red'],  mcolors['saddlebrown'], mcolors['mediumblue'], mcolors['peru'],  ]) #, 'yellow', 'gray'])
 
     # Draw graph
-    nx.draw(g, with_labels=False, node_color=carac['type'].cat.codes, node_size = carac['size'] * 500, cmap=cmap)
+    nx.draw(g, with_labels=False, node_color=carac['type'].cat.codes, node_size = carac['size'] * 10, cmap=cmap)
     # can use edgecolors attribute to color border of nodes by tag
     
     return ax
 
 
-def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=True):
+def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=True, corrections=True, mapping=None):
 
     ## train lmdb
 
     # binary_inds = sids2inds(traindb, list(sids.keys()))
 
+    if corrections:
+
+        vdwdf = pd.read_csv('../dft/baseline_y_relaxed_corrections_by_molsid.csv')
+
     glist_full = []
     glist_reduced = []
+    full_atom_targets = []
+    reduced_atom_targets = []
 
     for bi, bb in enumerate(binary_inds):
         
         rlxatoms = relaxed_atoms_from_lmdb(traindb, bb)
+
+        if corrections:
+
+            # print(rlxatoms.info['energy'])
+            molsid = mapping['random'+str(rlxatoms.info['sid'])]['ads_id']
+            # print(rlxatoms.get_chemical_symbols())
+            # print(molsid)
+            if molsid in vdwdf['mol_sid'].values:
+                adder = vdwdf.loc[vdwdf['mol_sid'] == molsid, 'ads_gs_delta'].values[0]
+            else:
+                adder = 0.
+            rlxatoms.info['energy'] -= adder
+            # print(rlxatoms.info['energy'])
+
+        # sys.exit()
         
         saveconstraints = rlxatoms.constraints.copy()
+
+        full_atom_targets = full_atom_targets + rlxatoms.info['tags'].tolist()        
 
         rcell, Q = rlxatoms.cell.standard_form()
         rlxatoms.cell = rlxatoms.cell @ Q.T
@@ -185,6 +218,7 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
 
         # if filteratoms:
         surfatoms = filter_atoms_by_tag(rlxatoms, keep=np.array([1,2]))
+        reduced_atom_targets = reduced_atom_targets + surfatoms.info['tags'].tolist()
         glist_reduced.append(surfatoms)
         # else:
         glist_full.append(rlxatoms)
@@ -192,6 +226,6 @@ def filter_lmdbs_and_graphs(traindb, binary_inds, graph_builder, filteratoms=Tru
     glist_full = graph_builder.convert_all(glist_full)
     glist_reduced = graph_builder.convert_all(glist_reduced)
 
-    return glist_full, glist_reduced
+    return glist_full, glist_reduced, full_atom_targets, reduced_atom_targets
 
 

@@ -117,6 +117,7 @@ class BaseTrainer(ABC):
         #     )
         # # catch instances where code is not being run from a git repo
         # except Exception:
+        # print(amp)
 
         ## disable commit logging for now
         commit_hash = None
@@ -320,12 +321,17 @@ class BaseTrainer(ABC):
                 self.model, device_ids=[self.device]
             )
 
-    def load_checkpoint(self, checkpoint_path):
+        # print('check out state dict')
+        # print(self.model.state_dict())
+
+    def load_checkpoint(self, checkpoint_path, strict_load=True):
         if not os.path.isfile(checkpoint_path):
             raise FileNotFoundError(
                 errno.ENOENT, "Checkpoint file not found", checkpoint_path
             )
 
+        print("loading checkpoint")
+        print(f"Loading checkpoint from: {checkpoint_path} with strict_load {strict_load}")
         logging.info(f"Loading checkpoint from: {checkpoint_path}")
         map_location = torch.device("cpu") if self.cpu else self.device
         checkpoint = torch.load(checkpoint_path, map_location=map_location)
@@ -340,14 +346,14 @@ class BaseTrainer(ABC):
             # No need for OrderedDict since dictionaries are technically ordered
             # since Python 3.6 and officially ordered since Python 3.7
             new_dict = {k[7:]: v for k, v in checkpoint["state_dict"].items()}
-            self.model.load_state_dict(new_dict)
+            self.model.load_state_dict(new_dict, strict=strict_load)
         elif distutils.initialized() and first_key.split(".")[1] != "module":
             new_dict = {
                 f"module.{k}": v for k, v in checkpoint["state_dict"].items()
             }
-            self.model.load_state_dict(new_dict)
+            self.model.load_state_dict(new_dict, strict=strict_load)
         else:
-            self.model.load_state_dict(checkpoint["state_dict"])
+            self.model.load_state_dict(checkpoint["state_dict"], strict=strict_load)
 
         if "optimizer" in checkpoint:
             self.optimizer.load_state_dict(checkpoint["optimizer"])
@@ -370,6 +376,8 @@ class BaseTrainer(ABC):
         self.loss_fn = {}
         self.loss_fn["energy"] = self.config["optim"].get("loss_energy", "mae")
         self.loss_fn["force"] = self.config["optim"].get("loss_force", "mae")
+        self.loss_fn["graph_classify"] = self.config["optim"].get("loss_graph_classify", "crossentropy_graph")
+        self.loss_fn["node_classify"] = self.config["optim"].get("loss_node_classify", "crossentropy_node")
         for loss, loss_name in self.loss_fn.items():
             if loss_name in ["l1", "mae"]:
                 self.loss_fn[loss] = nn.L1Loss()
@@ -377,6 +385,16 @@ class BaseTrainer(ABC):
                 self.loss_fn[loss] = nn.MSELoss()
             elif loss_name == "l2mae":
                 self.loss_fn[loss] = L2MAELoss()
+            elif loss_name == "crossentropy_graph":
+                if self.config["dataset"].get("graph_class_weights", None) is not None:
+                    self.loss_fn[loss] = nn.CrossEntropyLoss(weight=self.config["dataset"].get("graph_class_weights", None).to(self.device))
+                else:
+                    self.loss_fn[loss] = nn.CrossEntropyLoss()
+            elif loss_name == "crossentropy_node":
+                if self.config["dataset"].get("node_class_weights", None) is not None:
+                    self.loss_fn[loss] = nn.CrossEntropyLoss(weight=self.config["dataset"].get("node_class_weights", None).to(self.device))
+                else:
+                    self.loss_fn[loss] = nn.CrossEntropyLoss()
             else:
                 raise NotImplementedError(
                     f"Unknown loss function name: {loss_name}"
@@ -650,12 +668,13 @@ class BaseTrainer(ABC):
         )
         np.savez_compressed(
             results_file_path,
-            ids=predictions["id"],
+            ids = np.arange(len(predictions["ads_sid"])),
             **{key: predictions[key] for key in keys},
         )
 
         distutils.synchronize()
         if distutils.is_master():
+            # print('distutils')
             gather_results = defaultdict(list)
             full_path = os.path.join(
                 self.config["cmd"]["results_dir"],
@@ -687,7 +706,24 @@ class BaseTrainer(ABC):
                         np.array(gather_results[k])[idx]
                     )[:-1]
                 else:
+                    # print(k)
                     gather_results[k] = np.array(gather_results[k])[idx]
 
             logging.info(f"Writing results to {full_path}")
             np.savez_compressed(full_path, **gather_results)
+
+        dffile = self.config["test_dataset"]["src"].split('.')[0] + '.csv'
+        if os.path.isfile(dffile):
+            import pandas as pd
+            print('updating CSV')
+            infdf = pd.read_csv(dffile)
+            # print(len(infdf))
+            preds = np.load(full_path)
+            # print(len(preds))
+            predsdf = pd.DataFrame.from_dict({item: preds[item] for item in preds.files}, orient='columns')
+            predsdf.columns = [col + '_' + self.config["task"]["type"] if col in ['energy'] else col for col in predsdf.columns]
+            # print(len(predsdf))
+            # print(predsdf)
+            infdf = infdf.merge(predsdf, on=['ads_sid','strain_id', 'hand'], how='inner',)
+            # print(len(infdf))
+            infdf.to_csv(dffile.split('.')[0] + '_' + self.config["task"]["type"] + '.csv')

@@ -16,6 +16,9 @@ __all__ = [
     "get_adsorbate_energy",
     "filter_lmdbs_and_graphs",
     "reshuffle_lmdb_splits",
+    "reflect_atoms",
+    "convert_asedb_to_dataframe",
+    # "load_map_frame"
     # "init_atoms_from_lmdb",
 
 ]
@@ -23,3 +26,4 @@ __all__ = [
 from .plot_and_filter import *
 from .structure_mod import *
 from .io import *
+from .analyze import *

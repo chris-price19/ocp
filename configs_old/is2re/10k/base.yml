@@ -1,0 +1,23 @@
+# trainer: energy
+trainer: multitask_energy
+
+dataset:
+  # - src: /home/ccprice/catalysis-data/ocp/data/is2re/10k/train/data.lmdb
+  - src: /home/ccprice/catalysis-data/ocp/data/strained_reduced_structures/binaryCu-relax-moleculesubset.lmdb
+    normalize_labels: True
+    target_mean: -1.525913953781128
+    target_std: 2.279365062713623
+  # - src: /home/ccprice/catalysis-data/ocp/data/is2re/all/val_id/data.lmdb
+  - src: /home/ccprice/catalysis-data/ocp/data/strained_reduced_structures/binaryCu-relax-moleculesubset_valid.lmdb
+
+logger: tensorboard
+
+task:
+  dataset: single_point_lmdb
+  num_targets: 2
+  loss_balance: 1
+  description: "Relaxed state energy prediction from initial structure."
+  type: regression
+  metric: mae
+  labels:
+    - relaxed energy

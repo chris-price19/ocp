@@ -1,0 +1,532 @@
+"""
+Copyright (c) Facebook, Inc. and its affiliates.
+
+This source code is licensed under the MIT license found in the
+LICENSE file in the root directory of this source tree.
+"""
+
+import logging
+import os
+from collections import defaultdict
+
+import numpy as np
+import torch
+import torch_geometric
+from tqdm import tqdm
+
+from ocpmodels.common import distutils
+from ocpmodels.common.data_parallel import ParallelCollater
+from ocpmodels.common.registry import registry
+from ocpmodels.modules.normalizer import Normalizer
+from ocpmodels.trainers.base_trainer import BaseTrainer
+
+@registry.register_trainer("multitask_thresh")
+class MultiThreshTrainer(BaseTrainer):
+    """
+    Trainer class for the Initial Structure to Relaxed Energy (IS2RE) task.
+
+    .. note::
+
+        Examples of configurations for task, model, dataset and optimizer
+        can be found in `configs/ocp_is2re <https://github.com/Open-Catalyst-Project/baselines/tree/master/configs/ocp_is2re/>`_.
+
+
+    Args:
+        task (dict): Task configuration.
+        model (dict): Model configuration.
+        dataset (dict): Dataset configuration. The dataset needs to be a SinglePointLMDB dataset.
+        optimizer (dict): Optimizer configuration.
+        identifier (str): Experiment identifier that is appended to log directory.
+        run_dir (str, optional): Path to the run directory where logs are to be saved.
+            (default: :obj:`None`)
+        is_debug (bool, optional): Run in debug mode.
+            (default: :obj:`False`)
+        is_vis (bool, optional): Run in debug mode.
+            (default: :obj:`False`)
+        is_hpo (bool, optional): Run hyperparameter optimization with Ray Tune.
+            (default: :obj:`False`)
+        print_every (int, optional): Frequency of printing logs.
+            (default: :obj:`100`)
+        seed (int, optional): Random number seed.
+            (default: :obj:`None`)
+        logger (str, optional): Type of logger to be used.
+            (default: :obj:`tensorboard`)
+        local_rank (int, optional): Local rank of the process, only applicable for distributed training.
+            (default: :obj:`0`)
+        amp (bool, optional): Run using automatic mixed precision.
+            (default: :obj:`False`)
+        slurm (dict): Slurm configuration. Currently just for keeping track.
+            (default: :obj:`{}`)
+    """
+
+    def __init__(
+        self,
+        task,
+        model,
+        dataset,
+        optimizer,
+        identifier,
+        normalizer=None,
+        timestamp_id=None,
+        run_dir=None,
+        is_debug=False,
+        is_vis=False,
+        is_hpo=False,
+        print_every=100,
+        seed=None,
+        logger="tensorboard",
+        local_rank=0,
+        amp=False,
+        cpu=False,
+        slurm={},
+    ):
+        super().__init__(
+            task=task,
+            model=model,
+            dataset=dataset,
+            optimizer=optimizer,
+            identifier=identifier,
+            normalizer=normalizer,
+            timestamp_id=timestamp_id,
+            run_dir=run_dir,
+            is_debug=is_debug,
+            is_vis=is_vis,
+            is_hpo=is_hpo,
+            print_every=print_every,
+            seed=seed,
+            logger=logger,
+            local_rank=local_rank,
+            amp=amp,
+            cpu=cpu,
+            name="multitask_thresh",
+            slurm=slurm,
+        )
+
+        # print('amp')
+        # print(amp)
+
+    def load_task(self):
+        assert (
+            self.config["task"]["dataset"] == "single_point_lmdb"
+        ), "EnergyTrainer requires single_point_lmdb dataset"
+
+        logging.info(f"Loading dataset: {self.config['task']['dataset']}")
+
+        self.parallel_collater = ParallelCollater(
+            0 if self.cpu else 1,
+            self.config["model_attributes"].get("otf_graph", False),
+        )
+
+        self.val_loader = self.test_loader = self.train_loader = None
+        self.val_sampler = self.test_sampler = self.train_sampler = None
+
+        if self.config.get("dataset", None):
+            self.train_dataset = registry.get_dataset_class(
+                self.config["task"]["dataset"]
+            )(self.config["dataset"])
+            self.train_sampler = self.get_sampler(
+                self.train_dataset,
+                self.config["optim"]["batch_size"],
+                shuffle=True,
+            )
+            self.train_loader = self.get_dataloader(
+                self.train_dataset,
+                self.train_sampler,
+            )
+
+        if self.config.get("val_dataset", None):
+            self.val_dataset = registry.get_dataset_class(
+                self.config["task"]["dataset"]
+            )(self.config["val_dataset"])
+            self.val_sampler = self.get_sampler(
+                self.val_dataset,
+                self.config["optim"].get(
+                    "eval_batch_size", self.config["optim"]["batch_size"]
+                ),
+                shuffle=False,
+            )
+            self.val_loader = self.get_dataloader(
+                self.val_dataset,
+                self.val_sampler,
+            )
+        if self.config.get("test_dataset", None):
+            self.test_dataset = registry.get_dataset_class(
+                self.config["task"]["dataset"]
+            )(self.config["test_dataset"])
+            self.test_sampler = self.get_sampler(
+                self.test_dataset,
+                self.config["optim"].get(
+                    "eval_batch_size", self.config["optim"]["batch_size"]
+                ),
+                shuffle=False,
+            )
+            self.test_loader = self.get_dataloader(
+                self.test_dataset,
+                self.test_sampler,
+            )
+
+        self.num_targets = self.config["task"].get("num_targets", 1)
+        self.loss_balance = self.config["task"].get("loss_balance", 1.)
+        self.min_target = self.config["dataset"].get("global_min_target", 0)
+
+        # print('targets')
+        # print(self.num_targets)
+
+        # Normalizer for the dataset.
+        # Compute mean, std of training set labels.
+        self.normalizers = {}
+        if self.normalizer.get("normalize_labels", False):
+            if "target_mean" in self.normalizer:
+                # print('normalize true')
+                self.normalizers["target"] = Normalizer(
+                    mean=self.normalizer["target_mean"],
+                    std=self.normalizer["target_std"],
+                    device=self.device,
+                )
+        # if self.normalizer.get("normalize_labels", False):
+            else:
+                print('no strain')
+                # raise NotImplementedError
+        if "data_mean" in self.normalizer:
+            self.normalizers["data"] = Normalizer(
+                mean=self.normalizer["data_mean"],
+                std=self.normalizer["data_std"],
+                device=self.device,
+            )
+
+            # print(self.normalizers["data"].mean)
+            # print(self.normalizers["data"].std)
+
+    @torch.no_grad()
+    def predict(
+        self, loader, per_image=True, results_file=None, disable_tqdm=False
+    ):
+        if distutils.is_master() and not disable_tqdm:
+            logging.info("Predicting on test.")
+        assert isinstance(
+            loader,
+            (
+                torch.utils.data.dataloader.DataLoader,
+                torch_geometric.data.Batch,
+            ),
+        )
+        rank = distutils.get_rank()
+
+        if isinstance(loader, torch_geometric.data.Batch):
+            loader = [[loader]]
+
+        self.model.eval()
+        if self.ema:
+            self.ema.store()
+            self.ema.copy_to()
+
+        if self.normalizers is not None and "target" in self.normalizers:
+            self.normalizers["target"].to(self.device)
+        predictions = {"ads_sid": [], "strain_id": [], "energy": [], "hand": [], "true": []}
+
+        for i, batch in tqdm(
+            enumerate(loader),
+            total=len(loader),
+            position=rank,
+            desc="device {}".format(rank),
+            disable=disable_tqdm,
+        ):
+
+            if "data_mean" in self.normalizer:
+                print('normalizing strains')
+                batch[0].strain = self.normalizers["data"].norm(batch[0].strain.to(self.device))
+
+            with torch.cuda.amp.autocast(enabled=self.scaler is not None):
+                out = self._forward(batch)
+
+            if self.normalizers is not None and "target" in self.normalizers and self.normalizer.get("normalize_labels", False):
+                # print('denormalizing energies')
+                out["energy"] = self.normalizers["target"].denorm(
+                    out["energy"]
+                )
+
+            if per_image:
+                # print(batch[0].hand)
+                predictions["ads_sid"].extend(
+                    [i for i in batch[0].sid.tolist()]
+                )
+                predictions["strain_id"].extend(
+                    [i for i in batch[0].strain_id.tolist()]
+                )
+
+                predictions["energy"].extend(torch.argmax(out["energy"].detach(), dim=1).tolist())
+
+                if "hand" in batch[0].keys:
+                    predictions["hand"].extend(
+                        [i for i in batch[0].hand]
+                    )
+                else:
+                    if "hand" in predictions.keys():
+                        predictions.pop("hand")
+
+                if "y_relaxed" in batch[0].keys:
+                    predictions["true"].extend(
+                        [i for i in batch[0].y_relaxed.tolist()]
+                    )
+                else:
+                    if "true" in predictions.keys():
+                        predictions.pop("true")
+                # predictions["classify"].extend(torch.argmax(out["classify"], dim=1).detach())
+            else:
+                predictions["strain_id"] = batch[0].strain_id.tolist()
+                predictions["energy"] = torch.argmax(out["energy"], dim=1).detach().tolist()
+                # predictions["classify"] = torch.argmax(out["classify"], dim=1).detach()
+
+                return predictions
+
+        # print(predictions)
+        if "true" in predictions.keys() and "hand" in predictions.keys():
+            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "hand", "true"]) # "classify"])
+        elif "hand" in predictions.keys():
+            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "hand",]) # "classify"])
+        elif "true" in predictions.keys():
+            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", "true",]) # "classify"])
+        else:
+            self.save_results(predictions, results_file, keys=["ads_sid", "strain_id", "energy", ]) # "classify"])
+
+        if self.ema:
+            self.ema.restore()
+
+        return predictions
+
+    def train(self, disable_eval_tqdm=False):
+
+        eval_every = self.config["optim"].get(
+            "eval_every", len(self.train_loader)
+        )
+        primary_metric = self.config["task"].get(
+            "primary_metric", self.evaluator.task_primary_metric[self.name]
+        )
+        self.best_val_mae = 1e9
+
+        # Calculate start_epoch from step instead of loading the epoch number
+        # to prevent inconsistencies due to different batch size in checkpoint.
+        start_epoch = self.step // len(self.train_loader)
+
+        for epoch_int in range(
+            start_epoch, self.config["optim"]["max_epochs"]
+        ):
+            self.train_sampler.set_epoch(epoch_int)
+            skip_steps = self.step % len(self.train_loader)
+            # print(skip_steps)
+            train_loader_iter = iter(self.train_loader)
+
+            for i in range(skip_steps, len(self.train_loader)):
+                self.epoch = epoch_int + (i + 1) / len(self.train_loader)
+                self.step = epoch_int * len(self.train_loader) + i + 1
+                self.model.train()
+
+                # Get a batch.
+                batch = next(train_loader_iter)
+
+                # print(batch.device)
+                # print(batch[0].strain)
+                # print(batch[0].natoms)
+                if "data_mean" in self.normalizer:
+                    # print(batch[0].strain.type())
+                    # print(self.normalizers["data"].mean.type())
+                    # print(self.normalizers["data"].std.type())
+                    # sys.exit()
+                    batch[0].strain = self.normalizers["data"].norm(batch[0].strain.to(self.device))
+                # print(batch[0].strain)
+                # sys.exit()
+
+                # Forward, loss, backward.
+                with torch.cuda.amp.autocast(enabled=self.scaler is not None):
+                    out = self._forward(batch)
+                    # print(out)
+                    loss = self._compute_loss(out, batch)
+                loss = self.scaler.scale(loss) if self.scaler else loss
+                self._backward(loss)
+                scale = self.scaler.get_scale() if self.scaler else 1.0
+
+                # if i == 1:
+                #     sys.exit()
+
+                # print(out)
+
+                # Compute metrics.
+                self.metrics = self._compute_metrics(
+                    out,
+                    batch,
+                    self.evaluator,
+                    metrics={},
+                )
+                self.metrics = self.evaluator.update(
+                    "loss", loss.item() / scale, self.metrics
+                )
+
+                # Log metrics.
+                log_dict = {k: self.metrics[k]["metric"] for k in self.metrics}
+                log_dict.update(
+                    {
+                        "lr": self.scheduler.get_lr(),
+                        "epoch": self.epoch,
+                        "step": self.step,
+                    }
+                )
+                if (
+                    self.step % self.config["cmd"]["print_every"] == 0
+                    and distutils.is_master()
+                    and not self.is_hpo
+                ):
+                    log_str = [
+                        "{}: {:.2e}".format(k, v) for k, v in log_dict.items()
+                    ]
+                    print(", ".join(log_str))
+                    self.metrics = {}
+
+                if self.logger is not None:
+                    self.logger.log(
+                        log_dict,
+                        step=self.step,
+                        split="train",
+                    )
+
+                # Evaluate on val set after every `eval_every` iterations.
+                if self.step % eval_every == 0: # or self.step == 2:
+                    self.save(
+                        checkpoint_file="checkpoint.pt", training_state=True
+                    )
+
+                    if self.test_loader is not None:
+                        test_metrics = self.validate(
+                            split="test",
+                            disable_tqdm=disable_eval_tqdm,
+                        )
+                    else:
+                        test_metrics = None
+
+                    if self.val_loader is not None:
+                        val_metrics = self.validate(
+                            split="val",
+                            disable_tqdm=disable_eval_tqdm,
+                        )
+                        # if the val_mae is the best so far, update and predict
+                        if (
+                            val_metrics[
+                                self.evaluator.task_primary_metric[self.name]
+                            ]["metric"]
+                            < self.best_val_mae
+                        ):
+                            self.best_val_mae = val_metrics[
+                                self.evaluator.task_primary_metric[self.name]
+                            ]["metric"]
+                            self.save(
+                                metrics=val_metrics,
+                                checkpoint_file="best_checkpoint.pt",
+                                training_state=False,
+                            )
+                            if self.test_loader is not None and not self.is_hpo:
+                                self.predict(
+                                    self.test_loader,
+                                    results_file="predictions",
+                                    disable_tqdm=False,
+                                )
+                                
+
+                        if self.is_hpo:
+                            self.hpo_update(
+                                self.epoch,
+                                self.step,
+                                self.metrics,
+                                val_metrics,
+                                test_metrics,
+                            )
+
+                if self.scheduler.scheduler_type == "ReduceLROnPlateau":
+                    if self.step % eval_every == 0:
+                        self.scheduler.step(
+                            metrics=val_metrics[primary_metric]["metric"],
+                        )
+                else:
+                    self.scheduler.step()
+
+            torch.cuda.empty_cache()
+
+        self.train_dataset.close_db()
+        if "val_dataset" in self.config:
+            self.val_dataset.close_db()
+        if "test_dataset" in self.config:
+            self.test_dataset.close_db()
+
+    def _forward(self, batch_list):
+        output = self.model(batch_list)
+        # print(output)
+
+        # for oi, oo in enumerate(output):
+            # print(output[oi])
+        if output[0].shape[-1] == 1:
+            eng_out = output[0].view(-1)
+        else:
+            # print('**')
+            # print(output[0])
+            eng_out = output[0]
+
+        return {
+            "energy": eng_out,
+            # "classify": torch.abs(output[1].squeeze()),
+            "classify": output[1].squeeze(),
+        }
+
+    def _compute_loss(self, out, batch_list):
+        energy_target = torch.cat(
+            [batch.y_relaxed.to(self.device) for batch in batch_list], dim=0
+        )
+        # print(energy_target)
+
+        class_target = torch.cat(
+            [batch.tags.to(self.device) - self.min_target for batch in batch_list], dim=0
+        )
+
+        if self.normalizer.get("normalize_labels", False):
+            print(self.normalizers["target"])
+            target_normed = self.normalizers["target"].norm(energy_target)
+        else:
+            target_normed = energy_target
+
+        # print(target_normed)
+        # print(class_target)
+
+        loss1 = self.loss_fn["graph_classify"](out["energy"], target_normed) 
+        loss2 = self.loss_fn["node_classify"](out["classify"], class_target)
+
+        # print(loss1 / loss2)
+
+        loss = loss1 + loss2 * self.loss_balance
+
+        return loss
+
+    def _compute_metrics(self, out, batch_list, evaluator, metrics={}):
+        energy_target = torch.cat(
+            [batch.y_relaxed.to(self.device) for batch in batch_list], dim=0
+        )
+
+        class_target = torch.cat(
+            [batch.tags.to(self.device) - self.min_target for batch in batch_list], dim=0
+        )
+
+        if self.normalizer.get("normalize_labels", False):
+            out["energy"] = self.normalizers["target"].denorm(out["energy"])
+
+        # print(out["energy"].shape)
+        # print(out["classify"].shape)
+        # print(energy_target.shape)
+        # print(class_target.shape)
+
+        # sys.exit()
+
+        metrics = evaluator.eval(
+            out,
+            {"energy": energy_target,
+             "classify": class_target
+             },
+            prev_metrics=metrics,
+        )
+
+        return metrics

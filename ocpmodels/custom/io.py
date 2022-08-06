@@ -10,6 +10,7 @@ import pickle
 import lzma
 
 import os
+import sys
 
 from ocpmodels.datasets import SinglePointLmdbDataset
 from ocpmodels.custom.plot_and_filter import sids2inds
@@ -31,7 +32,7 @@ def read_lzma_to_atoms(inpfile, ofile='temp.extxyz'):
     atoms = ase.io.read(ofile, "-1")
     return atoms
 
-def write_lmbd(data_objects, target_col, location, filename):
+def write_lmbd(data_objects, target_col, location, filename, append=False):
     
     ## data_objects must be iterable of Data()
     
@@ -44,6 +45,11 @@ def write_lmbd(data_objects, target_col, location, filename):
         map_async=True,
     )
 
+    if append:
+        adder = env.stat()["entries"]
+    else:
+        adder = 0
+
     target = []
     for fid, data in enumerate(data_objects):
 
@@ -53,7 +59,8 @@ def write_lmbd(data_objects, target_col, location, filename):
         data.fid = fid # becomes ind
 
         # compute mean and std.
-        target.append(data.y_relaxed)
+        if target_col is not None:
+            target.append(data[target_col])
 
         # no neighbor edge case check
         if data.edge_index.shape[1] == 0:
@@ -61,7 +68,7 @@ def write_lmbd(data_objects, target_col, location, filename):
             continue
 
         txn = db.begin(write=True)
-        txn.put(f"{fid}".encode("ascii"), pickle.dumps(data, protocol=-1))
+        txn.put(f"{fid + adder}".encode("ascii"), pickle.dumps(data, protocol=-1))
         txn.commit()
 
         # txn = db.begin(write=True)
@@ -71,8 +78,12 @@ def write_lmbd(data_objects, target_col, location, filename):
 
     db.close()
     
-    mean = np.mean(target)
-    std = np.std(target)
+    if target_col is not None:
+        mean = np.mean(target)
+        std = np.std(target)
+    else:
+        mean = None
+        std = None
 
     return mean, std
 
@@ -138,6 +149,14 @@ def reshuffle_lmdb_splits(base_lmdb, splits, outdir = os.getcwd(), ood=False):
         trainsids = pd.merge(merged.reset_index(), traingroups, on=domain_cols, how='inner')
         valsids = pd.merge(merged.reset_index(), valgroups, on=domain_cols, how='inner')
         testsids = pd.merge(merged.reset_index(), testgroups, on=domain_cols, how='inner')
+
+        # print(trainsids.loc[trainsids['ads_id'].isin(testsids['ads_id'])])
+        # print(testsids.loc[testsids['ads_id'].isin(trainsids['ads_id'])])
+
+        # print(trainsids.loc[trainsids['bulk_mpid'].isin(testsids['bulk_mpid'])])
+        # print(testsids.loc[testsids['bulk_mpid'].isin(trainsids['bulk_mpid'])])
+
+        # sys.exit()
 
         # convert to indices in base database
         ind_train = sids2inds(basedb, trainsids['index'].tolist())

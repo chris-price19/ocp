@@ -25,8 +25,11 @@ class Normalizer(object):
             return
 
         if mean is not None and std is not None:
-            self.mean = torch.tensor(mean).to(device)
-            self.std = torch.tensor(std).to(device)
+            self.mean = torch.tensor(mean, dtype=torch.float).to(device)
+            self.std = torch.tensor(std, dtype=torch.float).to(device)
+
+            # print(self.mean.device)
+            # print(self.std.device)
 
     def to(self, device):
         self.mean = self.mean.to(device)

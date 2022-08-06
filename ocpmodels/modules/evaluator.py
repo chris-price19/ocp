@@ -7,6 +7,7 @@ LICENSE file in the root directory of this source tree.
 
 import numpy as np
 import torch
+from sklearn.metrics import f1_score
 
 
 """
@@ -47,35 +48,52 @@ class Evaluator:
             "positions_mse",
         ],
         "is2re": ["energy_mae", "energy_mse", "energy_within_threshold"],
+        "multitask": ["energy_mae", "energy_mse", "energy_within_threshold", "f1_node"],
+        "multitask_thresh":["f1_graph", "f1_node"]
     }
 
     task_attributes = {
         "s2ef": ["energy", "forces", "natoms"],
         "is2rs": ["positions", "cell", "pbc", "natoms"],
         "is2re": ["energy"],
+        "multitask":["energy", "classify"],
+        "multitask_thresh":["energy", "classify"]
     }
 
     task_primary_metric = {
         "s2ef": "energy_force_within_threshold",
         "is2rs": "average_distance_within_threshold",
         "is2re": "energy_mae",
+        "multitask": "energy_mae",
+        "multitask_thresh": "f1_graph"
     }
 
     def __init__(self, task=None):
-        assert task in ["s2ef", "is2rs", "is2re"]
+        assert task in ["s2ef", "is2rs", "is2re", "multitask", "multitask_thresh"]
         self.task = task
+        # print(self.task)
         self.metric_fn = self.task_metrics[task]
 
     def eval(self, prediction, target, prev_metrics={}):
         for attr in self.task_attributes[self.task]:
             assert attr in prediction
             assert attr in target
-            assert prediction[attr].shape == target[attr].shape
+            if len(prediction[attr].shape) == 0 or len(target[attr].shape) == 0:
+                print(prediction[attr])
+                print(target[attr])
+                sys.exit()
+            # print(attr)
+            # print(prediction[attr].shape)
+            # print(target[attr].shape)
+            assert prediction[attr].shape[0] == target[attr].shape[0]
 
         metrics = prev_metrics
 
         for fn in self.task_metrics[self.task]:
+            # print(prediction)
+            # print(target)
             res = eval(fn)(prediction, target)
+            # print(fn)
             metrics = self.update(fn, res, metrics)
 
         return metrics
@@ -96,6 +114,8 @@ class Evaluator:
                 metrics[key]["total"] / metrics[key]["numel"]
             )
         elif isinstance(stat, float) or isinstance(stat, int):
+            # print(stat)
+            # sys.exit()
             # If float or int, just add to the total and increment numel by 1.
             metrics[key]["total"] += stat
             metrics[key]["numel"] += 1
@@ -107,6 +127,25 @@ class Evaluator:
 
         return metrics
 
+def f1_node(prediction, target):
+    # correct = torch.sum(torch.argmax(prediction["classify"], dim=1) == target)
+    preds = torch.argmax(prediction["classify"], dim=1).cpu()
+    # print(target.keys())
+    # print(preds.shape)
+    # print(target["classify"].shape)
+    f1 = f1_score(target["classify"].cpu(), preds, labels=torch.unique(target["classify"]).cpu(), average='weighted')
+    # print(target["classify"])
+    # print(preds)
+    # print(f1)
+    # sys.exit()
+    return f1
+
+def f1_graph(prediction, target):
+
+    preds = torch.argmax(prediction["energy"], dim=1).cpu()
+    f1 = f1_score(target["energy"].cpu(), preds, labels=torch.unique(target["energy"]).cpu(), average='weighted')
+
+    return f1
 
 def energy_mae(prediction, target):
     return absolute_error(prediction["energy"], target["energy"])

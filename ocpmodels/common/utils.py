@@ -21,7 +21,7 @@ from bisect import bisect
 from itertools import product
 from pathlib import Path
 
-import demjson
+# import demjson3
 import numpy as np
 import pandas as pd
 import torch
@@ -327,6 +327,8 @@ def load_config(path: str, previous_includes: list = []):
 
     direct_config = yaml.safe_load(open(path, "r"))
 
+    # print(direct_config)
+
     # Load config from included files.
     if "includes" in direct_config:
         includes = direct_config.pop("includes")
@@ -352,8 +354,13 @@ def load_config(path: str, previous_includes: list = []):
         config, merge_dup_error = merge_dicts(config, include_config)
         duplicates_error += merge_dup_error
 
+    # print(config["checkpoint"])
+    # print(direct_config)
+    # sys.exit()
     # Duplicates between included and main file causes warnings
     config, merge_dup_warning = merge_dicts(config, direct_config)
+    # print(config["checkpoint"])
+    # print(direct_config["checkpoint"])
     duplicates_warning += merge_dup_warning
 
     return config, duplicates_warning, duplicates_error
@@ -361,6 +368,7 @@ def load_config(path: str, previous_includes: list = []):
 
 def build_config(args, args_override):
     config, duplicates_warning, duplicates_error = load_config(args.config_yml)
+
     if len(duplicates_warning) > 0:
         logging.warning(
             f"Overwritten config parameters from included configs "
@@ -378,6 +386,12 @@ def build_config(args, args_override):
         config, _ = merge_dicts(config, overrides)
 
     # Some other flags.
+    # print(args.distributed_backend)
+    # # print(args.run_dir)
+    # print(config["distributed_backend"])
+    # # sys.exit()
+    # print(args.amp)
+
     config["mode"] = args.mode
     config["identifier"] = args.identifier
     config["timestamp_id"] = args.timestamp_id
@@ -387,7 +401,7 @@ def build_config(args, args_override):
     config["is_vis"] = args.vis
     config["print_every"] = args.print_every
     config["amp"] = args.amp
-    config["checkpoint"] = args.checkpoint
+    config["checkpoint"] = args.checkpoint if "checkpoint" not in config.keys() else config["checkpoint"]
     config["cpu"] = args.cpu
     # Submit
     config["submit"] = args.submit
@@ -398,6 +412,13 @@ def build_config(args, args_override):
     config["world_size"] = args.num_nodes * args.num_gpus
     config["distributed_backend"] = args.distributed_backend
 
+    if args_override != []:
+        overrides = create_dict_from_args(args_override)
+        config, _ = merge_dicts(config, overrides)
+        
+    # print(config["checkpoint"])
+    # print(config["strict_load"])
+    # sys.exit()
         # Check for overriden parameters.
     # if args_override != []:
     #     print('overriding')
@@ -412,12 +433,50 @@ def build_config(args, args_override):
     #     dd["target_std"] = datastats['std'].values[0]
 
     # read mean, std from target.stats, apply to training dataset (dataset[0])
-    if os.path.isfile(os.path.dirname(config["dataset"][0]["src"]) + '/target.stats'):
-        datastats = pd.read_csv(os.path.dirname(config["dataset"][0]["src"]) + '/target.stats', sep='\t')
-        config["dataset"][0]["target_mean"] = datastats['mean'].values[0]
-        config["dataset"][0]["target_std"] = datastats['std'].values[0]
+    if os.path.isfile(os.path.dirname(config["dataset"][0]["src"]) + '/data.stats'):
+        datastats = pd.read_csv(os.path.dirname(config["dataset"][0]["src"]) + '/data.stats', index_col=0)
+        # print(datastats)
+
+        ## energy regression
+        if 'target' in datastats.index.values:
+            print('config1')
+            config["dataset"][0]["target_mean"] = datastats.loc['target']['mean'] # .values[0]
+            config["dataset"][0]["target_std"] = datastats.loc['target']['std']
+
+        ### input datastats
+        if 'strain_xx' in datastats.index.values:
+            print('config2')
+            config["dataset"][0]["data_mean"] = datastats.filter(regex='strain', axis=0)['mean'].values
+            config["dataset"][0]["data_std"] = datastats.filter(regex='strain', axis=0)['std'].values
+            config["model"]["max_atoms"] = int(datastats.loc["max_atoms"]["mean"])
+
+        ### regular node level target stuff
+        if 'global_min_target' in datastats.index.values:
+            print('config3')
+            config["task"]["num_targets"] = int(datastats.loc["num_targets"]["mean"])
+            config["task"]["num_graph_targets"] = 1
+            config["task"]["num_node_targets"] = config["task"]["num_targets"] - config["task"]["num_graph_targets"]
+            config["dataset"][0]["global_min_target"] = int(datastats.loc["global_min_target"]["mean"])
+            config["dataset"][0]["node_class_weights"] = torch.FloatTensor(datastats.filter(regex='class', axis=0)['mean'].values)
+
+        ### energy threshold section
+        if 'num_graph_targets' in datastats.index.values:
+            print('config4')
+            config["dataset"][0]["global_min_target"] = int(datastats.loc["global_min_node_target"]["mean"])
+
+            config["task"]["num_graph_targets"] = int(datastats.loc["num_graph_targets"]["mean"])
+            config["task"]["num_node_targets"] = int(datastats.loc["num_node_targets"]["mean"])
+           
+            config["dataset"][0]["graph_class_weights"] = torch.FloatTensor(datastats.filter(regex='graph_class', axis=0)['mean'].values)
+            config["dataset"][0]["node_class_weights"] = torch.FloatTensor(datastats.filter(regex='node_class', axis=0)['mean'].values)
+        # if 'num_node_targets' in datastats.index.values:
+           
+            config["task"]["num_targets"] = config["task"]["num_node_targets"] + config["task"]["num_graph_targets"]
 
     print(config)
+    print(config["task"])
+    print(config["dataset"][0])
+    # sys.exit()
 
     return config
 

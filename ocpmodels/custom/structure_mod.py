@@ -13,6 +13,8 @@ import pymatgen.transformations.standard_transformations as ptrans
 from pymatgen.core.structure import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
+from copy import deepcopy
+
 from numpy.random import default_rng
 
 class StrainTensor:
@@ -71,6 +73,8 @@ def generate_strain_tensors(number_of_tensors, max_mag = 0.01, man_override = No
 
     return strain_tensor_list
 
+# def bespoke_strain(strain_list)
+
 def strain_atoms(atoms, eps):
 
     ## eps is a 3x3 deformation gradient matrix (symmetric)
@@ -102,3 +106,33 @@ def strain_atoms(atoms, eps):
     return strainatoms
 
 
+def reflect_atoms(atoms1):
+    
+    flippedatoms = atoms1.copy()
+#     print(flippedatoms.info)
+    
+    savex = deepcopy(flippedatoms.positions[:,0])
+    savey = deepcopy(flippedatoms.positions[:,1])
+    savecell = deepcopy(flippedatoms.cell)
+
+    flippedatoms.positions[:,0] = savey
+    flippedatoms.positions[:,1] = savex
+    flippedatoms.cell[0,0] = savecell[1,1]
+    flippedatoms.cell[0,1] = savecell[1,0]
+    flippedatoms.cell[1,0] = savecell[0,1]
+    flippedatoms.cell[1,1] = savecell[0,0]
+
+    savestrain = deepcopy(flippedatoms.info['og_strain'])
+    newstrain = np.eye(3)
+    
+    newstrain[0,0] = savestrain[1,1]
+    newstrain[1,0] = savestrain[0,1]
+    newstrain[0,1] = savestrain[1,0]
+    newstrain[1,1] = savestrain[0,0]
+    
+    flippedatoms.info['og_strain'] = newstrain
+    flippedatoms.info['strain'] = np.expand_dims((flippedatoms.info['og_strain'] - np.eye(3))[0:2,0:2].flatten(),0)*100.
+    flippedatoms.info['hand'] = 'L'
+#     print(flippedatoms.info)
+    
+    return flippedatoms
